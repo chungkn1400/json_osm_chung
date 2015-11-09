@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html>
+<!-- json_osmall_webgl_shadow a program by NGUYEN.Chung (2015) 
+openstreetmap roads to html5 array 
+shadows without depth texture for basic webgl -->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+<body bgcolor="#FFFFFF" onunload="close();" onKeyUp="keyup(event);" onKeyDown="keydown(event);" >
+	<div id="mydiv" style="position:absolute;top:0px;left:0px;z-index:200;" >
+	<canvas id="canvas" style="border:none;top:0px;left:0px;" width="600" height="400"></canvas>
+    </div>
+	<div id="mydiv2" style="position:absolute;top:0px;left:0px;z-index:100;" >
+	<canvas id="canvasgl" style="border:red 1px solid;top:0px;left:0px;" width="600" height="400"></canvas>
+	<br />
+	<button id="fullscreen"  onclick="sizescreen();">fullscreen</button>
+	<select id="combo" onChange="subcombo();" onblur="tfocus=1;waitkey=0;" onfocus="tfocus=0;waitkey=0;">
+          <option id="initial">initial</option>
+          <option id="deauville marinas">deauville marinas</option>
+          <option id="deauville plage">deauville plage</option>
+          <option id="trouville plage">trouville plage</option>
+          <option id="nancy">nancy</option>
+          <option id="crickvenica">crickvenica</option>
+          <option id="paris tolbiac">paris tolbiac</option>
+          <option id="paris defense">paris defense</option>
+          <option id="ivry romain roland">ivry romain roland</option>
+          <option id="orsay">orsay</option>
+          <option id="le barcares">le barcares</option>
+          <option id="jerusalem">jerusalem</option>
+          <option id="marseille">marseille</option>
+          <option id="nice">nice</option>
+          <option id="arcachon">arcachon</option>
+          <option id="grenoble">grenoble</option>
+          <option id="san francisco">san francisco</option>
+          <option id="new york">new york</option>
+          <option id="atlanta">atlanta</option>
+          <option id="rio">rio</option>
+          <option id="hong kong">hong kong</option>
+          <option id="athenes">athenes</option>
+          <option id="perth">perth</option>
+          <option id="le caire">le caire</option>
+          <option id="washington">washington</option>
+          <option id="tajmahal">tajmahal</option>
+     </select>
+	 <input type="text"  readonly="readonly" id="msg" maxlength="65" size="65" />
+     </div>
+<script src="https://maps.googleapis.com/maps/api/js?v=3" type="text/javascript" ></script>
+<script src="glMatrix-0.9.5.min.js"></script>
+<script src="webgl-utils.js"></script>
+<script src="base64binary.js"></script>
+<script src="vk_keys.js"></script>
+<script id="shader-fs2" type="x-shader/x-fragment">
+    precision lowp float;
+    //precision mediump float;
+	//precision highp float;
+
+    //varying vec2 vTextureCoord;
+	varying float z;
+
+    uniform sampler2D uSampler;
+	uniform vec4 ucolor;
+
+float k255=255.0;
+vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
+  if(v>5000.0){return vec4(1.0,1.0,1.0,1.0);}
+  vec4 enc = vec4(1.0, k255, 65025.0, 160581375.0) * v/5000.0;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/k255,1.0/k255,1.0/k255,1.0/k255);
+  return enc;
+}
+float decodefloatrgba( vec4 rgba ) {
+  return dot( rgba, vec4(1.0, 1.0/k255, 1.0/65025.0, 1.0/160581375.0) )*5000.0;
+}
+
+  void main(void) {
+        //gl_FragColor = texture2D(uSampler, vTextureCoord);
+	    //float z=gl_FragCoord.z;
+		if(z<1.0){discard;}
+        else{
+   gl_FragColor=encodefloatrgba(z);
+		}		 		
+    }
+</script>
+<script id="shader-vs2" type="x-shader/x-vertex">
+    //precision lowp float;
+	//precision highp float;
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+	//varying vec2 vTextureCoord;
+    varying float z;
+
+    void main(void) {
+        vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
+		gl_Position = uPMatrix *xyz;
+        vec2 vTextureCoord = aTextureCoord;
+		//z=-gl_Position.z;
+		z=-xyz.z;
+		if(z<1.0){z=0.0;}
+		//z=floor(z*20.0)/20.0;
+		z=z*z/5000.0;
+    }
+</script>
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision lowp float;
+    //precision mediump float;
+	//precision highp float;
+
+    varying vec2 vTextureCoord;
+    varying vec2 vTextureCoord2;
+	varying float z;
+
+    uniform sampler2D uSampler;
+	uniform vec4 ucolor;
+    uniform sampler2D uSampler2;
+
+	float k255=255.0;
+float decodefloatrgba( vec4 rgba ) {
+  return dot( (rgba), vec4(1.0, 1.0/k255, 1.0/65025.0, 1.0/160581375.0) )*5000.0;
+}
+    
+	void main(void) {
+        gl_FragColor = texture2D(uSampler, vTextureCoord);
+		if(ucolor.a>0.001){
+	     if(gl_FragColor.a<0.5){discard;}else{
+		   float s=vTextureCoord.y;
+		   float r,g,b;
+		   if(s<400.0){r=1.0;g=1.0;b=1.0;}
+		   else if(s<800.0){r=0.7;g=0.7;b=0.7;}
+		   else if(s<1200.0){r=0.4;g=0.4;b=0.4;}
+		   else if(s<1600.0){r=1.0;g=0.4;b=0.4;}
+		   else if(s<2000.0){r=0.7;g=0.7;b=1.5;}
+		   else if(s<2400.0){r=0.5;g=0.5;b=1.0;}
+		   else if(s<2800.0){r=1.0;g=1.0;b=0.5;}
+		   else if(s<3200.0){r=0.7;g=1.5;b=0.7;}
+		   else if(s<3600.0){r=0.5;g=1.0;b=0.5;}
+		   else{r=0.3;g=0.7;b=0.5;}
+		   vec4 xyz=texture2D(uSampler2, vTextureCoord2);
+		   float z0=decodefloatrgba(xyz);
+		   if(z>(z0+0.01)){r*=0.4;g*=0.4;b*=0.4;}
+		   gl_FragColor.a*=ucolor.a;
+		   gl_FragColor.r*=ucolor.r*r;
+		   gl_FragColor.g*=ucolor.g*g;
+		   gl_FragColor.b*=ucolor.b*b;
+		 }}		 		
+        //gl_FragColor = texture2D(uSampler2, vTextureCoord2);
+		//if(z<0.0){discard;}
+    }
+</script>
+<script id="shader-vs" type="x-shader/x-vertex">
+    //precision lowp float;
+	//precision highp float;
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat4 uMVMatrix2;
+    uniform mat4 uPMatrix2;
+
+    varying vec2 vTextureCoord;
+    varying vec2 vTextureCoord2;
+	varying float z;
+
+    void main(void) {
+        gl_Position = uPMatrix * (uMVMatrix * vec4(aVertexPosition, 1.0));
+        vTextureCoord = aTextureCoord;
+		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
+		vec4 pxyz=uPMatrix2*xyz;
+		z=-xyz.z;
+		if(z<1.0){z=0.0;}
+		//z=floor(z*20.0)/20.0;
+		z=z*z/5000.0;
+		float px=pxyz.x*0.5+0.5; 
+		float py=pxyz.y*0.5+0.5; 
+		vTextureCoord2.x=px; 
+		vTextureCoord2.y=py;
+        if(px<0.02 || px>0.98 || py<0.02 || py>0.98){z=0.0;} 		
+		//gl_Position=xyz;
+    }
+</script>
+<script>
+var windx=600,windy=400;
+var auxvar=null,auxvar2=null,auxvar3=null;
+var http="http:";
+if(document.location.href.indexOf("https")>=0){
+   http="https:";}
+//var overpass="//overpass.osm.rambler.ru/cgi/";
+var overpass="//overpass-api.de/api/";
+var url=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%2850.746%2C7.154%2C50.78%2C7.27%29%3Bout%20skel%203%3B";
+//url=http+"//overpass-api.de/api/xapi?map?bbox=7.012854,51.450317,7.016477,51.452105";
+//url=http+"//overpass-api.de/api/interpreter?data=node[name=\"Gielgen\"];out;";
+
+var wayjson,nodejson,ways,waynodes,nodes,waytype;
+var latnodes=[],lonnodes=[];
+var dlat=0.005,dlon=0.008;
+var lat=48.765,lng=2.20;
+lat=48.826125291730506;lng=2.3570559500472212;
+var lat1=lat-dlat/2,lon1=lng-dlon/2;
+var lat2=lat+dlat/2,lon2=lng+dlon/2;
+var wayurl=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+var nodeurl=http+overpass+"interpreter?data=[out:json];%28node%28371597318%29;node%28371597317%29%29%3Bout%20skel%209%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%2099%3B";
+//wayurl=http+overpass+"interpreter?data=[out:json];way[highway~'motorway|trunk|primary']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+//wayurl=http+overpass+"interpreter?data=[out:json];way[highway~'motorway|trunk']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+//wayurl=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
+var nodekey,nodekey2,nodekey3,nkeymax=450;
+//nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
+function waycallback(r){//alert(r);
+  wayjson=JSON.parse(r);
+  var msg="",ntest=0;
+  nnode=0;
+  ways=null;
+  ways=wayjson.elements;
+  msg+="len="+ways.length;
+  for(var i=0;i<ways.length;i++){
+   var way=(ways[i]);
+   /*msg+="/ "+way.type+" id="+way.id+" "
+   waytype="none";
+   if(way.tags){if(way.tags.highway){
+      waytype=way.tags.highway;}}
+   msg+=waytype;*/	  
+   for(var j=0;j<way.nodes.length;j++){
+      //if(i<2){msg+="/"+way.nodes[j];};
+	  nnode+=1;
+	  }
+   }
+  //alert("nnode="+nnode+" "+msg);
+  setTimeout("getnodes();",20);
+}
+function nodecallback(r){//alert(r);
+  nodejson=JSON.parse(r);
+  var msg="";
+  nodes=null;
+  nodes=nodejson.elements;
+  msg+="len="+nodes.length;
+  if(resetnode==1){latnodes=[];lonnodes=[];}
+  for(var i=0;i<nodes.length;i++){
+     if(i<5){
+	  msg+="/ nodeid="+nodes[i].id;
+	  msg+=" lat="+nodes[i].lat;
+	  msg+=" lon="+nodes[i].lon;
+	  }
+	 var inode=nodes[i].id; 
+	 latnodes[inode]=nodes[i].lat;
+     lonnodes[inode]=nodes[i].lon;	 
+	 }
+  //alert(msg);
+  
+     tdraw=1;//draw();	 
+}
+var loading=0,tdraw=0,klon=1; 
+function getways(){
+if(loading==1){return;}
+loading=1;
+lat=latx+sin1*dxmax*0.4/scale;
+lng=lngx+cos1*dxmax*0.4*dlon/scale;
+lat=Math.max(-87,Math.min(87,lat));
+lng=Math.max(-179,Math.min(179,lng));
+klon=1/Math.cos(3.1416*lat/180);
+dlon=dlat*klon;
+var kx=1;
+lat1=lat-kx*dlat/2;lon1=lng-kx*dlon/2;
+lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
+context.font = "12pt Arial";
+context.fillText("loading...",20,80);
+//wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
+//var keyway="[highway~'motorway|trunk|primary|secondary']";
+var keyway="[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']";
+//var keyway="[highway~'motorway|trunk|primary|secondary|tertiary|residential']";
+var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
+//keyway="(way['building:height']"+latlon+";way['building:levels']"+latlon+")";
+//keyway="(way['building:height']"+latlon+";way['height']"+latlon+";way['building:levels']"+latlon+")";
+//keyway="[building~'tower|apartment|commercial']";
+keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+")";
+//keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
+//wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3B";
+try{		
+httpGet(wayurl,waycallback);
+}catch (e){alert("error getways");loading=0;}
+}
+var resetnode=0,tgetnode=1;
+function getnodes(){
+lat1=lat-dlat/2;lon1=lng-dlon/2;
+lat2=lat+dlat/2;lon2=lng+dlon/2;
+//nodeurl=http+overpass+"interpreter?data=[out:json];"+nodekey+"%3Bout%20skel%209999%3B";
+var dx=0.001;
+var lat11=lat1-dx,lon11=lon1-dx;
+var lat21=lat2+dx,lon21=lon2+dx;
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2019999%3B";
+resetnode=1;tgetnode=1;
+try{		
+httpGet(nodeurl,nodecallback);
+}catch (e){alert("error getnodes");loading=0;}
+}
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var gl,contextgl;
+var canvasgl = document.getElementById('canvasgl');
+//var contextgl = canvasgl.getContext('2d');
+canvasgl.width=windx;
+canvasgl.height=windy;
+function initwebgl(){
+ initGL(canvasgl);
+ initShaders();
+ initTexture();
+ initBuffers();
+ setTimeout("tick(0);",500);
+}
+//contextgl.strokeStyle = '#ffff00';
+//contextgl.lineWidth = 50;
+//line(0,0,300,300);
+context.width=windx;
+context.height=windy;
+context.lineWidth = 3;
+context.fillStyle = '#ff0000';
+context.font = "12pt Arial";
+function line(x,y,x1,y1){
+contextgl.beginPath();
+contextgl.moveTo(x,y);
+contextgl.lineTo(x1,y1);
+contextgl.stroke();
+}
+function draw(){
+context.clearRect (0,0,windx,windy);
+context.font = "12pt Arial";
+for(var i=0;i<ways.length;i++){
+   var way=(ways[i]),test=1;
+   waytype="none";
+   if(way.tags){if(way.tags.highway){
+      waytype=way.tags.highway;}}
+   if(way.tags){if(way.tags.building){
+      waytype="building";}}
+   //if(waytype=="none" || waytype=="path"){
+   //  test=0;}
+   if(waytype=="building"){
+     context.lineWidth = 1;
+     context.strokeStyle = '#008fff';
+   }else if(waytype=="motorway"){
+     context.lineWidth = 4;
+     context.strokeStyle = '#ff0000';
+   }else if(waytype=="trunk"){
+     context.lineWidth = 3;
+     context.strokeStyle = '#cf0000';
+   }else if(waytype=="track"){
+     context.lineWidth = 3;
+     context.strokeStyle = '#9f8000';
+   }else if(waytype=="primary"){
+     context.lineWidth = 2;
+     context.strokeStyle = '#4f9f00';
+   }else if(waytype=="secondary"){
+     context.lineWidth = 1;
+     context.strokeStyle = '#00ff00';
+   }else if(waytype=="tertiary"){
+     context.lineWidth = 1;
+     context.strokeStyle = '#008f00';
+   }else{//test=0;
+     context.lineWidth = 1;
+     context.strokeStyle = '#000000';
+   }
+   if(test==1){
+   context.beginPath();
+   for(var j=0;j<way.nodes.length;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){  
+	   var y=windy-windy*(latnodes[inode]-lat1)/(lat2-lat1);
+	   var x=windx*(lonnodes[inode]-lon1)/(lon2-lon1);
+	   if(j==0){context.moveTo(x,y);}
+	   else{context.lineTo(x,y);}
+	 }  
+   }
+   context.stroke();
+   if(waytype=="building"){
+      context.fillStyle = '#dfefff';
+	  context.fill();}	  
+   }}
+   context.fillStyle = '#ff0000';
+   context.fillText("lat="+lat1+" lon="+lon1,20,20);
+   context.fillText("nways="+i+" nnodes="+nnode,20,40);
+   //alert("drawways="+i);
+}
+function timer(){
+return Date.now();
+//return (new Date()).getTime();//ms
+}
+var keys=new Array(256),keys0=new Array(256),tkeys=new Array(256),tkey=0;
+var pkeys=new Array(256);
+function resetkeys(){
+ for(var i=0;i<256;i++){keys[i]=0;keys0[i]=0;tkeys[i]=0;}
+}
+resetkeys();
+function keydown(e){
+var key=eval(e.which || e.keyCode)
+var t=timer();
+if(key>0 && key<256){keys[key]=1;tkeys[key]=t;keys0[key]=1;}
+}
+function keyup(e){
+var key=eval(e.which || e.keyCode)
+if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
+}
+function subhelp(){
+var crlf=String.fromCharCode(13)+String.fromCharCode(10);
+var msg="H => help "+crlf;
+msg+="3 => fullscreen"+crlf;
+msg+="shift+G => flyto geolocation"+crlf;
+msg+="shift+T => change time hour"+crlf;
+msg+="M => map"+crlf;
+msg+="pageup/pagedown => look up/down"+crlf;
+alert(msg);
+document.getElementById('msg').focus();
+}
+var quit=0,tmsg=0,lat0=lat,lng0=lng,latx=lat,lngx=lng;
+var scale=0.3*windy/dlat,x0=x,y0=y,tmove=0;
+function close(){quit=1;}
+var tmap=0,dxmax=12;
+function testkeys(){
+var test=0,v=0.0000002*dtime;
+if(keys[vk_up]){latx+=v*sin1;lngx+=v*cos1*klon;test=1;}
+if(keys[vk_down]){latx-=v*sin1;lngx-=v*cos1*klon;test=1;}
+if(keys[vk_left]){o1+=dtime*0.04;}
+if(keys[vk_right]){o1-=dtime*0.04;}
+if(keys[vk_page_up]){o2+=dtime*0.04;}
+if(keys[vk_page_down]){o2-=dtime*0.04;}
+if(keys[vk_3]){keys[vk_3]=0;sizescreen();}
+if(keys[vk_h]){keys[vk_h]=0;subhelp();}
+if(keys[vk_g] && keys[vk_shift]){keys[vk_g]=0;geolocate();}
+if(keys[vk_m]){tmap+=1;
+   if(tmap>3){tmap=0;
+              canvas.height = parseInt(canvasgl.height/3);
+			  context.clearRect(0,0,windx,windy);}
+   else{canvas.height = parseInt(canvasgl.height);}
+   resetkeys();}
+if(keys[vk_t] && keys[vk_shift]) {thour+=3.5;if(thour>24){thour-=24;};
+    hour=new Date().getHours()+thour;
+	while(hour>24){hour-=24;}
+	while(hour<0){hour+=24;}
+	updatesun();tmove=1;
+    alert("timehour = "+hour);resetkeys();}
+x=((lngx-lng0)/klon)*scale;
+y=(latx-lat0)*scale;
+if(tmove==0){tmove=test;}
+if(test==1 && loading==0){
+ test=0;
+ if(Math.max(Math.abs(x-x0),Math.abs(y-y0))>dxmax){test=1;}
+}else{test=0;}
+if(test==1 && loading==0){test=0;loading=2;
+   //resetkeys();
+   getways();
+   }
+if(tframe>tmsg+200){
+   tmsg=tframe;
+   var msg="arrow keys => move  /";
+   msg+=" x="+parseInt(x*10)/10;
+   msg+=" y="+parseInt(y*10)/10;
+   msg+=" o1="+parseInt(o1*10)/10;
+   msg+=" fps="+parseInt(fps*10)/10;
+   if(auxvar!=null){msg+=" aux="+auxvar;}
+   if(auxvar2!=null){msg+=" aux2="+auxvar2;}
+   if(auxvar3!=null){msg+=" aux3="+auxvar3;}
+   document.getElementById('msg').value=msg;
+   }  
+   
+    if(o2>85){o2=84;o1=180+o1-o3;o3=180;};
+    if(o2<-85){o2=-84;o1=180+o1+o3;o3=0;};
+	while(o1>180){o1-=360;} 
+	while(o1<-180){o1+=360;}
+	while(o3>180){o3-=360;}
+	while(o3<-180){o3+=360;}
+    cos1=Math.cos(degtorad(o1));sin1=Math.sin(degtorad(o1));
+    cos2=Math.cos(degtorad(o2));sin2=Math.sin(degtorad(o2));
+    cos3=Math.cos(degtorad(o3));sin3=Math.sin(degtorad(o3));
+}
+var x=0,y=0,z=0,o1=0,o2=-10,o3=0,vrun=1.10;
+var cos1=0,sin1=0,cos2=0,sin2=0,cos3=0,sin3=0,do1=0,do2=0,do3=0; 
+var xmin=-30000,xmax=30000,ymin=-30000,ymax=30000;
+
+    var tframe=0,tframe0=0,tfps=30,fps=10,dtime=1,tmsg=0,clearr,clearg,clearb,tskip=0;
+	var ttimeout=0,testloop=0,tskip2=0,tsrtm=0,itime=0;
+	function tick(tt) {
+	    itime+=1;if(itime>10000){itime=0;}
+        //requestAnimFrame(tick);
+        if(quit==0 && testloop==0 && ttimeout==0){testloop=1;requestAnimationFrame(tick);
+        }else{testloop=0;};
+		testkeys();
+		tskip=0;
+		//if(x<xmin){x+=xmax-xmin;tskip=1;};
+		//if(x>xmax){x-=xmax-xmin;tskip=1;};
+		//if(y<ymin){y+=ymax-ymin;tskip=1;};
+		//if(y>ymax){y-=ymax-ymin;tskip=1;};
+		if(tframe<tskip2+100){tskip=1;}
+        gl.clearColor(1,1,1, 1.0);
+		if(tskip==0 && tmove==1 && (itime%5)==0){tmove=0;drawrttshadow();};
+        if(tskip==0){drawScene();}
+	    if(tdraw==1){tdraw=0;drawgl();}
+		if(tmap==1){tmap=2;draw();
+		            setTimeout("draw();",500);}
+		if(tupdatesoltexture==1){
+		    tupdatesoltexture=0;
+			latsol0=latsol;lngsol0=lngsol;
+			handleLoadedTexture(solTexture);}
+		tframe0=tframe;
+		tframe=timer();
+		dtime=tframe-tframe0;
+		if(dtime>1000){dtime=1000;}
+		tfps+=(tframe-tframe0-tfps)*0.2;
+		if(tfps<1){tfps=1;}
+		if(tfps>1000){tfps=1000;}
+		fps=1000/tfps;
+		var dt=(tframe0+25-tframe);
+		if(dt<10){dt=10};
+		if(quit==0 && ttimeout){timeouttick=setTimeout("tick(0);",dt);
+           }else{
+		   //if(tclose==0){requestAnimationFrame(tick);};
+           if(quit==0 && testloop==0){testloop=1;requestAnimFrame(tick);
+		     }else{testloop=0;};}
+    }
+//getways();
+document.getElementById('msg').focus();
+document.getElementById('msg').value="arrow keys => move";
+
+var icombo=0,combotext="";
+var flytolat=48.82612529173,flytolng=2.3570559500472;
+var flytoname="initial";
+function subcombo(){
+icombo=document.getElementById('combo').selectedIndex;
+combotext = document.getElementById('combo')[icombo].id ;
+var o1=0;
+lat=flytolat;lng=flytolng;
+if (combotext=="deauville marinas"){lat=49.36198047661674   ;lng=0.07262960190958628   ;o1=120;}
+if (combotext=="deauville plage"){lat=49.35600551121942   ;lng=0.06075459446313726   ;o1=110;}
+if (combotext=="trouville plage"){lat=49.36663106706898   ;lng=0.07818353983048315   ;o1=130;}
+if (combotext=="nancy"){lat=48.69306979368741   ;lng=6.182922715725031   ;o1=70;}
+if (combotext=="crickvenica"){lat=45.1734569955986   ;lng=14.689314428610118   ;o1=-110;}
+if (combotext=="paris tolbiac"){lat=48.826125291730506   ;lng=2.3570559500472212   ;o1=0;}
+if (combotext=="paris defense"){lat=48.891977155490395   ;lng=2.237673523003608   ;o1=160;}
+if (combotext=="ivry romain roland"){lat=48.80346335679542   ;lng=2.3934673532940915   ;o1=-50;}
+if (combotext=="orsay"){lat=48.706787   ;lng=2.180894999999964   ;o1=-30;}
+if (combotext=="le barcares"){lat=42.78764305091493   ;lng=3.0338932951133533   ;o1=175;} 
+if (combotext=="jerusalem"){lat=31.776636707589287   ;lng=35.2337121963501   ;o1=36.3920;}
+if (combotext=="marseille"){lat=43.2803905;lng=5.405139   ;o1=36.3920;}
+if (combotext=="nice"){lat=43.7031905;lng=7.252817  ;o1=36.3920;}
+if (combotext=="arcachon"){lat=44.6514284;lng=-1.171656  ;o1=36.3920;}
+if (combotext=="grenoble"){lat=45.1841656;lng=5.7155425 ;o1=36.3920;}
+if (combotext=="san francisco"){lat=37.7577;lng=-122.4376 ;o1=36.3920;}
+if (combotext=="new york"){lat=40.7033121;lng=-73.97968 ;o1=36.3920;}
+if (combotext=="atlanta"){lat=33.7677129;lng=-84.42060 ;o1=36.3920;}
+if (combotext=="rio"){lat=-22.8650853;lng=-43.13109 ;o1=36.3920;}
+if (combotext=="hong kong"){lat=22.3700556;lng=114.153758 ;o1=36.3920;}
+if (combotext=="athenes"){lat=37.9908372;lng=23.7383394 ;o1=36.3920;}
+if (combotext=="perth"){lat=-31.9546529;lng=115.852662 ;o1=36.3920;}
+if (combotext=="le caire"){lat=30.04441959;lng=31.23571160;o1=36.3920;}
+if (combotext=="washington"){lat=38.8850399;lng=-77.08054296;o1=36.3920;}
+if (combotext=="tajmahal"){lat=27.17015;lng=78.002155;o1=36.3920;}
+document.getElementById('msg').focus();
+latx=lat;lngx=lng;tmap=0;
+getways();
+}
+var xmlhttp;
+function httpGet(url,callback) 
+{
+  xmlhttp = new XMLHttpRequest();
+  if ("withCredentials" in xmlhttp) {
+    // Check if the XMLHttpRequest object has a "withCredentials" property.
+    // "withCredentials" only exists on XMLHTTPRequest2 objects.
+    //alert("withCredentials");
+	xmlhttp.open("GET", url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // Otherwise, check if XDomainRequest.
+    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+    xmlhttp = new XDomainRequest();
+	//alert("XDomainRequest");
+    xmlhttp.open("GET", url);
+  } else {
+    // Otherwise, CORS is not supported by the browser.
+    xmlhttp = null;
+	alert("cors crossdomain not supported by browser");
+	return;
+  }
+    xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {callback(xmlhttp.responseText);
+        }
+    }
+    //xmlhttp.open("GET", theUrl, false);
+    xmlhttp.send();    
+}
+function degtorad(degrees) {
+    return degrees * Math.PI / 180;
+}
+function initGL(canvasgl){
+       try {
+           gl = canvasgl.getContext("experimental-webgl");
+           //gl = canvasgl.getContext("webgl");
+		   gl.viewportWidth = canvasgl.width;
+           gl.viewportHeight = canvasgl.height;
+       } catch (e) {alert("error initGL");}
+       if (!gl) {
+           alert("Could not initialise WebGL, sorry :-(");
+       }
+}
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+
+
+    var shaderProgram,shader2Program;
+
+    function initShaders() {
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+        var fragmentShader2 = getShader(gl, "shader-fs2");
+        var vertexShader2 = getShader(gl, "shader-vs2");
+	
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shader");
+        }
+
+        shader2Program = gl.createProgram();
+        gl.attachShader(shader2Program, vertexShader2);
+        gl.attachShader(shader2Program, fragmentShader2);
+        gl.linkProgram(shader2Program);
+
+        if (!gl.getProgramParameter(shader2Program, gl.LINK_STATUS)) {
+            alert("Could not initialise shader2");
+        }
+
+        gl.useProgram(shaderProgram);
+
+        shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+        shaderProgram.pMatrixUniform2 = gl.getUniformLocation(shaderProgram, "uPMatrix2");
+        shaderProgram.mvMatrixUniform2 = gl.getUniformLocation(shaderProgram, "uMVMatrix2");
+        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+        shaderProgram.colorUniform = gl.getUniformLocation(shaderProgram, "ucolor");
+        shaderProgram.samplerUniform2 = gl.getUniformLocation(shaderProgram, "uSampler2");
+
+        gl.useProgram(shader2Program);
+
+        shader2Program.vertexPositionAttribute = gl.getAttribLocation(shader2Program, "aVertexPosition");
+        gl.enableVertexAttribArray(shader2Program.vertexPositionAttribute);
+
+        shader2Program.textureCoordAttribute = gl.getAttribLocation(shader2Program, "aTextureCoord");
+        gl.enableVertexAttribArray(shader2Program.textureCoordAttribute);
+
+        shader2Program.pMatrixUniform = gl.getUniformLocation(shader2Program, "uPMatrix");
+        shader2Program.mvMatrixUniform = gl.getUniformLocation(shader2Program, "uMVMatrix");
+        shader2Program.samplerUniform = gl.getUniformLocation(shader2Program, "uSampler");
+        shader2Program.colorUniform = gl.getUniformLocation(shader2Program, "ucolor");
+
+		}
+    var texturelist=[],itexturelist=0;
+	function handleLoadedTexture00(texture) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas2);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        texture.width=canvas2.width;
+		texture.height=canvas2.height;
+    }
+	function handleLoadedTexture0(texture) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        texture.width=texture.image.width;
+		texture.height=texture.image.height;
+		//texture.image.src=null;
+    }
+	function handleLoadedTexture(texture) {
+	    if(texture.image.src==null){return;}
+	    handleLoadedTexture0(texture);
+		itexturelist+=1;
+		texturelist[itexturelist]=texture;
+		setTimeout("deleteimagelist("+itexturelist+");",500);
+	}
+	function deleteimagelist(i){
+	    var texture=texturelist[i];
+		texture.image.src=null;
+	}
+    function gettexturedata(texture){
+	  // Create a framebuffer backed by the texture
+      var framebuffer = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture, 0);
+      // Read the contents of the framebuffer (data stores the pixel data)
+      var data = new Uint8Array(texture.width * texture.height * 4);
+      gl.readPixels(0,0,texture.width,texture.height,gl.RGBA,gl.UNSIGNED_BYTE,data);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.deleteFramebuffer(framebuffer);
+	  return data;
+    }
+
+    var towerTexture,roadTexture,solTexture;
+	var houseTexture,roofTexture;
+	var rttFramebuffer,rttTexture,renderbuffer;
+	
+    function gldeleteTexture(texture){
+	    if(texture){gl.deleteTexture(texture);
+		            texture.image.src=null;
+	                };}
+	function deletetextures(){
+        //cancelRequestAnimationFrame(); 
+	    for(var i=1;i<=itexturelist;i++){
+		   gldeleteTexture(texturelist[i]);
+		}
+    }
+    function initTexture() {
+        roadTexture = gl.createTexture();
+        roadTexture.image = new Image();
+        roadTexture.image.onload = function () {
+			handleLoadedTexture(roadTexture);
+        }
+        roadTexture.image.src = "road.bmp";
+		
+        towerTexture = gl.createTexture();
+        towerTexture.image = new Image();
+        towerTexture.image.onload = function () {
+			handleLoadedTexture(towerTexture);
+        }
+        towerTexture.image.src = "tower1.jpg";
+
+        /*houseTexture = gl.createTexture();
+        houseTexture.image = new Image();
+        houseTexture.image.onload = function () {
+			handleLoadedTexture(houseTexture);
+        }
+        houseTexture.image.src = "tower3.jpg";
+		*/
+        roofTexture = gl.createTexture();
+        roofTexture.image = new Image();
+        roofTexture.image.onload = function () {
+			handleLoadedTexture(roofTexture);
+        }
+        roofTexture.image.src = "roof.jpg";
+
+        solTexture = gl.createTexture();
+        solTexture.image = new Image();
+        solTexture.image.onload = function () {
+			tupdatesoltexture=1;
+			//handleLoadedTexture(solTexture);
+        }
+        updatesoltexture();
+		//solTexture.image.src = "map2.jpg";
+		
+        rttFramebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+        rttFramebuffer.width = 1024;
+        rttFramebuffer.height = 1024;
+        rttTexture = gl.createTexture();
+        rttTexture.width=rttFramebuffer.width;
+        rttTexture.height=rttFramebuffer.height;
+		gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        //gl.enable(gl.depth_texture);
+		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rttFramebuffer.width,rttFramebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
+        renderbuffer = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rttFramebuffer.width, rttFramebuffer.height);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        }
+
+var tupdatesoltexture=0;		
+function updatesoltexture(){
+		var lat000=lat,lng000=lng;
+		latsol=lat;lngsol=lng;
+		getworldxy(zoom,lat,lng);
+        getlatlng(zoom,worldx+256,worldy+256)
+		dlatsol=lat-latsol;dlngsol=lng-lngsol;
+		lat=lat000;lng=lng000;
+		solTexture.image.crossOrigin = "anonymous";
+        solTexture.image.src = getmap(zoom,lat,lng,512,"png",2);//map2jpg;
+}
+
+var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
+var latsol0=lat,lngsol0=lng;
+function getmap(zoom,lat,lng,size,type0,scale){
+var type=type0;
+if(type=="jpg"){type="jpg-baseline";}
+var mapstyle="&style=feature:road%7Cvisibility:off&style=element:labels%7Cvisibility:off&style=element:geometry.stroke%7Cvisibility:off";
+return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zoom="+zoom+"&scale="+scale+"&size="+size+"x"+size+"&maptype=satellite&format="+type+mapstyle;
+}
+    var mvMatrix = mat4.create();
+    var mvMatrixStack = [];
+    var pMatrix = mat4.create();
+    var mvMatrix2 = mat4.create();
+    var pMatrix2 = mat4.create();
+    var mvMatrix2sol = mat4.create();
+    var mvMatrix2road = mat4.create();
+
+    function mvPushMatrix() {
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+    function mvPopMatrix() {
+        if (mvMatrixStack.length == 0) {
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+	 var colorr=1.0,colorg=1.0,colorb=1.0,colora=1.0;
+     function setMatrixUniforms() {
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniform4f(shaderProgram.colorUniform,colorr,colorg,colorb,colora);
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform2, false, pMatrix2);
+	    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform2, false, mvMatrix2);
+    }
+     function setMatrixUniformssol() {
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniform4f(shaderProgram.colorUniform,colorr,colorg,colorb,colora);
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform2, false, pMatrix2);
+	    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform2, false, mvMatrix2sol);
+    }
+     function setMatrixUniformsroad() {
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        gl.uniform4f(shaderProgram.colorUniform,colorr,colorg,colorb,colora);
+	    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform2, false, pMatrix2);
+	    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform2, false, mvMatrix2road);
+    }
+     function setMatrixUniforms2() {
+        gl.uniformMatrix4fv(shader2Program.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shader2Program.mvMatrixUniform, false, mvMatrix);
+        gl.uniform4f(shader2Program.colorUniform,colorr,colorg,colorb,colora);
+    }
+
+    function drawrttshadow() {//return;
+      //gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+      //gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
+      testshadow=0;
+	  drawshadow();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      //gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    }
+var tshadow=0,distshadow=0,sunzz=1000,sunco2=0,sunsi2=1,sunco1=0,sunsi1=1;
+var sunx=100,suny=-200,sunz=300;
+    function drawshadow() {
+	    tshadow=1;
+        gl.viewport(0, 0, rttTexture.width,rttTexture.height);//620,419);
+        //gl.viewport(0, 0, 500,500);
+        //gl.clearColor(1,1,1, 1.0);
+        gl.clearColor(1,1,0, 1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		distshadow=30.0;
+		var wx=distshadow,wy=distshadow;
+		var dz=Math.sqrt(sunx*sunx+suny*suny+sunz*sunz);
+		var dx=Math.sqrt(sunx*sunx+suny*suny);
+		sunco2=dx/dz;sunsi2=sunz/dz;
+		sunco1=sunx/dz;sunsi1=suny/dz;
+        //mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,10.0, 9000.0, pMatrix);
+        mat4.ortho(-wx,wx,-wy,wy,10.0, 10000.0, pMatrix);
+		var xv=x+sunx,yv=y+suny,zv=z+sunz;//20*sunz+51000;
+		mat4.lookAt([xv,yv,zv],[x,y,z],[-sunx,-suny,-0.1],mvMatrix);
+   		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
+		//mat4.rotate(mvMatrix, degtorad(o1), [0, 0, 1]);
+   		gl.useProgram(shader2Program);
+		drawtowers2();
+		drawroofs2();
+		drawsol2();
+		drawroads2();
+		tshadow=0;
+	}	
+    var tfoot=1;
+	function drawScene() {//drawshadow();return;//fs2
+    gl.clearColor(0.85,0.85,1.0, 1.0);
+		gl.viewport(0, 0, windx,windy);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    	mat4.perspective(47, gl.viewportWidth / gl.viewportHeight, 0.2, 6000.0, pMatrix);
+
+		if(tmap==0){
+		   mat4.lookAt([x,y,z+0.5],[x+cos1*cos2,y+sin1*cos2,z+sin2+0.5],[0,0,1],mvMatrix);
+		}else if(tmap==3){
+		   mat4.lookAt([x,y,z+200.5],[x+cos1*cos2,y+sin1*cos2,z+sin2+0.5],[0,0,1],mvMatrix);
+		}else{
+		   return;
+		   //mat4.lookAt([x,y,z+200.5],[x+cos1*cos2,y+sin1*cos2,z+sin2+0.5],[0,0,1],mvMatrix);
+		}
+		   
+		gl.useProgram(shaderProgram);
+	gl.activeTexture(gl.TEXTURE10);
+    gl.bindTexture(gl.TEXTURE_2D,  rttTexture);
+    gl.uniform1i(shaderProgram.samplerUniform2, 10);
+	if(tmap==0){
+		drawroads();
+		drawtowers();
+		drawroofs();
+		drawbouss();
+		drawsol();
+	}else{
+		//drawtowers();
+		//drawroofs();
+		drawbouss();
+		drawsol();
+    }		
+}
+function drawroads(){
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,sc]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  roadTexture);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, roadVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, roadVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniformsroad();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawroads2(){
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,sc]);
+	mat4.set(mvMatrix,mvMatrix2road);
+	mvPopMatrix();
+}	
+function drawtowers(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  towerTexture);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, towerVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, towerVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniforms();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawtowers2(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	//mat4.multiply(pMatrix,mvMatrix,pvMatrix2);
+	mat4.set(pMatrix,pMatrix2);
+	mat4.set(mvMatrix,mvMatrix2);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  towerTexture);
+    gl.uniform1i(shader2Program.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, towerVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer);
+    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, towerVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniforms2();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawroofs(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  roofTexture);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, roofVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, roofVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniforms();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawroofs2(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  roofTexture);
+    gl.uniform1i(shader2Program.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, roofVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer);
+    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, roofVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniforms2();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawbouss(){
+  var xx=windx-40,yy=40,r=14;
+  context.clearRect (xx-40,yy-40,xx+40,yy+40);
+  context.font = "12pt Arial";
+  context.fillText("+",xx,yy);
+  context.fillText("S",xx+r*cos1,yy+r*sin1);
+  context.fillText("N",xx-r*cos1,yy-r*sin1);
+  context.fillText("E",xx+r*sin1,yy-r*cos1);
+  context.fillText("W",xx-r*sin1,yy+r*cos1);
+}
+var xsol=0,ysol=0,zsol=-0.03;
+function drawsol(){
+//xsol=parseInt(x/100)*100;
+//ysol=parseInt(y/100)*100;
+xsol=((lngsol0-lng0)/klon)*scale;
+ysol=(latsol0-lat0)*scale;
+   
+	
+	mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [xsol,ysol,zsol]);
+    var sc=1;
+	var scx=(dlngsol/klon)*scale;
+	var scy=dlatsol*scale;
+    if(Math.abs(xsol-x)>scx*0.7 || Math.abs(ysol-y)>scy*0.7){
+	   if(tupdatesoltexture==0){
+	      tupdatesoltexture=2;updatesoltexture();}}
+	gl.activeTexture(gl.TEXTURE0);
+    if(tmap==0){
+	   mat4.scale(mvMatrix,[scx,scy,sc]);
+	   gl.bindTexture(gl.TEXTURE_2D,  solTexture);
+    }else{
+	   mat4.scale(mvMatrix,[scx,scy,sc]);
+	   gl.bindTexture(gl.TEXTURE_2D,  rttTexture);
+	}
+	gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, solVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, solVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, solVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, solVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    //colorr=1.34;colorg=1.34;colorb=1.34;colora=1;
+    colorr=1.5;colorg=1.9;colorb=1.5;colora=1;
+	setMatrixUniformssol();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, solVertexPositionBuffer.numItems);
+	mvPopMatrix();
+}
+function drawsol2(){
+//xsol=parseInt(x/100)*100;
+//ysol=parseInt(y/100)*100;
+xsol=((lngsol0-lng0)/klon)*scale;
+ysol=(latsol0-lat0)*scale;
+   	
+	mvPushMatrix();
+	mat4.translate(mvMatrix, [xsol,ysol,zsol]);
+    var sc=1;
+	var scx=(dlngsol/klon)*scale;
+	var scy=dlatsol*scale;
+    mat4.scale(mvMatrix,[scx,scy,sc]);
+	mat4.set(mvMatrix,mvMatrix2sol);
+	mvPopMatrix();
+}
+
+	var index=0,indexroad=0,itextroad=0;
+	var indextower=0,itexttower=0;
+	var indexhouse=0,itexthouse=0;
+	var indexroof=0,itextroof=0;
+	function append(tab,values){
+	  if(index>(tab.length-values.length)){return;}
+	  for(var i=0;i<values.length;i++){
+	     tab[index]=values[i];index+=1;
+	  }
+	}
+    
+	var roadVertexPositionBuffer;
+	var roadVertexTextureCoordBuffer;
+	var roadvertices,roadtextureCoords;
+	var towerVertexPositionBuffer;
+	var towerVertexTextureCoordBuffer;
+	var towervertices,towertextureCoords;
+	var solVertexPositionBuffer;
+	var solVertexTextureCoordBuffer;
+	var solvertices,soltextureCoords;
+	var houseVertexPositionBuffer;
+	var houseVertexTextureCoordBuffer;
+	var housevertices,housetextureCoords;
+	var roofVertexPositionBuffer;
+	var roofVertexTextureCoordBuffer;
+	var roofvertices,rooftextureCoords;
+
+	var maxvertice=20000*6,nsol=20,n=nsol;
+	function initBuffers() {
+        roadVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer);
+        roadvertices = new Float32Array(3*maxvertice);
+		var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice;i++){
+		   append(roadvertices,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (roadvertices), gl.STATIC_DRAW);
+        roadVertexPositionBuffer.itemSize = 3;
+        roadVertexPositionBuffer.numItems = maxvertice;
+	
+        roadVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer);
+        roadtextureCoords = new Float32Array(2*maxvertice);
+		index=0;
+		for (var i=0;i<maxvertice;i++) {
+		   append(roadtextureCoords,[
+             0,0        
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (roadtextureCoords), gl.STATIC_DRAW);
+        roadVertexTextureCoordBuffer.itemSize = 2;
+        roadVertexTextureCoordBuffer.numItems = maxvertice;//24;
+
+        towerVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer);
+        towervertices = new Float32Array(3*maxvertice);
+		//var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice;i++){
+		   append(towervertices,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (towervertices), gl.STATIC_DRAW);
+        towerVertexPositionBuffer.itemSize = 3;
+        towerVertexPositionBuffer.numItems = maxvertice;
+	
+        towerVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer);
+        towertextureCoords = new Float32Array(2*maxvertice);
+		index=0;
+		for (var i=0;i<maxvertice;i++) {
+		   append(towertextureCoords,[
+             0,0        
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (towertextureCoords), gl.STATIC_DRAW);
+        towerVertexTextureCoordBuffer.itemSize = 2;
+        towerVertexTextureCoordBuffer.numItems = maxvertice;//24;
+
+        solVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, solVertexPositionBuffer);
+        //solvertices = new Float32Array(3*6);
+        solvertices = new Float32Array(3*6*(nsol+1)*(nsol+1));
+		var nitem=0;
+		px=1;py=1;pz=0;
+		index=0;
+		var dx=2*px/nsol,dy=dx;
+		for(var i=0;i<nsol;i++){
+		 var ppx=-px+dx*i;
+		 for(var j=0;j<nsol;j++){
+		 nitem+=1;
+           var ppy=-py+dx*j;
+           //pz=-0.1;
+		   append(solvertices,[
+             ppx,ppy,pz, ppx+dx,ppy,pz, ppx,ppy+dy,pz,
+             ppx+dx,ppy,pz, ppx+dx,ppy+dy,pz, ppx,ppy+dx,pz  			 
+            ]);
+		}}
+        gl.bufferData(gl.ARRAY_BUFFER, (solvertices), gl.STATIC_DRAW);
+        solVertexPositionBuffer.itemSize = 3;
+        solVertexPositionBuffer.numItems = 6*nitem;
+		
+        solVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, solVertexTextureCoordBuffer);
+        soltextureCoords = new Float32Array(2*6*(nsol+1)*(nsol+1));
+		index=0;
+		var s1=1;
+		nitem=0;
+		for(var i=0;i<nsol;i++){
+		 for(var j=0;j<nsol;j++){
+		 nitem+=1;
+		 var ds=s1/nsol;
+		 var s0=ds*i;
+         var t0=ds*j;		   
+	     append(soltextureCoords,[
+             s0,t0, s0+ds,t0, s0,t0+ds,
+             s0+ds,t0, s0+ds,t0+ds, s0,t0+ds			 
+			 ]);
+        }} 			 
+        gl.bufferData(gl.ARRAY_BUFFER, (soltextureCoords), gl.STATIC_DRAW);
+        solVertexTextureCoordBuffer.itemSize = 2;
+        solVertexTextureCoordBuffer.numItems = 6*nitem;
+
+        houseVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexPositionBuffer);
+        housevertices = new Float32Array(3*maxvertice);
+		//var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice;i++){
+		   append(housevertices,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (housevertices), gl.STATIC_DRAW);
+        houseVertexPositionBuffer.itemSize = 3;
+        houseVertexPositionBuffer.numItems = maxvertice;
+	
+        houseVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexTextureCoordBuffer);
+        housetextureCoords = new Float32Array(2*maxvertice);
+		index=0;
+		for (var i=0;i<maxvertice;i++) {
+		   append(housetextureCoords,[
+             0,0        
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (housetextureCoords), gl.STATIC_DRAW);
+        houseVertexTextureCoordBuffer.itemSize = 2;
+        houseVertexTextureCoordBuffer.numItems = maxvertice;//24;
+
+        roofVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer);
+        roofvertices = new Float32Array(3*maxvertice);
+		//var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice;i++){
+		   append(roofvertices,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (roofvertices), gl.STATIC_DRAW);
+        roofVertexPositionBuffer.itemSize = 3;
+        roofVertexPositionBuffer.numItems = maxvertice;
+	
+        roofVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer);
+        rooftextureCoords = new Float32Array(2*maxvertice);
+		index=0;
+		for (var i=0;i<maxvertice;i++) {
+		   append(rooftextureCoords,[
+             0,0        
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (rooftextureCoords), gl.STATIC_DRAW);
+        roofVertexTextureCoordBuffer.itemSize = 2;
+        roofVertexTextureCoordBuffer.numItems = maxvertice;//24;
+
+		}
+function drawgl(){
+context.clearRect (0,0,windx,windy);
+indexroad=0;
+itextroad=0;
+indextower=0;
+itexttower=0;
+indexhouse=0;
+itexthouse=0;
+indexroof=0;
+itextroof=0;
+if(Math.max(Math.abs(latx-lat0),Math.abs(lngx-lng0))>0.01){
+   lat0=latx;lng0=lngx;}
+for(var i=0;i<ways.length;i++){
+   var way=(ways[i]),test=1;
+   var xx=0,xxx=0,yy=0,yyy=0,r=1,dr=1;
+   var dx=1,dy=1,dxx=0,dyy=0,dx0=0,dy0=0,zz=0,zzz=0;
+   var s=0,t=0,tt=0;
+   waytype="none";
+   if(way.tags){if(way.tags.highway){
+      waytype=way.tags.highway;}}
+   if(way.tags){if(way.tags.building){
+      waytype="building";}}
+   //if(waytype=="none" || waytype=="path"){
+   //  test=0;}
+   if(waytype=="building"){
+     addtower(way);
+     test=0;
+	 //context.lineWidth = 1;
+     //context.strokeStyle = '#008fff';
+   }else if(waytype=="motorway"){
+     r=4;
+	 //context.lineWidth = 4;
+     //context.strokeStyle = '#ff0000';
+   }else if(waytype=="trunk"){
+     r=3;
+	 //context.lineWidth = 3;
+     //context.strokeStyle = '#cf0000';
+   }else if(waytype=="primary"){
+     r=2.5;
+	 //context.lineWidth = 2;
+     //context.strokeStyle = '#4f9f00';
+   }else if(waytype=="secondary"){
+     r=2;
+	 //context.lineWidth = 1;
+     //context.strokeStyle = '#00ff00';
+   }else if(waytype=="tertiary"){
+     r=1.2;
+	 //context.lineWidth = 1;
+     //context.strokeStyle = '#008f00';
+   }else{//test=0;
+     r=0.8;
+	 //context.lineWidth = 1;
+     //context.strokeStyle = '#000000';
+   }
+   if(test==1){
+   //context.beginPath();
+   var jmax=way.nodes.length-1;
+   var jstart=0;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=0;
+	   dx0=dx;dy0=dy;
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
+			dx=-r*dyy/dr;dy=r*dxx/dr;
+			if(j==1){dx0=dx;dy0=dy;
+			         xxx-=dy*0.4;yyy+=dx*0.4;}
+			if(j==jmax){xx+=dy*0.4;yy-=dx*0.4;}
+			index=indexroad;
+		    append(roadvertices,[
+              xxx-dx0,yyy-dy0,zzz,
+			  xx+dx,yy+dy,zz,
+			  xxx+dx0,yyy+dy0,zzz,
+			  xxx-dx0,yyy-dy0,zzz,
+			  xx-dx,yy-dy,zz,
+			  xx+dx,yy+dy,zz
+            ]);
+			indexroad=index;
+			s=1;tt=t;t+=dr*0.3;
+			index=itextroad;
+		    append(roadtextureCoords,[
+			  0,tt,
+			  1,t,
+			  1,tt,
+			  0,tt,
+			  0,t,
+			  1,t
+            ]);
+			itextroad=index;
+		   }
+	 }  
+   }
+   //context.stroke();
+   }}
+   
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (roadvertices), gl.STATIC_DRAW);
+   roadVertexPositionBuffer.itemSize = 3;
+   roadVertexPositionBuffer.numItems = indexroad/3;
+	
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (roadtextureCoords), gl.STATIC_DRAW);
+   roadVertexTextureCoordBuffer.itemSize = 2;
+   roadVertexTextureCoordBuffer.numItems = itextroad/2;
+
+   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (towervertices), gl.STATIC_DRAW);
+   towerVertexPositionBuffer.itemSize = 3;
+   towerVertexPositionBuffer.numItems = indextower/3;
+	
+   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (towertextureCoords), gl.STATIC_DRAW);
+   towerVertexTextureCoordBuffer.itemSize = 2;
+   towerVertexTextureCoordBuffer.numItems = itexttower/2;
+   
+   /*gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexPositionBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (housevertices), gl.STATIC_DRAW);
+   houseVertexPositionBuffer.itemSize = 3;
+   houseVertexPositionBuffer.numItems = indexhouse/3;
+	
+   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexTextureCoordBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (housetextureCoords), gl.STATIC_DRAW);
+   houseVertexTextureCoordBuffer.itemSize = 2;
+   houseVertexTextureCoordBuffer.numItems = itexthouse/2;
+   */
+   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (roofvertices), gl.STATIC_DRAW);
+   roofVertexPositionBuffer.itemSize = 3;
+   roofVertexPositionBuffer.numItems = indexroof/3;
+	
+   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer);
+   gl.bufferData(gl.ARRAY_BUFFER, (rooftextureCoords), gl.STATIC_DRAW);
+   roofVertexTextureCoordBuffer.itemSize = 2;
+   roofVertexTextureCoordBuffer.numItems = itextroof/2;
+   
+   //lat0=lat;lng0=lng;
+   x0=x;y0=y;
+   
+   context.font = "12pt Arial";
+   context.fillStyle = '#ff0000';
+   var latt=parseInt(lat*10000)/10000;
+   var lngg=parseInt(lng*10000)/10000;
+   context.fillText("lat="+latt+" lon="+lngg,20,20);
+   context.fillText("nways="+i+" nnodes="+nnode,20,40);
+   context.fillText("H => help",20,60);
+   //alert("drawways="+i);
+   loading=0;
+   tmove=1;
+}
+function addtower(way){
+   var xx=0,xxx=0,yy=0,yyy=0,r=1,dr=1;
+   var dxx=0,dyy=0,zz=0,zzz=0;
+   var s=0,t=0,tt=0;
+   var h=1;
+   if(way.tags){
+    if(way.tags.height){h=way.tags.height/6;}
+    else if(way.tags["building:height"]){
+		    h=way.tags["building:height"]/6;
+			}
+    else if(way.tags["building:levels"]){
+		    h=way.tags["building:levels"]/4;
+			}
+   }
+   var jmax=way.nodes.length-1;
+   var larg=1,ilarg=way.nodes[parseInt(jmax/2)];
+   var i0=way.nodes[0];
+   var xmid=0,ymid=0,zmid=0;
+   if(latnodes[ilarg] && latnodes[i0]){
+   	   yyy=(latnodes[i0]-lat0)*scale*2;
+	   xxx=((lonnodes[i0]-lng0)/klon)*scale*2;
+   	   yy=(latnodes[ilarg]-lat0)*scale*2;
+	   xx=((lonnodes[ilarg]-lng0)/klon)*scale*2;
+       larg=Math.max(Math.abs(xx-xxx),Math.abs(yy-yyy));
+	   xmid=(xx+xxx)/2;
+	   ymid=(yy+yyy)/2;
+	   zmid=0;
+   }
+zmid-=0.1;
+if(h>3){//tower   
+   var xxmin=xmid+999999,xxmax=xmid-999999;
+   var yymin=ymid+999999,yymax=ymid-999999;
+   var jstart=0;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(xx<xxmin){xxmin=xx;}
+	   if(xx>xxmax){xxmax=xx;}
+	   if(yy<yymin){yymin=yy;}
+	   if(yy>yymax){yymax=yy;}
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
+			index=indextower;
+		    append(towervertices,[
+              xxx,yyy,zzz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz+h,
+			  xx,yy,zz
+            ]);
+			indextower=index;
+			var s0=(parseInt(h*10.5)%10)*400;
+			if(h<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
+			else{s=s0+1+parseInt(h*2);tt=t;t+=dr;}
+			index=itexttower;
+		    append(towertextureCoords,[
+			  tt,s0,
+			  tt,s,
+			  t,s0,
+			  tt,s,
+			  t,s,
+			  t,s0
+            ]);
+			itexttower=index;
+		   }
+	 }  
+   }
+   xmid=(xxmin+xxmax)/2;
+   ymid=(yymin+yymax)/2;
+   var hh=0;
+   //hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
+   hh=h+hh;
+   tt=0;t=0;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.abs(dxx)+Math.abs(dyy));
+			index=indexroof;
+		    append(roofvertices,[
+              xmid,ymid,zmid+hh,
+			  xx,yy,zz+h,
+			  xxx,yyy,zzz+h
+            ]);
+			indexroof=index;
+            tt=t;t+=dr;
+			index=itextroof;
+		    append(rooftextureCoords,[
+			  0.5,1,
+			  t-parseInt(t),0,
+			  tt-parseInt(tt),0
+            ]);
+			itextroof=index;
+		}}
+	}
+}else if(larg>12*h){//commercial
+   var jstart=0;
+   var xxmin=xmid+999999,xxmax=xmid-999999;
+   var yymin=ymid+999999,yymax=ymid-999999;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(xx<xxmin){xxmin=xx;}
+	   if(xx>xxmax){xxmax=xx;}
+	   if(yy<yymin){yymin=yy;}
+	   if(yy>yymax){yymax=yy;}
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
+			index=indextower;
+		    append(towervertices,[
+              xxx,yyy,zzz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz+h,
+			  xx,yy,zz
+            ]);
+			indextower=index;
+			var s0=(parseInt(h*10.5)%10)*400;
+			if(h<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr/3.5;}
+			else{s=s0+1+parseInt(h*2);tt=t;t+=dr/3.5;}
+			index=itexttower;
+		    append(towertextureCoords,[
+			  tt,s0,
+			  tt,s,
+			  t,s0,
+			  tt,s,
+			  t,s,
+			  t,s0
+            ]);
+			itexttower=index;
+		   }
+	 }  
+   }
+   xmid=(xxmin+xxmax)/2;
+   ymid=(yymin+yymax)/2;
+   var hh=0;
+   //hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
+   hh=h+hh;
+   tt=0;t=0;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.abs(dxx)+Math.abs(dyy));
+			index=indexroof;
+		    append(roofvertices,[
+              xmid,ymid,zmid+hh,
+			  xx,yy,zz+h,
+			  xxx,yyy,zzz+h
+            ]);
+			indexroof=index;
+            tt=t;t+=dr;
+			index=itextroof;
+		    append(rooftextureCoords,[
+			  0.5,1,
+			  t-parseInt(t),0,
+			  tt-parseInt(tt),0
+            ]);
+			itextroof=index;
+		}}
+	}
+}else{//house
+   var jstart=0;
+   var xxmin=xmid+999999,xxmax=xmid-999999;
+   var yymin=ymid+999999,yymax=ymid-999999;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(xx<xxmin){xxmin=xx;}
+	   if(xx>xxmax){xxmax=xx;}
+	   if(yy<yymin){yymin=yy;}
+	   if(yy>yymax){yymax=yy;}
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
+			index=indextower;
+		    append(towervertices,[
+              xxx,yyy,zzz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz+h,
+			  xx,yy,zz
+            ]);
+			indextower=index;
+			var s0=(parseInt(h*10.5)%10)*400;
+			if(h<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
+			else{s=s0+1+parseInt(h*2);tt=t;t+=dr;}
+			index=itexttower;
+		    append(towertextureCoords,[
+			  tt,s0,
+			  tt,s,
+			  t,s0,
+			  tt,s,
+			  t,s,
+			  t,s0
+            ]);
+			itexttower=index;
+		   }
+	 }  
+   }
+   xmid=(xxmin+xxmax)/2;
+   ymid=(yymin+yymax)/2;
+   var hh=h*0.2;
+   hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
+   hh=h+hh;
+   tt=0;t=0;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   xxx=xx;yyy=yy;zzz=zz;
+	   yy=(latnodes[inode]-lat0)*scale*2;
+	   xx=((lonnodes[inode]-lng0)/klon)*scale*2;
+	   zz=zmid;
+	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
+	   }else{//context.lineTo(xx,yy);
+	        dxx=xx-xxx;dyy=yy-yyy;
+			dr=Math.max(0.00001,Math.abs(dxx)+Math.abs(dyy));
+			index=indexroof;
+		    append(roofvertices,[
+              xmid,ymid,zmid+hh,
+			  xx,yy,zz+h,
+			  xxx,yyy,zzz+h
+            ]);
+			indexroof=index;
+            tt=t;t+=dr;
+			index=itextroof;
+		    append(rooftextureCoords,[
+			  0.5,1,
+			  t-parseInt(t),0,
+			  tt-parseInt(tt),0
+            ]);
+			itextroof=index;
+		}}
+	}
+}
+}
+var MERCATOR_RANGE = 256;
+function degreesToRadians(deg) {
+  return deg * (Math.PI / 180);
+}
+function radiansToDegrees(rad) {
+  return rad / (Math.PI / 180);
+}
+var pixeloriginx=MERCATOR_RANGE / 2;
+var pixeloriginy=MERCATOR_RANGE / 2;
+var pixelsPerLonDegree = MERCATOR_RANGE / 360;
+var pixelsPerLonRadian = MERCATOR_RANGE / (2 * Math.PI);
+
+var pointx=0,pointy=0,worldx=0,worldy=0,zoom=15;
+function MercatorLatLngtoPoint(lat,lng) {
+  pointx = pixeloriginx + lng * pixelsPerLonDegree;
+  // NOTE(appleton): Truncating to 0.9999 effectively limits latitude to
+  // 89.189.  This is about a third of a tile past the edge of the world tile.
+  var siny=Math.min(Math.max(Math.sin(degreesToRadians(lat)),-0.9999),0.9999);
+  pointy = pixeloriginy+0.5*Math.log((1+siny)/(1-siny))*pixelsPerLonRadian;  
+};
+
+function MercatorPointtoLatLng(pointx,pointy) {
+  lng=(pointx-pixeloriginx)/pixelsPerLonDegree;
+  var latRadians = (pointy-pixeloriginy)/pixelsPerLonRadian;
+  lat=radiansToDegrees(2*Math.atan(Math.exp(latRadians))-Math.PI/2);
+};
+function getlatlng(zoom,worldx,worldy){
+pointx = worldx / Math.pow(2,zoom);
+pointy = worldy / Math.pow(2,zoom);
+MercatorPointtoLatLng(pointx,pointy);
+}
+function getworldxy(zoom,lat,lng){
+MercatorLatLngtoPoint(lat,lng);
+worldx=pointx*Math.pow(2,zoom);
+worldy=pointy*Math.pow(2,zoom);
+}	 
+var fullscreen=0;
+function sizescreen(){
+	    if(fullscreen==0){fullscreen=1;
+		                  canvas.width  = parseInt(window.innerWidth*0.98);
+                          canvas.height = parseInt(window.innerHeight*0.94);
+						 }else{fullscreen=0;
+						  canvas.width=600;canvas.height=400;};
+	canvas.width  = Math.min(canvas.width,window.innerWidth-20);
+    canvas.height = Math.min(canvas.height,window.innerHeight-36);
+	canvasgl.width  = Math.min(canvas.width,window.innerWidth-20);
+    canvasgl.height = Math.min(canvas.height,window.innerHeight-36);
+	gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+			windx = canvas.width;
+            windy = canvas.height;
+            gl.viewport(0, 0, windx,windy);
+            document.getElementById("canvas").setAttribute("style",
+	         "border: none;top:0px;left:0px;");
+    canvas.height = parseInt(canvasgl.height/3);
+	tmap=0;
+    document.getElementById("msg").focus();
+}
+var geolocation="";
+function geolocate(){
+geolocation = "paris france";
+geolocation=window.prompt("flyto : enter address or location");
+//alert("geolocation="+geolocation);
+if (geolocation.length>0){
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode( { 'address': geolocation}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var latlng=results[0].geometry.location;
+	  lat=latlng.lat();
+	  lng=latlng.lng();
+	  flytolat=lat;flytolng=lng;flytoname=geolocation;
+	  icombo=0;
+	  document.getElementById('combo')[icombo].text=flytoname;
+	  document.getElementById('combo').selectedIndex=icombo;
+      latx=lat;lngx=lng;tmap=0;
+      getways();
+    } else {
+      alert('Geolocation not found ! ' + status);
+    }
+  });
+}
+document.getElementById('msg').focus();
+}
+function updatesun(){
+	    hour=new Date().getHours()+new Date().getMinutes()/60.0+ thour;
+		while(hour>24){hour-=24;}
+		while(hour<0){hour+=24;};
+    	var hour2=hour;//12+(hour-12)*2;
+		if(hour2<6){hour2=6+(hour2-6)/3;}
+		if(hour2>18){hour2=18+(hour2-18)/3;}
+		sunx=1000*Math.sin((12-hour2)*3.14/24);
+		suny=-1000*Math.cos((12-hour2)*3.44/24);
+		sunz=1000*Math.cos((12-hour2)*3.14/24)*Math.cos((12-hour2)*3.14/24)+40;
+		var r=Math.sqrt(sunx*sunx+suny*suny+0.59*sunz*sunz);
+		sunx*=300/r;suny*=300/r;sunz*=300/r;
+}
+var thour=0;
+var hour=new Date().getHours()+new Date().getMinutes()/60.0+ thour;
+while(hour>24){hour-=24;}
+while(hour<0){hour+=24;};
+updatesun();
+getways();
+setTimeout("initwebgl();",1000);
+</script>
+</body>
+</html>

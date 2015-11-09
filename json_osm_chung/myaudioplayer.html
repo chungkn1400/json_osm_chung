@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>myaudioplayer2</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+  <div id="divaudio" style="position:absolute;top:9000px;left:0px;z-index:0;" >
+  <audio id="myaudio" autoplay >
+    <!--span class="ko">&lt;audio&gt; not supported !</span--></audio><br/><br/>
+  </div>
+  <select id="combo" onChange="subcombo();" onblur="tfocus=1;" onfocus="tfocus=0;;" style="width: 89px; height: 18px;">
+      <option >07/silence_before_storm.mp3</option>
+      <option >10/yunas.mp3</option>
+      <option >07/yunas_determination.mp3</option>
+      <option >07/rikku.mp3</option>
+  </select>
+  <br />
+  <select id="comborepeat" onChange="subcomborepeat();" onblur="tfocus=1;" onfocus="tfocus=0;" style="width: 89px; height: 18px;">
+      <option id="repeat one">repeat one</option>
+      <option id="repeat all">repeat all</option>
+      <option id="repeat rnd">repeat rnd</option>
+  </select>
+  <!--button id="save"  onclick="subcookie();">save</button-->
+<script type="text/javascript">
+/*var auxvar=null;
+auxvar=Date.now();
+for(var i=0;i<10000;i++){for(var j=0;j<1000;j++){var x=Math.random()*1233.543*234.54;}}
+auxvar=Date.now()-auxvar;
+alert(auxvar);
+*/
+var folder="";
+//folder="https://b3d8783ddc02a86af1ce60266a06c20f1a961f99.googledrive.com/host/0B6GM9ay7ImZLOXpiUkx5bFhacXc/";
+//folder="https://sites.google.com/site/mywebglflightchung/mywebglflight/";
+folder="http://chung.h.c.f.unblog.fr/files/2015/";//"07/";
+var msg="",icombo=0,combotext="",mp3="",tclose=0;
+var volume=1,speed=1.0,repeat=1;
+var icombomax=document.getElementById('combo').length;
+initparms();
+myaudio=document.getElementById('myaudio');
+document.getElementById('combo').selectedIndex=icombo;
+combotext=document.getElementById('combo')[icombo].value;
+myaudio.src=folder+combotext;//"pennylane.mp3";
+//myaudio.crossOrigin=true;
+//myaudio.autoplay=true;
+document.getElementById('comborepeat').selectedIndex=repeat;
+if(repeat==0){myaudio.loop=true;}
+//else{myaudio.loop=false;}
+myaudio.volume=volume;
+/*var hash=document.location.search;//parent.location.hash;
+if(hash.length>0){
+   icombo=eval(hash.substr(1,99));
+   if(icombo>=icombomax){icombo=0;}
+   document.getElementById('combo').selectedIndex=icombo;
+   combotext=document.getElementById('combo')[icombo].id;
+   myaudio.src=folder+combotext;}*/
+speed=1.0;
+myaudio.playbackRate=speed;
+myaudio.load();
+function submsg(text){
+ //document.getElementById("msg").value=text;
+}
+function subcombo(){
+icombo=document.getElementById('combo').selectedIndex;
+  /*var url=document.location.href;
+  var i=url.indexOf("?");
+  if(i>0){url=url.substr(0,i);}
+  url+="?"+icombo+"&";*/
+  myaudio.pause();
+  //myaudio.src=null;
+  savecookie();
+  setsearchtxt();
+  setTimeout("document.location.search=searchtxt;",500); 
+  //document.location.href=url;
+}
+function subcomborepeat(){
+var i=document.getElementById('comborepeat').selectedIndex;
+repeat=i;
+if(repeat==0){myaudio.loop=true;}
+else{myaudio.loop=false;}
+savecookie();
+}
+function mysub(){
+volume=myaudio.volume;
+//speed=myaudio.playbackRate;
+//myaudio.playbackRate=speed;
+//myaudio.defaultPlaybackRate=speed;
+msg="vol="+volume+" speed="+speed+" repeat="+repeat;
+submsg(msg);
+if(myaudio.ended){
+  if(repeat==1){icombo+=1;
+     if(icombo>=icombomax){icombo=0;};
+     document.getElementById('combo').selectedIndex=icombo;
+	 tclose=1;subcombo();}
+  if(repeat==2){icombo=parseInt(Math.random()*icombomax);
+     if(icombo>=icombomax){icombo=0;};
+     document.getElementById('combo').selectedIndex=icombo;
+	 tclose=1;subcombo();}
+}
+if(tclose==0){setTimeout("mysub();",1000);}
+}
+setTimeout("mysub();",500);
+var searchtxt="",parms=[],iparm=0;
+function addparm(parm){
+   searchtxt+=(parseInt(parm*1000)/1000)+"&";
+}
+function initparms(){
+  var hash0=document.location.search;//parent.location.hash;
+  if(hash0.indexOf("reset",0)>=0 || hash0.indexOf("nocook",0)>=0){hash0="";
+  }else{readcookie();}
+  var hash0=document.location.search;//parent.location.hash;
+  getparms(hash0);
+}
+function evaln(n){if(isNaN(eval(n))){return 0;}else{return eval(n);};}
+function getparms(hash){
+  if(hash!=""){parms=[];parms=hash.split("&");
+    icombo=evaln(parms[0].substr(1,parms[0].length-1));
+    var i=1,n=parms.length-1;
+	volume=evaln(parms[i]);i+=1;if(i>=n){return;}
+    speed=evaln(parms[i]);i+=1;if(i>=n){return;}
+	repeat=evaln(parms[i]);i+=1;if(i>=n){return;}
+	//if(icombo){document.getElementById('combo').selectedIndex=icombo;
+    //           setTimeout("subcombo();",3000);}
+	}
+}
+function setlink(){
+  tclose=1;
+  alert("copy the adress bar to link to this place later");
+  setsearchtxt();
+  document.location.search=searchtxt;  
+}
+function setsearchtxt(){
+  searchtxt="";
+  addparm(icombo);
+  addparm(volume);
+  addparm(speed);
+  addparm(repeat);
+}
+function readcookie(){
+var mycookie=document.cookie+";";
+//alert("mycookie="+mycookie);
+var pref="myaudioplayerchung2=";
+var i=mycookie.indexOf(pref,0);
+if(i<0){return;}
+i+=pref.length;
+var j=mycookie.indexOf(";",i);
+if(j<i){return;}
+var mycookie=mycookie.substring(i,j);
+//alert(mycookie);
+var hash0="?"+mycookie;getparms(hash0);
+}
+function savecookie(){
+var mycookie="";
+var cookie0=document.cookie;
+setsearchtxt();
+mycookie+=searchtxt;
+//alert(mycookie);  
+var pref="myaudioplayerchung2=";
+mycookie =pref+mycookie+"; expires=Fri, 3 Aug 2100 20:47:11 UTC; path=/";
+if(mycookie.length>(3900-cookie0.length)){alert("could not save, cookie too long");return;}
+document.cookie=mycookie;
+}
+function deletecookie(){
+var pref="myaudioplayerchung2=";
+document.cookie =pref+";expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/";
+}
+function subcookie(){
+  if(confirm("save player cookie ?")){savecookie();alert("cookie saved");
+  }else if(confirm("delete playersave cookie ?")){
+           deletecookie();alert("cookie deleted");}
+}
+</script>
+  </body>
+</html>

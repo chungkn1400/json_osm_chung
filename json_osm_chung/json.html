@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+<body   onunload="close();" onKeyUp="keyup(event);" onKeyDown="keydown(event);" >
+	<div id="mydiv" style="position:absolute;top:0px;left:0px;z-index:100;" >
+	<canvas id="canvas" style="border:red 1px solid;top:0px;left:0px;" width="600" height="400"></canvas>
+    <br />
+	<select id="combo" onChange="subcombo();" onblur="tfocus=1;waitkey=0;" onfocus="tfocus=0;waitkey=0;">
+          <option id="initial">initial</option>
+          <option id="deauville marinas">deauville marinas</option>
+          <option id="deauville plage">deauville plage</option>
+          <option id="trouville plage">trouville plage</option>
+          <option id="nancy">nancy</option>
+          <option id="crickvenica">crickvenica</option>
+          <option id="paris tolbiac">paris tolbiac</option>
+          <option id="paris defense">paris defense</option>
+          <option id="ivry romain roland">ivry romain roland</option>
+          <option id="orsay">orsay</option>
+          <option id="le barcares">le barcares</option>
+          <option id="jerusalem">jerusalem</option>
+          <option id="marseille">marseille</option>
+          <option id="nice">nice</option>
+          <option id="arcachon">arcachon</option>
+          <option id="grenoble">grenoble</option>
+          <option id="san francisco">san francisco</option>
+          <option id="new york">new york</option>
+          <option id="atlanta">atlanta</option>
+          <option id="rio">rio</option>
+          <option id="hong kong">hong kong</option>
+          <option id="athenes">athenes</option>
+          <option id="perth">perth</option>
+          <option id="le caire">le caire</option>
+          <option id="washington">washington</option>
+          <option id="tajmahal">tajmahal</option>
+     </select>
+	 <input type="text"  readonly="readonly" id="msg" maxlength="80" size="80" />
+     </div>
+<script src="vk_keys.js"></script>
+<script>
+var xmax=600,ymax=500;
+var url="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way[highway=motorway]%2850.746%2C7.154%2C50.78%2C7.27%29%3Bout%20skel%203%3B";
+//url="http://overpass-api.de/api/xapi?map?bbox=7.012854,51.450317,7.016477,51.452105";
+//url="http://overpass-api.de/api/interpreter?data=node[name=\"Gielgen\"];out;";
+var head = document.getElementsByTagName('head')[0];
+var js = document.createElement("script");
+js.type = "application/javascript";
+js.src = url;
+//js.async=false;
+//js.crossOrigin = "anonymous";
+//js.onreadystatechange = jscallback;
+js.onload = function(data,resp){//alert(data+resp);
+var msg="",j=0;
+for(var i in data){msg+="/"+i+"="+eval("data."+i);j+=1;if(j>70){break;};}
+//alert(msg);
+msg="";j=0;
+var data2=data.target;
+for(var i in data2){msg+="/"+i+"="+eval("data2."+i);j+=1;if(j>70){break;};}
+alert(msg);
+msg="";j=0;
+var data3=data2.dataset;//properties;
+//data3=data2.contentEditable;
+alert(data3);
+for(var i in data3){msg+="/"+i+"="+eval("data3."+i);j+=1;if(j>70){break;};}
+alert(msg);
+}
+//head.appendChild(js);
+function callback(r){alert(r);}
+
+var wayjson,nodejson,ways,waynodes,nodes,waytype;
+var latnodes=[],lonnodes=[];
+var dlat=0.005,dlon=0.008;
+var lat1=48.765,lon1=2.20;
+lat1=48.826125291730506;lon1=2.3570559500472212;
+lat1-=dlat/2;lon1-=dlon/2;
+lat2=lat1+dlat,lon2=lon1+dlon;
+var wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+var nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];%28node%28371597318%29;node%28371597317%29%29%3Bout%20skel%209%3B";
+wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%2099%3B";
+//wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way[highway~'motorway|trunk|primary']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+//wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way[highway~'motorway|trunk']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+//wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
+nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
+var nodekey,nodekey2,nodekey3,nkeymax=450;
+//nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
+function waycallback(r){alert(r);
+  wayjson=JSON.parse(r);
+  var msg="",ntest=0;
+  nnode=0;
+  ways=null;
+  ways=wayjson.elements;
+  msg+="len="+ways.length;
+  nodekey="(";
+  nodekey2="(";
+  nodekey3="(";
+  for(var i=0;i<ways.length;i++){
+   var way=(ways[i]);
+   msg+="/ "+way.type+" id="+way.id+" "
+   waytype="none";
+   if(way.tags){if(way.tags.highway){
+      waytype=way.tags.highway;}}
+   msg+=waytype;
+   msg+="/"+way.tags["building:height"];
+   //for(var p in way.tags){msg+="/"+p;}   
+   for(var j=0;j<way.nodes.length;j++){
+      //if(i<2){msg+="/"+way.nodes[j];};
+	  nnode+=1;
+	  if(nnode<nkeymax){nodekey+="node("+way.nodes[j]+");";}
+	  else if(nnode<nkeymax+nkeymax){nodekey2+="node("+way.nodes[j]+");";}
+	  else if(nnode<nkeymax+nkeymax+nkeymax){nodekey3+="node("+way.nodes[j]+");";}
+	  }
+   }
+  alert("nnode="+nnode+" "+msg);
+  nodekey+=")";
+  nodekey2+=")";
+  nodekey3+=")";
+  setTimeout("getnodes();",20);
+}
+function nodecallback(r){//alert(r);
+  nodejson=JSON.parse(r);
+  var msg="";
+  nodes=null;
+  nodes=nodejson.elements;
+  msg+="len="+nodes.length;
+  if(resetnode==1){latnodes=[];lonnodes=[];}
+  for(var i=0;i<nodes.length;i++){
+     if(i<5){
+	  msg+="/ nodeid="+nodes[i].id;
+	  msg+=" lat="+nodes[i].lat;
+	  msg+=" lon="+nodes[i].lon;
+	  }
+	 var inode=nodes[i].id; 
+	 latnodes[inode]=nodes[i].lat;
+     lonnodes[inode]=nodes[i].lon;	 
+	 }
+  //alert(msg);
+  
+  if(tgetnode==1 && nnode>nkeymax){
+     tgetnode=2;
+     setTimeout("getnodes2();",20);}
+  else if(tgetnode==2 && nnode>nkeymax+nkeymax){
+     tgetnode=3;
+     setTimeout("getnodes3();",20);}
+  else{	 
+     draw();
+     loading=0;}	 
+}
+var xmlhttp;
+function httpGet(theUrl,callback) 
+{
+	if (window.XMLHttpRequest)
+    {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }
+    else
+    {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {callback(xmlhttp.responseText);
+        }
+    }
+    xmlhttp.open("GET", theUrl, false);
+    xmlhttp.send();    
+}
+var loading=0; 
+function getways(){
+if(loading==1){return;}
+loading=1;
+lat2=lat1+dlat;lon2=lon1+dlon;
+context.fillText("loading...",20,60);
+//wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
+//var keyway="[highway~'motorway|trunk|primary|secondary']";
+var keyway="[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']";
+//var keyway="[highway~'motorway|trunk|primary|secondary|tertiary|residential']";
+keyway="['building:height']";
+wayurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
+try{		
+httpGet(wayurl,waycallback);
+}catch (e){alert("error getways");loading=0;}
+}
+var resetnode=0,tgetnode=1;
+function getnodes(){
+lat2=lat1+dlat;lon2=lon1+dlon;
+nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];"+nodekey+"%3Bout%20skel%201999%3B";
+var lat11=lat1-0.0001,lon11=lon1-0.0001;
+var lat21=lat2+0.0001,lon21=lon2+0.0001;
+//nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%209999%3B";
+resetnode=1;tgetnode=1;
+try{		
+httpGet(nodeurl,nodecallback);
+}catch (e){alert("error getnodes");loading=0;}
+}
+function getnodes2(){
+lat2=lat1+dlat;lon2=lon1+dlon;
+nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];"+nodekey2+"%3Bout%20skel%201999%3B";
+resetnode=0;tgetnode=2;
+try{		
+httpGet(nodeurl,nodecallback);
+}catch (e){alert("error getnodes2");loading=0;}
+}
+function getnodes3(){
+lat2=lat1+dlat;lon2=lon1+dlon;
+nodeurl="http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];"+nodekey3+"%3Bout%20skel%201999%3B";
+resetnode=0;tgetnode=3;
+try{		
+httpGet(nodeurl,nodecallback);
+}catch (e){alert("error getnodes3");loading=0;}
+}
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+context.width=xmax;
+context.height=ymax;
+context.lineWidth = 3;
+context.strokeStyle = '#ff0000';
+context.font = "12pt Arial";
+function line(x,y,x1,y1){
+context.beginPath();
+context.moveTo(x,y);
+context.lineTo(x1,y1);
+context.stroke();
+}
+function draw(){
+context.clearRect (0,0,xmax,ymax);
+context.font = "12pt Arial";
+context.fillText("lat="+lat1+" lon="+lon1,20,20);
+for(var i=0;i<ways.length;i++){
+   var way=(ways[i]),test=1;
+   waytype="none";
+   if(way.tags){if(way.tags.highway){
+      waytype=way.tags.highway;}}
+   if(waytype=="none" || waytype=="path"){
+     test=0;}
+   if(waytype=="motorway"){
+     context.lineWidth = 4;
+     context.strokeStyle = '#ff0000';
+   }else if(waytype=="trunk"){
+     context.lineWidth = 3;
+     context.strokeStyle = '#cf0000';
+   }else if(waytype=="track"){
+     context.lineWidth = 3;
+     context.strokeStyle = '#9f8000';
+   }else if(waytype=="primary"){
+     context.lineWidth = 2;
+     context.strokeStyle = '#4f9f00';
+   }else if(waytype=="secondary"){
+     context.lineWidth = 1;
+     context.strokeStyle = '#00ff00';
+   }else if(waytype=="tertiary"){
+     context.lineWidth = 1;
+     context.strokeStyle = '#008f00';
+   }else{//test=0;
+     context.lineWidth = 1;
+     context.strokeStyle = '#000000';
+   }
+   if(test==1){
+   context.beginPath();
+   for(var j=0;j<way.nodes.length;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){  
+	   var y=ymax-ymax*(latnodes[inode]-lat1)/(lat2-lat1);
+	   var x=xmax*(lonnodes[inode]-lon1)/(lon2-lon1);
+	   if(j==0){context.moveTo(x,y);}
+	   else{context.lineTo(x,y);}
+	 }  
+   }
+   context.stroke();
+   }}
+   context.fillText("nways="+i+" nnodes="+nnode,20,40);
+   //alert("drawways="+i);
+}
+function timer(){
+return Date.now();
+//return (new Date()).getTime();//ms
+}
+var keys=new Array(256),keys0=new Array(256),tkeys=new Array(256),tkey=0;
+var pkeys=new Array(256);
+function resetkeys(){
+ for(var i=0;i<256;i++){keys[i]=0;keys0[i]=0;tkeys[i]=0;}
+}
+resetkeys();
+function keydown(e){
+var key=eval(e.which || e.keyCode)
+var t=timer();
+if(key>0 && key<256){keys[key]=1;tkeys[key]=t;keys0[key]=1;}
+}
+function keyup(e){
+var key=eval(e.which || e.keyCode)
+if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
+}
+var quit=0;
+function close(){quit=1;}
+function testkeys(){
+var test=0;
+if(keys[vk_up]){lat1+=0.0012;test=1;}
+if(keys[vk_down]){lat1-=0.0012;test=1;}
+if(keys[vk_left]){lon1-=0.0012;test=1;}
+if(keys[vk_right]){lon1+=0.0012;test=1;}
+if(test==1){test=0;resetkeys();
+   lat2=lat1+dlat;lon2=lon1+dlon;
+   getways();
+}
+if(quit==0){setTimeout("testkeys();",100);}
+}
+getways();
+setTimeout("testkeys();",500);
+document.getElementById('msg').focus();
+
+var icombo=0,combotext="";
+function subcombo(){
+icombo=document.getElementById('combo').selectedIndex;
+combotext = document.getElementById('combo')[icombo].id ;
+var o1=0,lat=49,lng=2;
+if (combotext=="deauville marinas"){lat=49.36198047661674   ;lng=0.07262960190958628   ;o1=120;}
+if (combotext=="deauville plage"){lat=49.35600551121942   ;lng=0.06075459446313726   ;o1=110;}
+if (combotext=="trouville plage"){lat=49.36663106706898   ;lng=0.07818353983048315   ;o1=130;}
+if (combotext=="nancy"){lat=48.69306979368741   ;lng=6.182922715725031   ;o1=70;}
+if (combotext=="crickvenica"){lat=45.1734569955986   ;lng=14.689314428610118   ;o1=-110;}
+if (combotext=="paris tolbiac"){lat=48.826125291730506   ;lng=2.3570559500472212   ;o1=0;}
+if (combotext=="paris defense"){lat=48.891977155490395   ;lng=2.237673523003608   ;o1=160;}
+if (combotext=="ivry romain roland"){lat=48.80346335679542   ;lng=2.3934673532940915   ;o1=-50;}
+if (combotext=="orsay"){lat=48.706787   ;lng=2.180894999999964   ;o1=-30;}
+if (combotext=="le barcares"){lat=42.78764305091493   ;lng=3.0338932951133533   ;o1=175;} 
+if (combotext=="jerusalem"){lat=31.776636707589287   ;lng=35.2337121963501   ;o1=36.3920;}
+if (combotext=="marseille"){lat=43.2803905;lng=5.405139   ;o1=36.3920;}
+if (combotext=="nice"){lat=43.7031905;lng=7.252817  ;o1=36.3920;}
+if (combotext=="arcachon"){lat=44.6514284;lng=-1.171656  ;o1=36.3920;}
+if (combotext=="grenoble"){lat=45.1841656;lng=5.7155425 ;o1=36.3920;}
+if (combotext=="san francisco"){lat=37.7577;lng=-122.4376 ;o1=36.3920;}
+if (combotext=="new york"){lat=40.7033121;lng=-73.97968 ;o1=36.3920;}
+if (combotext=="atlanta"){lat=33.7677129;lng=-84.42060 ;o1=36.3920;}
+if (combotext=="rio"){lat=-22.8650853;lng=-43.13109 ;o1=36.3920;}
+if (combotext=="hong kong"){lat=22.3700556;lng=114.153758 ;o1=36.3920;}
+if (combotext=="athenes"){lat=37.9908372;lng=23.7383394 ;o1=36.3920;}
+if (combotext=="perth"){lat=-31.9546529;lng=115.852662 ;o1=36.3920;}
+if (combotext=="le caire"){lat=30.04441959;lng=31.23571160;o1=36.3920;}
+if (combotext=="washington"){lat=38.8850399;lng=-77.08054296;o1=36.3920;}
+if (combotext=="tajmahal"){lat=27.17015;lng=78.002155;o1=36.3920;}
+document.getElementById('msg').focus();
+lat1=lat-dlat/2;lon1=lng-dlon/2;
+getways();
+}
+
+</script>
+  </body>
+</html>
