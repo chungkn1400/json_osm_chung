@@ -8836,11 +8836,13 @@ if(way.nodes){
 			if(smallbridge==1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
 			           if(ii<di){zz+=dzlayer;}}
 			else if(bridge>=1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
+			           if(ii<di){zz+=dzlayer;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));
 			              //zz=Math.max(zz,zz1+(zz2-zz1)/(di-ii+1));
 			              //zz1=zz;
 						  }
 			else if(layer>=1){zz=(getterrainheight(lonxx,latxx)+dhr);
+			           if(ii<di){zz+=dzlayer;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
 			else{zz=getterrainheight(lonxx,latxx)+dhr;}
 			//zz=getterrainheight(lonxx+dlonxx,latxx+dlatxx);
