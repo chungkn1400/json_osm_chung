@@ -2655,7 +2655,7 @@ if(twebaudio==1 && tradio==0){
 document.getElementById('msg').focus();
 document.getElementById('msg').value="H => help  /  arrow keys => move";
 
-var icombo=0,combotext="";
+var icombo=2,combotext="deauville marinas";
 var flytolat=48.82612529173,flytolng=2.3570559500472;
 var flytoname="flyto",combolat=lat,combolng=lng;
 function formatname(text){
@@ -8836,11 +8836,13 @@ if(way.nodes){
 			if(smallbridge==1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
 			           if(ii<di){zz+=dzlayer;}}
 			else if(bridge>=1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
+			           if(ii<di){zz+=dzlayer;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));
 			              //zz=Math.max(zz,zz1+(zz2-zz1)/(di-ii+1));
 			              //zz1=zz;
 						  }
 			else if(layer>=1){zz=(getterrainheight(lonxx,latxx)+dhr);
+			           if(ii<di){zz+=dzlayer;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
 			else{zz=getterrainheight(lonxx,latxx)+dhr;}
 			//zz=getterrainheight(lonxx+dlonxx,latxx+dlatxx);
