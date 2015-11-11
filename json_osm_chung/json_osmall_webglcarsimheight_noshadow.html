@@ -1173,6 +1173,8 @@ function subradio(){
 	//var urlradio="https://42c17c83e1e121e17e84ae58bf77551517545859.googledrive.com/host/0B6GM9ay7ImZLY25Sd1FSUWNENWM/myaudioplayer2.html";
 	//var urlradio="https://sites.google.com/site/mywebglflightchung/mywebglflight/myaudioplayer.html?3&1&1&0&";
 	var urlradio="https://42c17c83e1e121e17e84ae58bf77551517545859.googledrive.com/host/0B6GM9ay7ImZLY25Sd1FSUWNENWM/myaudioplayer2.html?13&1&1&0&";
+    if(localStorage){var store=localStorage.getItem("json_osm_chung_tradiocanal");
+	                 if(store){tradiocanal=store;}}
 	if(tradiocanal==1){urlradio="myaudioplayer.html";}
 	//else{urlradio="https://www.reverbnation.com/widget_code/html_widget/artist_352350?autoplay=true";}
 	//else{urlradio="https://www.reverbnation.com/widget_code/html_widget/artist_352350?autoplay=true&widget_id=1&pwc[included_songs]=2";}
@@ -1207,6 +1209,7 @@ tradiocanal+=1;if(tradiocanal>1){tradiocanal=0;}
 	if(tradiocanal==1){urlradio="myaudioplayer.html";}
 	else{urlradio="https://www.reverbnation.com/widget_code/html_widget/artist_352350?autoplay=true";}
 	document.getElementById('radio').src=urlradio;	
+    if(localStorage){localStorage.setItem("json_osm_chung_tradiocanal",tradiocanal);}
 }
 function radioreduce(){
     if(fullscreen==0){
