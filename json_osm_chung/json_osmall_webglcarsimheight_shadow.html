@@ -2417,6 +2417,12 @@ if(tmap==0){
 	  var ko3v=60/(60+Math.abs(o3volant));
 	  if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant>64){o3volant=64;};}
       if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant<-64){o3volant=-64;};}
+	  var dxx=x+1.5*cos1+0.64*sin1-nx[0];
+	  if(Math.abs(dxx)<1){
+	    var dyy=y+1.5*sin1-0.64*cos1-ny[0];
+	    if(Math.abs(dyy)<1){
+		   //if(dxx*dxx+dyy*dyy<1){
+		      o3volant=Math.max(38,o3volant);}}//}
 	  if(Math.abs(o3volant)>0.2){
 	     var vcar3=vcar*0.5/(0.5+Math.abs(vcar));
 		 var do13=0;
@@ -2783,12 +2789,18 @@ function degtorad(degrees) {
     return degrees * Math.PI / 180;
 }
 var canvas2,canvastext;
+//var canvas3,canvassrtm;
 function initGL(canvasgl){
        try {
          canvas2=document.createElement('canvas');
          canvas2.setAttribute('width', 512);
          canvas2.setAttribute('height', 512);
          canvastext=canvas2.getContext("2d");
+
+         /*canvas3=document.createElement('canvas');
+         canvas3.setAttribute('width', 600);
+         canvas3.setAttribute('height', 600);
+         canvassrtm=canvas3.getContext("2d");*/
 
      	   gl = canvasgl.getContext("experimental-webgl");
            //gl = canvasgl.getContext("webgl");
@@ -9982,7 +9994,14 @@ function updatecitypanelx(){
 	      citypanelr[i]=0;citypanelx[i]=9999;}}
 	   }
 }
-function subtest(){snowlat=9999;setsnow();return;
+function subtest(){
+var srtmfich='http://caper.ws/terrain-srtm30-plus/tms7/14/24.png';
+var srtmimg=new Image();
+//srtmimg.crossOrigin = "anonymous";
+srtmimg.onload=function(){alert(srtmimg.width+"/"+srtmimg.height);}//337x95/337x337/337x325
+srtmimg.src=srtmfich;alert(srtmfich);
+return;
+snowlat=9999;setsnow();return;
 resetboeing2();return;
 getnodes4();
 //addcitypanel(x-5,y,getterrainheight2(x-5,y),0.45,cos1,sin1,locationname,5);addcitypaneltest();
@@ -11094,9 +11113,19 @@ var srtmfolder="",srtmfolder0=folderdrive+"srtm/";
 var srtmfile="",srtmfiles=[],isrtm=0,srtmvar="",srtmvars=[];
 var srtmdata=[],srtmlat=[],srtmlng=[];
 var lat5=0,lng5=0,lat50=0,lng40=0;
+var d5=360.0/128,d55=180.0/128,d25=d5/2.0,d255=d55/2.0;
 for(var i=0;i<4;i++){srtmfiles[i]="";
     srtmvars[i]="";srtmdata[i]=new Int16Array(601*601);
 	srtmlat[i]=99999;srtmlng[i]=9999;}
+function getsrtmfile22(lat1,lng1){
+if(lat1<-87 || lat1>87 || lng1<-177 || lng1>177){return "";}
+lat5=-90+d55*parseInt((lat1+90.0)/d55);
+lng5=-180+d5*parseInt((lng1+180.0)/d5);
+srtmfile=parseInt((lng1+180.0)/d5);
+srtmfile+="/"+parseInt((lat1+90.0)/d55);
+srtmvar=''; 
+srtmfile=srtmfile+".png";
+}
 function getsrtmfile(lat1,lng1){
 if(lat1<-87 || lat1>87 || lng1<-177 || lng1>177){return "";}
 lat5=-90+5*parseInt((lat1+90.0)/5);
@@ -11138,12 +11167,14 @@ function testloadsrtmfile(lat1,lng1){
   for(var i=0;i<4;i++){if(srtmfiles[i]==srtmfile){return;}}
   var distsrtm=0;
   for(var i=0;i<4;i++){
-    var dist=Math.max(Math.abs(lat1-srtmlat[i]),Math.abs(lng1-srtmlng[i]));
+    var dist=(Math.abs(lat1-srtmlat[i])+Math.abs(lng1-srtmlng[i]));
     if(dist>distsrtm){isrtm=i;distsrtm=dist;}
   }
   //auxvar=isrtm;
   srtmfiles[isrtm]=srtmfile;
   srtmvars[isrtm]=srtmvar;
+  //srtmlat[isrtm]=lat5+d255;
+  //srtmlng[isrtm]=lng5+d25+1000;
   srtmlat[isrtm]=lat5+2.5;
   srtmlng[isrtm]=lng5+2.5+1000;
   var worldx0=worldx,worldy0=worldy;
@@ -11180,6 +11211,19 @@ jsfile=jsfilelist[i];
 		try{head.removeChild(jslist[i]);}catch(e){err+="/js:"+jsfile;}
 		msg+="/"+jsfile;
 		};}
+}
+var srtmimg=new Image(),iisrtm0=0;
+srtmimg.crossOrigin = "anonymous";
+srtmimg.onload=function(){alert(srtmimg.width+"/"+srtmimg.height);//337x95/337x337/337x325
+              setTimeout("jscallback2(isrtm);",100);
+			  };
+function loadsrtmfile22(iisrtm){
+loading=55;
+//srtmfolder0='http://caper.ws/terrain-srtm30-plus/tms7/';//14/24.png;
+srtmfolder0='http://jaanga.github.io/terrain-srtm30-plus-data-tms-7plus/7plus/';
+var srtmfich=srtmfolder0+srtmfiles[iisrtm];
+alert("load "+srtmfolder0+srtmfiles[iisrtm]);
+srtmimg.src=srtmfich;alert(srtmfich);
 }
 function loadsrtmfile(iisrtm){
 loading=55;
@@ -11240,6 +11284,43 @@ srtmlng[ii]-=1000;
 tinitgmap=2;loading=50;
 ttestloadsrtm=0;
 }
+function jscallback22(ii){
+ alert("callback "+srtmfiles[ii]+"/"+ii);
+ canvas3.setAttribute('width', 600);
+ canvas3.setAttribute('height', 600);
+ canvassrtm.drawImage(srtmimg,0,0,srtmimg.width,srtmimg.height, 0,0,600,600);
+ var rgb=canvassrtm.getImageData(0,0,600,600).data;
+ auxvar=0;
+ //var srtmtext=eval(srtmvars[ii]);
+ //alert("srtmtextlen="+rgb.length);
+ var j=0,k=0,l=0,kl=0,n=0,p=0,x=0,ix=0,ixmax=601*600,jx=0;
+ var jmax=rgb.length;
+ while(j<jmax && ix<ixmax){
+	//x=srtmtext[j];
+	x = rgb[ j ] + 256 * rgb[ j + 1 ] + 65536 * rgb[ j +2 ] ;
+    if(x>=32767){x-=16777216;}
+	if(x<-11000){x=0;}
+	x=-x;
+    x*=0.0081;
+	if(x>auxvar){auxvar=x;}
+	//elevation = elevation < 32767 ? elevation : elevation - 16777216;
+	//elevation  = elevation < -11000 ? 0 : elevation ;
+    srtmdata[ii][ix]=x;ix++;j+=4;
+ }
+ alert("ix="+ix+"/"+(600*600)+"/isrtm="+ii+"/aux="+auxvar);
+ srtmtext=[];
+ //srtmimg.src=null;
+ //alert(srtmdata[i][0]); 
+/*srtmxmin[ii]=-srtmxmin[ii];
+srtmymin[ii]=-srtmymin[ii];
+srtmxmax[ii]=-srtmxmax[ii];
+srtmymax[ii]=-srtmymax[ii];
+*/
+srtmlng[ii]-=1000;
+//updatesrtm();
+tinitgmap=2;loading=50;
+ttestloadsrtm=0;
+}
 var kn18=18;
 function getheight1(i,j){return height1[(i+nsol2)*(n22)+j+nsol2];
 }
@@ -11277,6 +11358,41 @@ function getterrainheightsrtm(lngx,laty){
 	var h=0.06*(getsrtmheight(lngx,laty)-14.004);//-14-0.004
 	if(h<0){h=-0.015;};
 return h;
+}
+function getsrtmheight22(lngx,laty){
+	//var wx=worldx+(px-xmaxmin2)*scaletexture*10;
+	//var wy=worldy+(py-ymaxmin2)*scaletexture*10;
+	var jj=-1;
+	for(var ii=0;ii<4;ii++){
+	  if(Math.abs(lngx-srtmlng[ii])<d25){
+	   if(Math.abs(laty-srtmlat[ii])<d255){
+	     jj=ii;break;}}
+	}
+	if(jj<0){return -0.5;}
+	//auxvar=Math.max(auxvar,jj);
+	//auxvar+=1;
+	var nny=0.0001+599.99*(lngx-srtmlng[jj]+d25)/d5;
+	var nnx=0.0001+599.99*(laty-srtmlat[jj]+d255)/d55;
+	//nnx=599.5-nnx;
+	nny-=0.5;
+    var ndata=600;
+	if(nnx>=ndata){nnx=ndata-1;}
+	if(nny>=ndata){nny=ndata-1;}
+	if(nnx<0.0001){nnx=0.0001;}
+	if(nny<0.0001){nny=0.0001;}
+	var i=parseInt(nnx),j=parseInt(nny);
+	var dx=nnx-i,dy=nny-j;
+	var i1=i+1,j1=j+1;
+	if(i1>=ndata){i1=ndata-1;}
+	if(j1>=ndata){j1=ndata-1;}
+	//var h=srtmdata[jj][i*ndata+j];
+	//auxvar=i+10000*j;//Math.max(h,auxvar);
+	//return h;
+    var z00=srtmdata[jj][i*ndata+j];
+    var z10=srtmdata[jj][i1*ndata+j];
+    var z01=srtmdata[jj][i*ndata+j1];
+    var z11=srtmdata[jj][i1*ndata+j1];
+return (1-dx)*(1-dy)*(z00)+(1-dx)*dy*(z01)+dx*(1-dy)*z10+dx*dy*z11;
 }
 function getsrtmheight(lngx,laty){
 	//var wx=worldx+(px-xmaxmin2)*scaletexture*10;
