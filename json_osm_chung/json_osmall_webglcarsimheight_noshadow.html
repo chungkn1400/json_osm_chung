@@ -3659,6 +3659,16 @@ function drawcarrea(){
 	setMatrixUniformsa();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
+function drawcarrecockpit(){
+	gl.bindBuffer(gl.ARRAY_BUFFER, cockpitVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderaProgram.textureCoordAttribute, cockpitVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, cockpitVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, cockpitVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+	setMatrixUniformsa();
+    gl.drawArrays(gl.TRIANGLES, 0, cockpitVertexPositionBuffer.numItems);
+}
 function drawcarresun(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexTextureCoordBuffer);
     gl.vertexAttribPointer(sunProgram.textureCoordAttribute, boussVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -4065,7 +4075,8 @@ function drawcarcockpit(){
     
     mat4.scale(mvMatrix,[2,1.4,1]);
     colorr=1;colorg=1;colorb=1;colora=1;//1+20;
-    drawcarrea();
+    //drawcarrea();
+	drawcarrecockpit();
     colorr=1;colorg=1;colorb=1;colora=1;
 	gl.useProgram(shaderProgram);
 
@@ -4977,6 +4988,9 @@ function drawtexture(texture){
     var bouss2VertexTextureCoordBuffer;
 	var boussvertices,bouss2textureCoords;
 	var boussx=43,boussy=43,boussz=0;
+	var cockpitVertexPositionBuffer;
+	var cockpitVertexTextureCoordBuffer;
+	var cockpitvertices,cockpittextureCoords;
 	var treeVertexPositionBuffer=[];
     var treeVertexTextureCoordBuffer=[];
 	var treevertices;
@@ -5506,6 +5520,58 @@ function updatebuffersol(){
         bouss2VertexTextureCoordBuffer.itemSize = 2;
         bouss2VertexTextureCoordBuffer.numItems = 6;
 
+        cockpitVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cockpitVertexPositionBuffer);
+        cockpitvertices = new Float32Array(3*6*4);
+	    xc=boussx;
+	    yc=boussy;
+	    zc=boussz;
+		var dx=0.2*xc,dx0=0.35*xc,dy=0.6*yc,dy0=1.05*yc;
+		index=0;
+		for (var i=0; i < 1; i++) {
+		   append(cockpitvertices,[
+             -xc,-yc,zc,  -xc,yc,zc,  -xc+dx0,-yc,zc,
+             -xc,yc,zc,  -xc+dx0,yc,zc,  -xc+dx0,-yc,zc,	
+			 
+             xc-dx,-yc,zc, xc-dx,yc,zc,  xc,-yc,zc,
+             xc-dx,yc,zc,  xc,yc,zc,  xc,-yc,zc,
+			 
+             -xc+dx0,-yc,zc,  -xc+dx0,-yc+dy0,zc,  xc-dx,-yc,zc,
+             -xc+dx0,-yc+dy0,zc,  xc-dx,-yc+dy0,zc,  xc-dx,-yc,zc,	
+			 
+             -xc+dx0,yc-dy,zc,  -xc+dx0,yc,zc,  xc-dx,yc-dy,zc,
+             -xc+dx0,yc,zc,  xc-dx,yc,zc,  xc-dx,yc-dy,zc	
+			 ]); 
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (cockpitvertices), gl.STATIC_DRAW);
+        cockpitVertexPositionBuffer.itemSize = 3;
+        cockpitVertexPositionBuffer.numItems = 6*4;
+
+        cockpitVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cockpitVertexTextureCoordBuffer);
+        cockpittextureCoords = new Float32Array(2*6*4);
+		dx/=xc;dx0/=xc;dy/=yc;dy0/=yc;
+		dx/=2;dx0/=2;dy/=2;dy0/=2;
+		index=0;
+		for (var i=0; i < 1; i++) {
+		   append(cockpittextureCoords,[
+             0,0, 0,1, dx0,0,
+			 0,1, dx0,1, dx0,0,
+			 
+             1-dx,0, 1-dx,1, 1,0,
+			 1-dx,1, 1,1, 1,0,
+			 
+             dx0,0, dx0,dy0, 1-dx,0,
+			 dx0,dy0, 1-dx,dy0, 1-dx,0,
+			 
+             dx0,1-dy, dx0,1, 1-dx,1-dy,
+			 dx0,1, 1-dx,1, 1-dx,1-dy
+            ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER,  (cockpittextureCoords), gl.STATIC_DRAW);
+        cockpitVertexTextureCoordBuffer.itemSize = 2;
+        cockpitVertexTextureCoordBuffer.numItems = 6*4;
+		
         }
 		
         roofVertexPositionBuffer[ibuff] = gl.createBuffer();
