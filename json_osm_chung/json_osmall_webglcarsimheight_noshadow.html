@@ -3845,6 +3845,7 @@ for(var i=1;i<=ncar;i++){
    movecar();
    testcollidecar(i);
    typecar=i;
+   testresetcar(typecar);
    if(Math.abs(x-nx[i])<10 && Math.abs(y-ny[i])<10){drawcarobj();}
    else{z=0;}
    savecar(i);
@@ -6181,6 +6182,21 @@ if(typecar>0){
 pautoroad0=-1;
 o1+=Math.random()*dtime*0.005;
 o1pilot=o1;
+}
+function testresetcar(typecar){
+if(typecar>0){
+ var dmax=dxmax*1.3;
+ if(Math.abs(x-nx[0])>dmax+2 || Math.abs(y-ny[0])>dmax+2){
+   lngx=nlngx[0]+ncos1[0]*dmax*klon/scale;
+   latx=nlatx[0]+nsin1[0]*dmax/scale;
+   x=nx[0]+ncos1[0]*dmax;
+   y=ny[0]+nsin1[0]*dmax;
+pautoroad0=-1;
+o1=no1[0]+180+(Math.random()-0.5)*90;
+if(Math.random()<0.1){o1-=180;}
+while(o1>180){o1-=360;}
+o1pilot=o1;
+}}
 }
 var roadbandlng0=0,roadbandlat0=0,roadbandlng=0,roadbandlat=0;
 var roadbandx=[],roadbandy=[],roadbandz=[],roadbandtan2=[];
