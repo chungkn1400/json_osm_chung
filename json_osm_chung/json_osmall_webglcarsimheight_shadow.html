@@ -897,6 +897,7 @@ function waycallback(r){//alert(r);
    }}
   //alert("nnode="+nnode+" "+msg);
   setTimeout("getnodes();",t300);
+  dtweb=timer()-dtweb;
   //if(nnode<7000){setTimeout("getways2();",20);}
   //else{ways2=[];waylat2=lat;waylon2=lng;setTimeout("getnodes();",t300*2);}
 }
@@ -1065,7 +1066,7 @@ context.fillStyle = '#ff0000';
 context.fillText(text,20,40);
 }
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
-var trygetways=0; 
+var trygetways=0,dtweb=0; 
 function getways(){
 trygetways=1;
 if(tframe<dtgetways){return;}
@@ -1077,14 +1078,14 @@ if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 trygetways=0;
 loading=1;
 dxmax=25;
-if(avgfps<8){dxmax2=Math.max(13,dxmax2-2);}
-if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
+if(avgfps<8 || dtweb>4500){dxmax2=Math.max(13,dxmax2-2);}
+else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
 var k=(300/(10+ways.length));
 k=Math.min(k,5000/(100+nodes.length+nodes2.length+nodes3.length));
 k=Math.max(0.75,Math.min(3,Math.sqrt(k)));
 if(tinit<2){k=1;};
-if(k<kdxmax){kdxmax-=0.25;}
-if(k>kdxmax){kdxmax+=0.25;}
+if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
+else if(k>kdxmax){kdxmax+=0.25;}
 kdxmax=Math.max(0.75,Math.min(2,kdxmax));
 //auxvar=kdxmax;auxvar2=nodes.length;
 dxmax=Math.max(19,dxmax2*kdxmax);
@@ -1115,6 +1116,7 @@ kx=1;
 lat1=lat-kx*dlat/2;lon1=lng-kx*dlon/2;
 lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 msgload("loading...");
+dtweb=timer();
 //wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
 //var keyway="[highway~'motorway|trunk|primary|secondary']";
 var keyway="[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']";
