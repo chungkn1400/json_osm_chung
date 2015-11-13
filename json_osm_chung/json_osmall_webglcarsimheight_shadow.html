@@ -10229,10 +10229,10 @@ function addtower(way){
 		    h00=way.tags["building:height"]/6;
 			}
     else if(way.tags["building:levels"]){
-		    h00=way.tags["building:levels"]*1.2;// /4;
+		    h00=way.tags["building:levels"]*1.0;// /4;
 			}
     else if(way.tags.levels){
-		    h00=way.tags.levels*1.2;// /4;
+		    h00=way.tags.levels*1.0;// /4;
 			}
 	if(h00>0){h=h00;}
     if(way.tags.min_height){hmin=way.tags.min_height/6;}
@@ -10240,7 +10240,7 @@ function addtower(way){
 		    hmin=way.tags["building:min_height"]/6;
 			}
     else if(way.tags["building:min_level"]){
-		    hmin=way.tags["building:min_level"]*1.2;// /4;
+		    hmin=way.tags["building:min_level"]*1.0;// /4;
 			}
     if(way.tags.amenity){
 	   amenity=way.tags.amenity;//amenity="fuel";//way.tags.amenity;
