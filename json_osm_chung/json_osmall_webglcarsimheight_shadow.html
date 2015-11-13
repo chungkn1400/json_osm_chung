@@ -1956,6 +1956,7 @@ if(tmsg<(tframe-150)){tmsg=tframe;
  setvolume();
  setvol(myaudiojet,Math.max(0.002,0.5*200/(100+distboeing*distboeing)));
  setspeed(myaudiojet,0.95+0.4*10/(10+distboeing));
+ settrottoir();
 }
 if(tframe>timejoy){timejoy=tframe+50;testjoystick();
 }
@@ -2507,7 +2508,7 @@ if(twebaudio==1 && tradio==0){
 
     var pix=new Uint8Array(16);
     var tframe=0,tframe0=0,tfps=30,fps=10,dtime=1,tmsg=0,clearr,clearg,clearb,tskip=0;
-	var ttimeout=0,testloop=0,tskip2=0,tsrtm=0,itime=0,tinit=0;
+	var ttimeout=0,testloop=0,tskip2=0,tsrtm=0,itime=0,tinit=0,dtinit=0;
 	var tmovertt=0,nextdx=0,nextdy=0,avgfps=10,trttok=1,ttestmouse=0;
 	var sunxsave=sunx,sunysave=suny,sunzsave=sunz;
 	function tick(tt) {
@@ -2614,10 +2615,11 @@ if(twebaudio==1 && tradio==0){
 		   tmovertt=1;
            loading=0;dtloading=tframe;
 		   nextdx=0;nextdy=0;
-		   if(tinit==0){tinit=1;}
+		   if(tinit==0){tinit=1;dtinit=tframe+4000;}
 		   msgload("");
 		   dtinitmap=Math.min(dtinitmap,tframe-3000);
 		   setsnow();
+		   trottoirx=999999;settrottoir();
 		   tdraw=0;
 		   }
 		if(itime%30==1){
@@ -2640,7 +2642,7 @@ if(twebaudio==1 && tradio==0){
 			//tinitgmap=2;//x00=999999;
 			tmovertt=1;
 		}//}
-     	if((tupdatetown2==1 || tupdatetown==2) && loading==0 && tframe>dtloading+2000){
+     	if((tupdatetown2==1 || tupdatetown==2) && loading==0 && tframe>dtloading+2000 && tframe>dtinit){
 		       updatetown();}
         sunx=sunxsave;suny=sunysave;sunz=sunzsave;
 		tfps+=(tframe-tframe0-tfps)*0.2;
@@ -3232,7 +3234,7 @@ function initGL(canvasgl){
 	var tajmahalTexture,buddahTexture,photoTexture,bikiniTexture;
 	var marisolTexture,womanTexture,churchTexture,boeingTexture;
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
-	var autumntreeTexture,autumntree2Texture,tree3Texture;
+	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -3702,6 +3704,13 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         boeingTexture.image.src = "boeing512.png";
 
+        trottoirTexture = gl.createTexture();
+        trottoirTexture.image = new Image();
+        trottoirTexture.image.onload = function () {
+			handleLoadedTexture(trottoirTexture);
+        }
+        trottoirTexture.image.src = "trottoir.jpg";
+		
 		arrowgreenforward=new Image();
 		arrowgreenforward.src="arrowgreenforward.png";
 		arrowgreenleft=new Image();
@@ -5854,6 +5863,18 @@ for(var i=0;i<nroc;i++){
     }}
  }
 }
+var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirx=0,trottoiry=0;
+function settrottoir(){
+var j=0;
+if(Math.abs(trottoirx-x)<7 && Math.abs(trottoiry-y)<7){return;}
+trottoirx=x;trottoiry=y;
+var dy=0.0008,dx=klon*dy;
+for(var i=0;i<ntrottoir;i++){
+    if(Math.abs(trottoirlat[i]-latx)<dy){
+	  if(Math.abs(trottoirlon[i]-lngx)<dx){j+=1;}}
+}
+if(j>35){ttrottoir=1;}else{ttrottoir=0;}
+}
 var tsnow=0,snowzsol=0,snowlat=9999,tpine=0;
 function setsnow(){
 if(Math.abs(zsol-snowzsol)>20 || Math.abs(snowlat-latx)>2){
@@ -6728,7 +6749,8 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
     gl.uniform1i(solProgram.samplerUniform, 7);
 
 	gl.activeTexture(gl.TEXTURE8);
-    if(tsnow==0){gl.bindTexture(gl.TEXTURE_2D,  solTexture0);}
+    if(tsnow==0 && ttrottoir==1){gl.bindTexture(gl.TEXTURE_2D,  trottoirTexture);}
+    else if(tsnow==0){gl.bindTexture(gl.TEXTURE_2D,  solTexture0);}
 	else{gl.bindTexture(gl.TEXTURE_2D,  solTexture02);}
     gl.uniform1i(solProgram.samplerUniform2, 8);
 
@@ -8421,7 +8443,12 @@ if(typecar>0){
    y=ny[0]+nsin1[0]*dmax;
 pautoroad0=-1;
 o1=no1[0]+180+(Math.random()-0.5)*90;
-if(Math.random()<0.1){o1-=180;}
+if(Math.random()<0.1){
+   o1-=180;
+   if(vcar>nvcar[0]*1.3){
+     x=nx[0]-ncos1[0]*dmax;
+     y=ny[0]-nsin1[0]*dmax;
+}}
 while(o1>180){o1-=360;}
 o1pilot=o1;
 }}
@@ -8705,6 +8732,7 @@ indextree=0;indextree2=0;
 indexline=0;indexlinetext=0;
 indexcross=0;
 tairport=0;airportx=999999;airportname="";distairport1=999999;distairport2=999999;
+ntrottoir=0;
 //resettree2();
 //resettree22();
 //if(Math.max(Math.abs(latx-lat0),Math.abs(lngx-lng0))>0.001){
@@ -10221,7 +10249,7 @@ function addtower(way){
    var jmax=way.nodes.length;//-1;
    var larg=1,ilarg=way.nodes[parseInt(jmax*0.51)];
    var i0=way.nodes[0];
-   var xmid=0,ymid=0,zmid=0,ztree=-9999,larg2=1,latmid=0,lonmid=0;
+   var xmid=0,ymid=0,zmid=0,ztree=-9999,larg2=1,latmid=-90,lonmid=0;
    if(latnodes[ilarg] && latnodes[i0]){
    	   latmid=latnodes[i0];lonmid=lonnodes[i0];
 	   yyy=(latnodes[i0]-latx0)*scale*2;
@@ -10271,7 +10299,8 @@ if(isNaN(h)){h=5;}
 if(amenity=="place_of_worship"){h=Math.max(3.1,h);}
 var h0=h;
 h+=0.5;
-//if(layer>0.9){hmin=1.2;}  
+//if(layer>0.9){hmin=1.2;}
+if(latmid>-89){trottoirlat[ntrottoir]=latmid;trottoirlon[ntrottoir]=lonmid;ntrottoir+=1;}
 if(h0>3 || hmin>0.1){//tower
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
