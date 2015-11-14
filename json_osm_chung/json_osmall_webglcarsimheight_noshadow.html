@@ -1151,6 +1151,7 @@ msg+="shift+C => collide  /  C => clouds(on/off)"+crlf;
 msg+="P => auto pilot"+crlf;
 msg+="A => ascend (climb walls,foot mode)"+crlf;
 msg+="7 => change season"+crlf;
+msg+="shift+E => change cockpit"+crlf;
 msg+="button 1 => accelerate"+crlf;
 msg+="button 2 => decelerate"+crlf;
 msg+="button 4 => car / foot"+crlf;
@@ -1253,8 +1254,11 @@ function subautopilot(){
  else{if(confirm("set autopilot off ?")){tautopilot=0;}}
 }
 function subgirl(){
- if(tgirl==0){if(confirm("set girl on ?")){tgirl=1;carTexture.image.src = "chevy2girl.png";}}
- else{if(confirm("set girl off ?")){tgirl=0;carTexture.image.src = "chevy2.png";}}
+ //if(tgirl==0){if(confirm("set girl on ?")){tgirl=1;carTexture.image.src = "chevy2girl.png";}}
+ //else{if(confirm("set girl off ?")){tgirl=0;carTexture.image.src = "chevy2.png";}}
+ if(tgirl==0){tgirl=1;carTexture.image.src = "toyota.png";}
+ else{tgirl=0;carTexture.image.src = "chevy2.png";}
+ resetkeys();
 }
 function subtest(){
 tupdatesoltexture=2;
@@ -2552,7 +2556,9 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         carTexture.image.onload = function () {
             handleLoadedTexture(carTexture)
         }
-        if(tgirl>=1){carTexture.image.src = "chevy2girl.png";}//"chevy.jpg";
+        //if(tgirl>=1){carTexture.image.src = "chevy2girl.png";}//"chevy.jpg";
+        //else{carTexture.image.src = "chevy2.png";}//"chevy.jpg";
+        if(tgirl>=1){carTexture.image.src = "toyota.png";}//"chevy.jpg";
         else{carTexture.image.src = "chevy2.png";}//"chevy.jpg";
 
         carTexture2 = gl.createTexture();
@@ -4066,6 +4072,7 @@ gl.useProgram(shaderProgram);
 }
 var cockpith=0;
 function drawcarcockpit(){
+if(tgirl==1){drawcarcockpit2();return;}
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.DEPTH_TEST);
         mvPushMatrix();
@@ -4085,10 +4092,11 @@ function drawcarcockpit(){
         //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
 	gl.useProgram(shaderaProgram);
 	gl.activeTexture(gl.TEXTURE5);
-	if(tgirl==1){if(Math.random()<dtime*0.0001){tgirl=2;}}
-	if(tgirl==2){if(Math.random()<dtime*0.0002){tgirl=1;}}
-    if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
-	else{gl.bindTexture(gl.TEXTURE_2D,  carTexture2);}
+	//if(tgirl==1){if(Math.random()<dtime*0.0001){tgirl=2;}}
+	//if(tgirl==2){if(Math.random()<dtime*0.0002){tgirl=1;}}
+    //if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
+    gl.bindTexture(gl.TEXTURE_2D,  carTexture);
+	//else{gl.bindTexture(gl.TEXTURE_2D,  carTexture2);}
     gl.uniform1i(shaderaProgram.samplerUniform, 5);
     
     mat4.scale(mvMatrix,[2,1.4,1]);
@@ -4143,8 +4151,59 @@ function drawrpm(){
 	drawcarre();
 	mvPopMatrix();
 }
+function drawcarcockpit2(){
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+        mvPushMatrix();
+		mat4.identity(mvMatrix);
+		//windx=canvas.width;
+		//windy=canvas.height;
+		//mat4.translate(mvMatrix, [230*windx/windy,-220,-600]);//boussx
+		mat4.translate(mvMatrix, [0,2.3,-84]);
+		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
+		//mat4.rotate(mvMatrix, degtorad(planedo2), [1, 0, 0]);
+		mat4.rotate(mvMatrix, degtorad(-planedo3*2.7), [0, 0, 1]);
+		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
+		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
+		else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+	    //mat4.identity(rotMatrix);
+        //mat4.translate(rotMatrix, [x,y,z]);
+        //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
+	gl.useProgram(shaderaProgram);
+	gl.activeTexture(gl.TEXTURE5);
+	//if(tgirl==1){if(Math.random()<dtime*0.0001){tgirl=2;}}
+	//if(tgirl==2){if(Math.random()<dtime*0.0002){tgirl=1;}}
+    if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
+	//else{gl.bindTexture(gl.TEXTURE_2D,  carTexture2);}
+    gl.uniform1i(shaderaProgram.samplerUniform, 5);
+    
+    mat4.scale(mvMatrix,[2,1.4,1]);
+    colorr=1;colorg=1;colorb=1;colora=0;//1+20;
+    //drawcarresh0();
+	drawcarrecockpit();
+    colorr=1;colorg=1;colorb=1;colora=1;
+	gl.useProgram(shaderProgram);
+
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-17.65,-26,0.005]);
+    mat4.scale(mvMatrix,[0.07,0.10,1]);
+	colora=1;
+	drawrpm();
+	colora=1;
+	mvPopMatrix();
+
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-17.57,-37.3,0.01]);
+    mat4.scale(mvMatrix,[0.265,0.427,1]);
+	mat4.rotate(mvMatrix, degtorad(o3volant), [0, 0, 1]);
+    drawvolant();
+	mvPopMatrix();
+	
+	mvPopMatrix();
+    gl.enable(gl.DEPTH_TEST);
+}
 var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirx=0,trottoiry=0;
-function settrottoir(){ttrottoir=0;return;
+function settrottoir(){
 var j=0;
 if(Math.abs(trottoirx-x)<7 && Math.abs(trottoiry-y)<7){return;}
 trottoirx=x;trottoiry=y;
