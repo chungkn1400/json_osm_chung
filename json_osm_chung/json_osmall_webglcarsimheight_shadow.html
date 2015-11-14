@@ -112,6 +112,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="carobjtxt.js"></script>
 <script src="carwheelobjtxt.js"></script>
 <script src="rocobjtxt.js"></script>
+<script src="station2objtxt.js"></script>
 <script id="shader-fs0" type="x-shader/x-fragment">
     precision lowp float;
     //precision mediump float;
@@ -945,11 +946,6 @@ function nodecallback(r){//alert(r);
 	 var inode=nodes[i].id; 
 	 latnodes[inode]=nodes[i].lat;
      lonnodes[inode]=nodes[i].lon;
-     /*if(nodes[i].tags){
-	  if(nodes[i].tags.highway){
-	   if(nodes[i].tags.highway=="traffic_signals"){
-		 nodesignal[inode]=1;
-		 }}}*/	 
 	 }
   //alert(msg+nodes.length);
   
@@ -959,7 +955,7 @@ var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
-  nodes2=[];
+  nodes2=[];nstation=0;
   nodes2=nodejson2.elements;
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
@@ -971,6 +967,13 @@ function nodecallback2(r){//alert(r);
 	 var inode=nodes2[i].id; 
 	 latnodes[inode]=nodes2[i].lat;
      lonnodes[inode]=nodes2[i].lon;
+     if(nodes2[i].tags){
+	  if(nodes2[i].tags.amenity){
+	   if(nodes2[i].tags.amenity=="fuel"){
+		 stationlat[nstation]=nodes2[i].lat;
+		 stationlon[nstation]=nodes2[i].lon;
+		 nstation+=1;
+		 }}}
 	 }
   //alert(msg);
   
@@ -1182,12 +1185,20 @@ httpGet(nodeurl,nodecallback);
 }
 function getnodes2(){
 msgload("getnodes2");
-var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
+lat1=lat-dlat/2;lon1=lng-dlon/2;
+lat2=lat+dlat/2;lon2=lng+dlon/2;
+var dx=0.001;
+var lat11=lat1-dx,lon11=lon1-dx*klon;
+var lat21=lat2+dx,lon21=lon2+dx*klon;
+var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
+//var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
+var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
 	if(i<inode2){nodeurl2+=";";}
 	}
-nodeurl2+="%29%3Bout%20skel%201999%3B";
+//nodeurl2+="%29%3Bout%20skel%201999%3B";
+nodeurl2+="%29%3Bout%201999%3B";
 try{		
 httpGet(nodeurl2,nodecallback2);
 }catch (e){alert("error getnodes2");loading=0;}
@@ -3243,6 +3254,7 @@ function initGL(canvasgl){
 	var marisolTexture,womanTexture,churchTexture,boeingTexture;
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
+	var stationTexture;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -3719,6 +3731,13 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         trottoirTexture.image.src = "trottoir.jpg";
 		
+        stationTexture = gl.createTexture();
+        stationTexture.image = new Image();
+        stationTexture.image.onload = function () {
+			handleLoadedTexture(stationTexture);
+        }
+        stationTexture.image.src = "station2.jpg";
+
 		arrowgreenforward=new Image();
 		arrowgreenforward.src="arrowgreenforward.png";
 		arrowgreenleft=new Image();
@@ -4382,6 +4401,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
     gl.uniform1i(shaderProgram.samplerUniform2, 15);
 */
 	if(tmap>=0){gl.useProgram(shaderaProgram);
+	            drawstationobj();
 		        drawncarobj();
 				drawsmoke();
 		        if(tcloud>=1){
@@ -5495,6 +5515,34 @@ function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
 
 	mvPopMatrix();
 }
+var nstation=0,stationlat=[],stationlon=[],stationx=[],stationy=[],stationz=[],stationo1=[];
+var nstation0=0,stationlat0=[],stationlon0=[],stationx0=[],stationy0=[],stationz0=[],stationo10=[];
+function drawstationobj(){
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, stationTexture);
+    gl.uniform1i(shaderaProgram.samplerUniform, 11);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, stationVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderaProgram.textureCoordAttribute, stationVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, stationVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, stationVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+ for(var i=0;i<nstation0;i++){
+   if(stationz0[i]>-999){auxvar+=1000;
+	mvPushMatrix();
+	mat4.translate(mvMatrix, [stationx0[i],stationy0[i],stationz0[i]]);
+    mat4.rotate(mvMatrix, degtorad(stationo10[i]), [0, 0, 1]);
+	
+	var sc=0.01;mat4.scale(mvMatrix,[sc,sc,sc]);
+	colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniformsa();
+	colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, stationVertexPositionBuffer.numItems);
+
+	mvPopMatrix();
+	}}
+}
 var tupdatesun=0,sunx=0,suny=0,sunz=0,o1sun=0,o2sun=0;
 var month=0;
 function updatesun(){
@@ -5638,7 +5686,8 @@ if(tgirl==1){drawcarcockpit2();return;}
 	gl.activeTexture(gl.TEXTURE5);
 	//if(tgirl==1){if(Math.random()<dtime*0.0001){tgirl=2;}}
 	//if(tgirl==2){if(Math.random()<dtime*0.0002){tgirl=1;}}
-    if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
+    //if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
+    gl.bindTexture(gl.TEXTURE_2D,  carTexture);
 	//else{gl.bindTexture(gl.TEXTURE_2D,  carTexture2);}
     gl.uniform1i(shader0Program.samplerUniform, 5);
     
@@ -8147,6 +8196,41 @@ var py=(py0)*2;
   }
 return test;
 }
+var iroadnear=0,xroadnear=0,yroadnear=0,zroadnear=0,o1roadnear=0;
+function testroadnear(px0,py0,lat10,lng10,r){
+var l,dx,dy,dxx,dxy,dxyi,distxy=999999;
+var px=(px0)*2;
+var py=(py0)*2;
+iroadnear=0;
+var j=-1;
+  for(var i=0;i<iroad;i++){
+    if(Math.abs(px-roadx[i])<roadl[i]+7){
+	 if(Math.abs(py-roady[i])<roadl[i]+7){
+	   dx=px-roadx[i];
+	   dy=py-roady[i];
+       dxx=dx*roadco1[i]+dy*roadsi1[i];
+	   if(dxx>-0.2 && dxx<roadl[i]+0.2){
+	     dxy=-dx*roadsi1[i]+dy*roadco1[i];
+	     if(Math.abs(dxy)<distxy){
+		    distxy=Math.abs(dxy);
+			dxyi=dxy;
+            iroadnear=i;j=i;
+		 }
+	   }
+	 }
+	}
+  }
+if(j>=0){var i=j;
+         if(distxy<roadr[i]){xroadnear=roadx[i]+dxx*roadco1[i];
+		                     yroadnear=roady[i]+dxx*roadsi1[i];}
+		 else{xroadnear=px;//roadx[i]+dxx*roadco1[i]-(r+roadr[i])*sign(dxyi)*roadsi1[i];
+              yroadnear=py;//roady[i]+dxx*roadsi1[i]+(r+roadr[i])*sign(dxyi)*roadco1[i];
+         }
+		 zroadnear=roadz[i]+dxx*roadtan2[i];
+         o1roadnear=diro1(roadco1[i],roadsi1[i]);			
+  return 1;}
+return 0;
+}
 var nroadarrow=25,iroadarrow=0,iroadarrow0=0;
 var roadarrowx=[],roadarrowy=[],roadarrowz=[];
 var roadarrowo1=[],roadarrowo2=[];
@@ -8572,7 +8656,7 @@ for(var i=0;i<ways2.length;i++){
    }}}}}}}
    */  
    //auxvar3=inode2+inode3+inode31;
-   if(inode2==0){tdraw=2;loading=1.75;}
+   if(inode2==9990){tdraw=2;loading=1.75;}
    else{setTimeout("getnodes2();",20);}
 }		
 function drawglroad(iway){
@@ -9219,6 +9303,7 @@ if(way.nodes){
    //context.fillText("M => map",20,60);
    //alert("drawways="+i);
    //loading=0;
+   addstationtest();
    addtreetest();
    addlinetest();
    addbartest();
@@ -9421,6 +9506,17 @@ function updateiroad(){
    //   citypanelx[i]+=dx;
    //   citypanely[i]+=dy;
    //}
+   for(var i=0;i<nstation;i++){
+     
+      stationlat0[i]=stationlat[i];
+      stationlon0[i]=stationlon[i];
+      stationx0[i]=stationx[i];
+      stationy0[i]=stationy[i];
+      if(stationz[i]>-999){stationz0[i]=getterrainheight(stationlon0[i],stationlat0[i]);}
+	  else{stationz0[i]=-999999;}
+      stationo10[i]=stationo1[i];
+   }
+   nstation0=nstation;
 }
 function updatebuffer1(){   
    var ibuff=ibuff1;
@@ -9930,6 +10026,21 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
    woman0si1[iwoman0]=womansi1[i];
    iwoman0+=1;
 }}
+}
+function addstationtest(){
+  for(var i=0;i<nstation;i++){
+     stationz[i]=-999999;
+	 var px=(stationlon[i]-lngx0)*scale/klon;
+	 var py=(stationlat[i]-latx0)*scale;
+	 if(testroadnear(px,py,latx0,lngx0,2)==1){
+	    stationx[i]=xroadnear/2;
+		stationy[i]=yroadnear/2;
+		//stationlon[i]=xroadnear*klon/scale+lngx0;
+		//stationlat[i]=yroadnear/scale+latx0;
+		stationz[i]=zroadnear;
+		stationo1[i]=o1roadnear;
+	 }
+  }
 }
 var citypanelx=[],citypanely=[],citypanelz=[],citypanelr=[],icitypanel=0;
 var citypanelco1=[],citypanelsi1=[],citypanelname=[],citypanelh=[];
@@ -11636,6 +11747,8 @@ var carwheelVertexPositionBuffer = null;
 var carwheelVertexTextureCoordBuffer = null;
 var rocVertexPositionBuffer = null;
 var rocVertexTextureCoordBuffer = null;
+var stationVertexPositionBuffer = null;
+var stationVertexTextureCoordBuffer = null;
 
 
 function loadmodels() {
@@ -11677,6 +11790,19 @@ function loadmodels() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
     rocVertexTextureCoordBuffer.itemSize = 2;
     rocVertexTextureCoordBuffer.numItems = vertexCount;//alert(vertexCount);
+    
+    handleLoadedWorld(station2objtxt);
+    stationVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, stationVertexPositionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
+    stationVertexPositionBuffer.itemSize = 3;
+    stationVertexPositionBuffer.numItems = vertexCount;
+
+    stationVertexTextureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, stationVertexTextureCoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
+    stationVertexTextureCoordBuffer.itemSize = 2;
+    stationVertexTextureCoordBuffer.numItems = vertexCount;//alert(vertexCount);
     
 }
 var vertexCount = 0;
