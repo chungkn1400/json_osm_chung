@@ -5920,17 +5920,18 @@ for(var i=0;i<nroc;i++){
     }}
  }
 }
-var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirx=0,trottoiry=0;
+var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirr=[],trottoirx=0,trottoiry=0;
 function settrottoir(){
 var j=0;
 if(Math.abs(trottoirx-x)<7 && Math.abs(trottoiry-y)<7){return;}
 trottoirx=x;trottoiry=y;
 var dy=0.0008,dx=klon*dy;
 for(var i=0;i<ntrottoir;i++){
+     dy=trottoirr[i]+0.0003;
     if(Math.abs(trottoirlat[i]-latx)<dy){
-	  if(Math.abs(trottoirlon[i]-lngx)<dx){j+=1;}}
+	  if(Math.abs(trottoirlon[i]-lngx)<dy*klon){j+=1;}}
 }
-if(j>35){ttrottoir=1;}else{ttrottoir=0;}
+if(j>12){ttrottoir=1;}else{ttrottoir=0;}
 }
 var tsnow=0,snowzsol=0,snowlat=9999,tpine=0;
 function setsnow(){
@@ -10370,9 +10371,10 @@ function addtower(way){
    var jmax=way.nodes.length;//-1;
    var larg=1,ilarg=way.nodes[parseInt(jmax*0.51)];
    var i0=way.nodes[0];
-   var xmid=0,ymid=0,zmid=0,ztree=-9999,larg2=1,latmid=-90,lonmid=0;
+   var xmid=0,ymid=0,zmid=0,ztree=-9999,larg2=1,latmid=-90,lonmid=0,latmid2=-90,lonmid2=0;
    if(latnodes[ilarg] && latnodes[i0]){
    	   latmid=latnodes[i0];lonmid=lonnodes[i0];
+   	   latmid2=latnodes[ilarg];lonmid2=lonnodes[ilarg];
 	   yyy=(latnodes[i0]-latx0)*scale*2;
 	   xxx=((lonnodes[i0]-lngx0)/klon)*scale*2;
    	   yy=(latnodes[ilarg]-latx0)*scale*2;
@@ -10391,6 +10393,7 @@ function addtower(way){
    i0=way.nodes[parseInt(jmax*0.26)];
    if(latnodes[ilarg] && latnodes[i0]){
    	   latmid=latnodes[i0];lonmid=lonnodes[i0];
+   	   latmid2=latnodes[ilarg];lonmid2=lonnodes[ilarg];
 	   yyy=(latnodes[i0]-latx0)*scale*2;
 	   xxx=((lonnodes[i0]-lngx0)/klon)*scale*2;
    	   yy=(latnodes[ilarg]-latx0)*scale*2;
@@ -10421,7 +10424,10 @@ if(amenity=="place_of_worship"){h=Math.max(3.1,h);}
 var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
-if(latmid>-89){trottoirlat[ntrottoir]=latmid;trottoirlon[ntrottoir]=lonmid;ntrottoir+=1;}
+if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
+               trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
+			   trottoirr[ntrottoir]=(Math.abs(latmid-latmid2)+Math.abs(lonmid-lonmid2)/klon)/2;
+			   ntrottoir+=1;}
 if(h0>3 || hmin>0.1){//tower
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
