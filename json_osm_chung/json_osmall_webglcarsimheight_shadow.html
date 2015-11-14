@@ -2634,7 +2634,7 @@ if(twebaudio==1 && tradio==0){
 		   tmovertt=1;
            loading=0;dtloading=tframe;
 		   nextdx=0;nextdy=0;
-		   if(tinit==0){tinit=1;dtinit=tframe+4000;}
+		   if(tinit==0){tinit=1;dtinit=tframe+8000;}
 		   msgload("");
 		   dtinitmap=Math.min(dtinitmap,tframe-3000);
 		   setsnow();
@@ -5529,7 +5529,7 @@ function drawstationobj(){
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, stationVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
  for(var i=0;i<nstation0;i++){
-   if(stationz0[i]>-999){auxvar+=1000;
+   if(stationz0[i]>-999){
 	mvPushMatrix();
 	mat4.translate(mvMatrix, [stationx0[i],stationy0[i],stationz0[i]]);
     mat4.rotate(mvMatrix, degtorad(stationo10[i]), [0, 0, 1]);
