@@ -144,6 +144,8 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 		vTextureCoord=aTextureCoord*0.5;
 		float dx=0.2499;
 		if(r>999.0){r-=1000.0;vTextureCoord.y=aTextureCoord.y;dx=0.99;}//bridgecolour
+		else if(r>399.0){r-=400.0;vTextureCoord.x+=0.25;}//highway
+		else if(r>299.0){r-=300.0;vTextureCoord.x+=0.5;vTextureCoord.y+=0.5;}//station
 		else if(r>199.0){r-=200.0;vTextureCoord.x+=0.125;vTextureCoord.y+=0.5;}//oneway2
 		else if(r>99.0){r-=100.0;vTextureCoord.y+=0.5;}//oneway
 		else if(r>20.0){r-=20.0;vTextureCoord=aTextureCoord;dx=0.99;}//city
@@ -5094,7 +5096,7 @@ function drawtexture(texture){
 	var crossVertexPositionBuffer=[];
     var crossVertexTextureCoordBuffer=[];
 	var crossvertices;
-	var ncross=300;
+	var ncross=600;
 	var citypanelVertexPositionBuffer=[];
     var citypanelVertexTextureCoordBuffer=[];
 	var citypanelvertices,citypaneltextureCoords;
@@ -6872,6 +6874,8 @@ if(way.nodes){
               addtree(xxx-(r+0.5)*(si1-co1),yyy+(r+0.5)*(co1+si1),ztree);
               if(r>0.8){addline(xxx+(r+0.3)*(si1-co1),yyy-(r+0.3)*(co1+si1),zzz+zsol0,0.017,co1,si1);}
 			}
+			if(r>2.7 && (ii%40)==5 && (parseInt(xxx+yyy)%3)==0){
+			    addcross(xxx+(r+0.5)*(co1+si1),yyy+(r+0.5)*(si1-co1),zzz+zsol0,r+400,co1,si1);}//highway
 			if(testband==0 && (ii%20)==10){
 			    if(oneway==1){addcross(xxx+(r+0.15)*(si1),yyy-(r+0.15)*(co1),zzz+zsol0,r+100,co1,si1);
 			                  addcross(xxx-(r+0.15)*(si1),yyy+(r+0.15)*(co1),zzz+zsol0,r+100,co1,si1);}}
@@ -7411,8 +7415,11 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
    si1=crosssi1[i]*r*9.45;
    co11=0.014*co1;
    si11=0.014*si1;
+   h2=0.45;
    if(testroadcross(xx/2,yy/2,latx0,lngx0,rr)==1){
       r+=10;co1*=0.87;si1*=0.87;}//stop
+   else if(rr>400){r+=400;co1*=1.05;si1*=1.05;h2=0.48;}//highway
+   else if(rr>300){r+=300;co1*=0.82;si1*=0.82;}//station
    else if(rr>200){r+=200;co1*=0.82;si1*=0.82;}//oneway2
    else if(rr>100){r+=100;co1*=0.82;si1*=0.82;}//oneway
    var zz0=zz-0.5;
