@@ -2443,13 +2443,13 @@ if(tmap==0){
 	  if(Math.abs(dxx)<1){
 	    var dyy=y+1.5*sin1-0.64*cos1-ny[0];
 	    if(Math.abs(dyy)<1){
-		      o3volant=Math.max(38,o3volant);testxx=1;}}
+		      o3volant=Math.max(28,o3volant);testxx=1;}}
 	  if(testxx==0){
 	    dxx=x+1.5*cos1-0.64*sin1-nx[0];
 	    if(Math.abs(dxx)<1){
 	      var dyy=y+1.5*sin1+0.64*cos1-ny[0];
 	      if(Math.abs(dyy)<1){
-		      o3volant=Math.min(-38,o3volant);}}
+		      o3volant=Math.min(-18,o3volant);}}
 	  }
 	  if(Math.abs(o3volant)>0.2){
 	     var vcar3=vcar*0.5/(0.5+Math.abs(vcar));
