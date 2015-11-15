@@ -142,14 +142,15 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 	    float z=aVertexPosition.z;
 	    float r=aVertexPosition.a;
 		vTextureCoord=aTextureCoord*0.5;
-		if(r>999.0){r-=1000.0;vTextureCoord.y=aTextureCoord.y;}//bridgecolour
-		else if(r>199.0){r-=200.0;vTextureCoord.x+=0.5;vTextureCoord.y+=0.5;}//oneway2
+		float dx=0.2499;
+		if(r>999.0){r-=1000.0;vTextureCoord.y=aTextureCoord.y;dx=0.99;}//bridgecolour
+		else if(r>199.0){r-=200.0;vTextureCoord.x+=0.125;vTextureCoord.y+=0.5;}//oneway2
 		else if(r>99.0){r-=100.0;vTextureCoord.y+=0.5;}//oneway
-		else if(r>20.0){r-=20.0;vTextureCoord=aTextureCoord;}//city
+		else if(r>20.0){r-=20.0;vTextureCoord=aTextureCoord;dx=0.99;}//city
 		else if(r>9.0){r-=10.0;}//stop
-		else{vTextureCoord.x+=0.5;}//cross
+		else{vTextureCoord.x+=0.125;}//cross
 		if(aTextureCoord.x<0.01){x-=r*usin1;y+=r*ucos1;}
-		if(aTextureCoord.x>0.99){x+=r*usin1;y-=r*ucos1;}
+		if(aTextureCoord.x>dx){x+=r*usin1;y-=r*ucos1;}
         //gl_Position = uPMatrix*(uMVMatrix*vec4(x,y,z, 1.0));
         gl_Position = (uMVMatrix*vec4(x,y,z, 1.0));
 		}
@@ -2708,7 +2709,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         crossTexture.image.onload = function () {
             handleLoadedTexture(crossTexture)
         }
-        crossTexture.image.src = "stopcross.png";
+        crossTexture.image.src = "stopcross2.png";
 
         woman1Texture = gl.createTexture();
         woman1Texture.image = new Image();
@@ -5784,16 +5785,17 @@ function updatebuffersol(){
         gl.bindBuffer(gl.ARRAY_BUFFER, crossVertexTextureCoordBuffer[ibuff]);
         var crosstextureCoords = new Array(2*6*ncross);
 		index=0;
+		var s1=0.25;
 		for (var i=0; i < ncross/3; i++) {
 		   append(crosstextureCoords,[
-             0,0,  0,1,  1,1,
-			 0,0,  1,1,  1,0,
+             0,0,  0,1,  s1,1,
+			 0,0,  s1,1,  s1,0,
 
-             0,10,  0,11,  1,11,
-			 0,10,  1,11,  1,10,
+             0,10,  0,11,  s1,11,
+			 0,10,  s1,11,  s1,10,
 
-             0,20,  0,21,  1,21,
-			 0,20,  1,21,  1,20
+             0,20,  0,21,  s1,21,
+			 0,20,  s1,21,  s1,20
 			 ]);
 		}	
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(crosstextureCoords), gl.STATIC_DRAW);
