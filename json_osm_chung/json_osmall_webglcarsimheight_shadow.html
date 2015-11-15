@@ -9204,9 +9204,9 @@ if(way.nodes){
               //if(bridge>0){if(r>0.8){addline(xxx+(r+0.19)*(si1-co1),yyy-(r+0.19)*(co1+si1),zzz+zsol0,0.017,co1,si1);}
 			  if(r>0.8){addline(xxx+(r+0.3)*(si1-co1),yyy-(r+0.3)*(co1+si1),zzz+zsol0,0.017,co1,si1);}
 			}
-			if(r>2.7 && (ii%40)==5 && (parseInt(xxx+yyy)%3)==0){
-			    addcross(xxx+(r+0.5)*(co1+si1),yyy+(r+0.5)*(si1-co1),zzz+zsol0,r+400,co1,si1);}//highway
-			if(testband==0 && (ii%20)==10){
+			if(r>2.7 && (ii%20)==10 && (parseInt(Math.abs(xxx+yyy))%4)==0){
+			    addcross(xxx+(r+0.5)*(si1),yyy-(r+0.5)*(co1),zzz+zsol0,r+400,co1,si1);}//highway
+			else if(testband==0 && (ii%20)==10){
 			//if(testband==0 && (ii%16)==7){
 			    if(oneway==1){addcross(xxx+(r+0.15)*(si1),yyy-(r+0.15)*(co1),zzz+zsol0,r+100,co1,si1);
 							  addcross(xxx-(r+0.15)*(si1),yyy+(r+0.15)*(co1),zzz+zsol0,r+100,co1,si1);
