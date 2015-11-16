@@ -1091,7 +1091,6 @@ dtloading=timer();
 if(loading>=1){return;}
 if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 trygetways=0;
-trygetweather=1;
 loading=1;
 dxmax=25;
 if(avgfps<8 || dtweb>4500){dxmax2=Math.max(13,dxmax2-2);}
@@ -1291,7 +1290,6 @@ return 1;
 function updatetown(){
 if(loading!=0){return;}
 if(tupdatetown==1){return;}
-if(trygetweather==1){trygetweather=0;getweather();return;}
 if(tupdatetown==2){tupdatetown=0;loading=1.2;
    for(var i=1;i<=ntown;i++){townname0[i]=townname[i];
        townlon0[i]=townlon[i];townlat0[i]=townlat[i];
@@ -2602,7 +2600,9 @@ if(twebaudio==1 && tradio==0){
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
 		if(tinit==1){tinit=2;trygetways=1;//loading=1;tupdatebuffer=1;
 		             setTimeout("trygetways=1;",10000);}
-		if(trygetways==1 && loading==0){getways();};
+		if(trygetways==1 && loading==0){
+                            if(trygetweather==1){trygetweather=0;getweather();}
+		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
 		     loading=22;dtloading=tframe;tinitgmap=0;
@@ -2677,6 +2677,7 @@ if(twebaudio==1 && tradio==0){
 		 //if(tupdatebuffersol==1){
 		    tupdatesoltexture=0;
 			handleLoadedTexture(solTexture);
+            trygetweather=1;
             //updatebuffersolheight();
 		    //tupdatebuffersol=0;
 			//updatebuffersol();
