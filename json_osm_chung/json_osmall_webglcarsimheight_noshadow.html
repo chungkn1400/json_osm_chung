@@ -502,8 +502,8 @@ var wayjson,nodejson,ways=[],waynodes,nodes=[],waytype,wayname,nnode=0;
 var latnodes=[],lonnodes=[];
 var dlat=0.005,dlon=0.008;
 var lat=48.765,lng=2.20;
-lat=48.826125291730506;lng=2.3570559500472212;
-lat=49.36198047661674   ;lng=0.07262960;
+lat=48.826125;lng=2.3570559;
+lat=49.36198;lng=0.07262960;
 var lat1=lat-dlat/2,lon1=lng-dlon/2;
 var lat2=lat+dlat/2,lon2=lng+dlon/2;
 var wayurl=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
@@ -612,6 +612,22 @@ function nodecallback3(r){//alert(r);
   
   tdraw=2;loading=1.75;//drawgl(0);;	 
 }
+var fogweather=0;
+function weathercallback(r){//alert(r);
+  var weatherjson=JSON.parse(r);
+  var allclouds=weatherjson.clouds.all;//alert(allclouds);
+  wclouds=allclouds;
+  var humidity=weatherjson.main.humidity;//alert(humidity);
+  var temp=weatherjson.main.temp-273;//alert(temp);
+  fogweather=Math.min(1,Math.max(0,(humidity-50)*0.15/Math.max(3,temp)));
+  if(Math.abs(loading-1.44)<0.001){loading=0;msgload("");}
+}
+function msgload(text){
+context.clearRect (0,20,100,100);
+context.font = "12pt Arial";
+context.fillStyle = '#ff0000';
+context.fillText(text,20,40);
+}
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
 var trygetways=0,dtweb=0; 
 function getways(){
@@ -712,6 +728,17 @@ nodeurl3+="%29%3Bout%20skel%201999%3B";
 try{		
 httpGet(nodeurl3,nodecallback3);
 }catch (e){alert("error getnodes3");loading=0;}
+}
+var trygetweather=0;
+function getweather(){
+if(http!="http:"){return;}
+if(loading!=0){return;}
+msgload("getweather");
+loading=1.44;
+var weatherurl="http://api.openweathermap.org/data/2.5/weather?lat="+latx+"&lon="+lngx+"&APPID=4cd1de75fbc57d92794e74ec918593ca";
+try{		
+httpGet(weatherurl,weathercallback);
+}catch (e){alert("error getweather");loading=0;}
 }
 var reversejson=null,countrycode="",cityname="";
 function reversecallback(r){//alert(r);
@@ -1892,13 +1919,15 @@ if(twebaudio==1 && tradio==0){
 		if(tstreetview==1){tskip=1;}
 		if(tskip==0 && tframe>tsrtm && testsrtm>=0.1 && loading==0){tsrtm=tframe+3000;testloadsrtm();}
 		if(tframe<tskip2+100){tskip=1;}
-        gl.clearColor(1,1,1, 1.0);//auxvar=loading;auxvar2=tinitgmap;
+        gl.clearColor(1,1,1, 1.0);auxvar2=loading;
 		//if(tskip==0 && (tmovertt==1 || itime%2==0)){tmovertt=0;drawrttshadow();};
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
 		if(tinit==1){tinit=2;trygetways=1;//loading=1;tupdatebuffer=1;
 		             setTimeout("x00=999999;",8000);}
-		if(trygetways==1 && loading==0){getways();};
+		if(trygetways==1 && loading==0){
+                            if(trygetweather==1){trygetweather=0;getweather();}
+		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
 		           loading=22;dtloading=tframe;tinitgmap=0;
@@ -1962,6 +1991,7 @@ if(twebaudio==1 && tradio==0){
 		 //if(tupdatebuffersol==1){
 		    tupdatesoltexture=0;
 			handleLoadedTexture(solTexture);
+            //trygetweather=1;
 		    //tupdatebuffersol=0;
 			//updatebuffersol();
 			//tinitgmap=0;initgmap();
@@ -2604,7 +2634,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         skydomeTexture.image.onload = function () {
             handleLoadedTexture(skydomeTexture)
         }
-        wclouds=Math.sqrt(Math.random())*Math.random()*90;
+        if(Math.abs(wclouds-50.1)<0.001){wclouds=Math.sqrt(Math.random())*Math.random()*90;}
         //wclouds=80;
 		if(wclouds<12){skydomeTexture.image.src = "skydome_1024.jpg";
         }else if(wclouds<50){skydomeTexture.image.src = "skydome_1024.jpg";
@@ -3421,7 +3451,7 @@ function drawroofs(){
     gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
-var timerain=0,train0=0,wclouds=50;
+var timerain=0,train0=0,wclouds=50.1;
 var train=0,train1=0,train2=0,timerain1=0,timerain2=0;
 var texscalex1=1,texscaley1=1,textdx1=0,textdy1=0;
 var texscalex2=1,texscaley2=1,textdx2=0,textdy2=0;
@@ -8472,6 +8502,7 @@ function initparms(){
   getparms(hash0);
   latinit/=100;
   lnginit/=100;
+  latx=latinit;lngx=lnginit;
   if(flytoname){
     document.getElementById('combo')[1].text=flytoname;}
   if(icombo>0){document.getElementById('combo').selectedIndex=icombo;
@@ -8988,6 +9019,7 @@ while(hour>24){hour-=24;}
 while(hour<0){hour+=24;};
 try{initparms();}catch(e){alert("error initparms()");}
 //getways();
+getweather();
 initgooglemap();setTimeout("hidemap();",2000);
 setTimeout("getways();initwebgl();",3000);
 setTimeout('radiomsg("hello,how are you");',3000);
