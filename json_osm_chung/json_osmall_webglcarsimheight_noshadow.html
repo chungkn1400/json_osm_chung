@@ -521,7 +521,7 @@ function waycallback(r){//alert(r);
   var msg="",ntest=0;
   nnode=0;
   ways=[];
-  ways=wayjson.elements;
+  if(wayjson.elements){ways=wayjson.elements;}
   msg+="len="+ways.length;
   if(ways.length>0){
   for(var i=0;i<ways.length;i++){
@@ -546,7 +546,7 @@ function nodecallback(r){//alert(r);
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
-  nodes=nodejson.elements;
+  if(nodejson.elements){nodes=nodejson.elements;}
   //msg+="len="+nodes.length;
   if(resetnode==1){latnodes=[];lonnodes=[];
                    nodesignal=[];}
@@ -574,7 +574,7 @@ function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
   nodes2=[];
-  nodes2=nodejson2.elements;
+  if(nodejson2.elements){nodes2=nodejson2.elements;}
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
      /*if(i<5){
@@ -596,7 +596,7 @@ function nodecallback3(r){//alert(r);
   nodejson3=JSON.parse(r);
   //var msg="";
   nodes3=[];
-  nodes3=nodejson3.elements;
+  if(nodejson3.elements){nodes3=nodejson3.elements;}
   //msg+="len3="+nodes3.length;
   for(var i=0;i<nodes3.length;i++){
      /*if(i<5){

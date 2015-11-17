@@ -882,7 +882,7 @@ function waycallback(r){//alert(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  ways=wayjson.elements;
+  if(wayjson.elements){ways=wayjson.elements;}
   msg+="len="+ways.length;
   if(ways.length>0){
   for(var i=0;i<ways.length;i++){
@@ -911,7 +911,7 @@ function waycallback2(r){//alert(r);
   var msg="",ntest=0;
   nnode2=0;
   ways2=[];
-  ways2=wayjson2.elements;
+  if(wayjson2.elements){ways2=wayjson2.elements;}
   //msg+="len="+ways2.length;
   //if(ways2.length>0){
   //for(var i=0;i<ways2.length;i++){
@@ -936,10 +936,11 @@ function nodecallback(r){//alert(r);
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
-  nodes=nodejson.elements;
+  if(nodejson.elements){nodes=nodejson.elements;}
   //msg+="len="+nodes.length;
   if(resetnode==1){latnodes=[];lonnodes=[];
                    nodesignal=[];}
+  if(nodes){
   for(var i=0;i<nodes.length;i++){
      /*if(i<5){
 	  msg+="/ nodeid="+nodes[i].id;
@@ -949,7 +950,7 @@ function nodecallback(r){//alert(r);
 	 var inode=nodes[i].id; 
 	 latnodes[inode]=nodes[i].lat;
      lonnodes[inode]=nodes[i].lon;
-	 }
+	 }}
   //alert(msg+nodes.length);
   
   tdraw=1;loading=1.5;//drawgl(0);;	 
@@ -959,7 +960,7 @@ function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
   nodes2=[];nstation=0;
-  nodes2=nodejson2.elements;
+  if(nodejson2.elements){nodes2=nodejson2.elements;}
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
      /*if(i<5){
@@ -988,7 +989,7 @@ function nodecallback3(r){//alert(r);
   nodejson3=JSON.parse(r);
   //var msg="";
   nodes3=[];
-  nodes3=nodejson3.elements;
+  if(nodejson3.elements){nodes3=nodejson3.elements;}
   //msg+="len3="+nodes3.length;
   for(var i=0;i<nodes3.length;i++){
      /*if(i<5){
@@ -1011,7 +1012,7 @@ function nodecallback31(r){//alert(r);
   nodejson31=JSON.parse(r);
   //var msg="";
   nodes31=[];
-  nodes31=nodejson31.elements;
+  if(nodejson31.elements){nodes31=nodejson31.elements;}
   //msg+="len31="+nodes31.length;
   for(var i=0;i<nodes31.length;i++){
      /*if(i<5){
@@ -1032,7 +1033,7 @@ function nodecallback4(r){//alert(r);
   nodejson4=JSON.parse(r);
   var msg="",nlayer=0;
   nodes4=[];layernode=[];
-  nodes4=nodejson4.elements;
+  if(nodejson4.elements){nodes4=nodejson4.elements;}
   msg+="len4="+nodes4.length;
   ntown=0;
   for(var i=0;i<nodes4.length;i++){
@@ -1144,7 +1145,7 @@ keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|t
 //keyway="(way[amenity~'fuel']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon2+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 var keyway2="way['building:height']"+latlon2+";way['building']['height']"+latlon2+";way['building']['levels']"+latlon2+";way['building:levels']"+latlon2;
-keyway="%28"+keyway2+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
+keyway="%28"+keyway2+";way[amenity~'parking']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
 //keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
@@ -8875,6 +8876,7 @@ for(var i=iway;i<ways.length;i++){
    var s=0,t=0,tt=0,rt=1;
    var di=1,xx0=0,yy0=0,zz0=0,xxx0=0,yyy0=0,zzz0=0;
    var dr0=1,oneway=0,bridge=0,colour="",structure="",icolor=0;
+   var tparking=0,parkingx=0,parkingy=0,parkingco1=1,parkingsi1=0;
    waytype="none";wayname="";taddbar=0;layer=0;
    if(way.tags){
     if(way.tags.highway){
@@ -8903,7 +8905,8 @@ for(var i=iway;i<ways.length;i++){
     if(way.tags.building){
       waytype="building";}
     if(way.tags.amenity){
-	  if(waytype="none"){waytype="building";}}
+	  if(way.tags.amenity=="parking"){waytype="parking";}
+	  else if(waytype="none"){waytype="building";}}
     if(way.tags.aeroway){
       waytype=way.tags.aeroway;}
     if(way.tags.landuse){
@@ -8935,6 +8938,8 @@ if(way.nodes){
      r=8;tairport=1;
    }else if(waytype=="taxiway"){
      r=6;tairport=1;
+   }else if(waytype=="parking"){
+     r=2.5;tparking=1;
    }else if(waytype=="motorway"){
      r=2.8;taddbar=1;
 	 //context.lineWidth = 4;
@@ -9018,6 +9023,8 @@ if(way.nodes){
 			var dlon2=0,dlat2=0;
 			if(bridge>=1){dlon2=0.5*dx*klon/(scale*2);dlat2=0.5*dy/(scale*2);
 			   zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);}
+			 if(tparking==1 && j==jstart){parkingx=xxx;parkingy=yyy,parkingz=zzz;
+					                      parkingco1=dxx/dr;parkingsi1=dyy/dr;}
 			if(j==jstart){dx0=dx;dy0=dy;
 			         drtree5=5+(parseInt((latxx+lonxx)*100000)%3)*10;
 			         xxx-=dy*0.4;yyy+=dx*0.4;
@@ -9034,6 +9041,65 @@ if(way.nodes){
               addcross(xxx+(r+0.25)*(si1),yyy-(r+0.25)*(co1),zzz+zsol0,r,co1,si1);
 			  //else if(j==jstart){addcross(xx-(r+0.15)*(si1),yy+(r+0.15)*(co1),zz+zsol0,r,-co1,-si1);}
 			  auxvar=icross;}*/	
+		   if(tparking==1 && j>jstart){
+			var xx2=(xx+xxx)/2,yy2=(yy+yyy)/2;
+			var drk=0.00001+Math.sqrt((xx2-parkingx)*(xx2-parkingx)+(yy2-parkingy)*(yy2-parkingy));
+			var dk=parseInt(Math.max(4,8*drk));
+			var zz1=Math.max(0.1,parkingz-0.2);//0.5);
+			var dlonxx=(parkingco1*klon/scale)*drk;
+			var dlatxx=(parkingsi1/scale)*drk;
+			var tan2=0;
+			for(var k=1;k<=dk;k++){
+			  setterrainheight((lonxx+lonxxx)/2-k*dlonxx/dk,(latxx+latxxx)/2-k*dlatxx/dk,-parkingco1,-parkingsi1,tan2,zz1);}
+			var dhrr=0.02;
+			dk=parseInt(dk/4);
+			index=indexroad;
+			for(var k=1;k<=dk;k++){
+		    append(roadvertices,[
+              parkingx+(k-1)*(xxx-parkingx)/dk,parkingy+(k-1)*(yyy-parkingy)/dk,parkingz+dhrr,
+              parkingx+k*(xxx-parkingx)/dk,parkingy+k*(yyy-parkingy)/dk,parkingz+dhrr,
+              parkingx+k*(xx-parkingx)/dk,parkingy+k*(yy-parkingy)/dk,parkingz+dhrr,
+			  
+              parkingx+(k-1)*(xxx-parkingx)/dk,parkingy+(k-1)*(yyy-parkingy)/dk,parkingz+dhrr,
+              parkingx+k*(xx-parkingx)/dk,parkingy+k*(yy-parkingy)/dk,parkingz+dhrr,
+              parkingx+(k-1)*(xx-parkingx)/dk,parkingy+(k-1)*(yy-parkingy)/dk,parkingz+dhrr
+            ]);}
+			indexroad=index;
+			var parkingss=(xxx-parkingx)*parkingco1+(yyy-parkingy)*parkingsi1;
+			var parkingtt=(xxx-parkingx)*parkingsi1-(yyy-parkingy)*parkingco1;
+			var parkings=(xx-parkingx)*parkingco1+(yy-parkingy)*parkingsi1;
+			var parkingt=(xx-parkingx)*parkingsi1-(yy-parkingy)*parkingco1;
+			index=itextroad;
+			for(var k=1;k<=dk;k++){
+			append(roadtextureCoords,[
+			  (k-1)*parkingss*0.3/dk,(k-1)*parkingtt*0.3/dk,
+			  k*parkingss*0.3/dk,k*parkingtt*0.3/dk,
+			  k*parkings*0.3/dk,k*parkingt*0.3/dk,
+			  
+			  (k-1)*parkingss*0.3/dk,(k-1)*parkingtt*0.3/dk,
+			  k*parkings*0.3/dk,k*parkingt*0.3/dk,
+			  (k-1)*parkings*0.3/dk,(k-1)*parkingt*0.3/dk
+            ]);}
+			itextroad=index;
+			dk=1+parseInt(dr);
+			for(var k=0;k<dk;k++){
+			if(iroad<nroad-1){
+			  roadx[iroad]=parkingx;roady[iroad]=parkingy;
+			  roadr[iroad]=0.5*dr/dk;
+			  xx2=xxx+(k+0.5)*(xx-xxx)/dk;
+			  yy2=yyy+(k+0.5)*(yy-yyy)/dk;
+			  drk=0.00001+Math.sqrt((xx2-parkingx)*(xx2-parkingx)+(yy2-parkingy)*(yy2-parkingy));
+			  roadl[iroad]=drk;
+			  roadco1[iroad]=(xx2-parkingx)/drk;
+			  roadsi1[iroad]=(yy2-parkingy)/drk;
+			  roadtan2[iroad]=0;
+			  roadz[iroad]=Math.max(zz,parkingz+0.05);
+			  roadoneway[iroad]=0;
+			  roadcross[iroad]=0;
+			  //iroadcross=iroad;
+			  iroad+=1;
+			}}
+		   }
             if(smallbridge==1 && di<3){di=3;}
 			dr=dr0/di;
 			var dh=0.005,dxdh=dx*1.2,dydh=dy*1.2;
