@@ -8940,7 +8940,7 @@ if(way.nodes){
    }else if(waytype=="taxiway"){
      r=6;tairport=1;
    }else if(waytype=="parking"){
-     r=2.5;tparking=1;
+     r=0.87;tparking=1;
    }else if(waytype=="motorway"){
      r=2.8;taddbar=1;
 	 //context.lineWidth = 4;
@@ -9042,7 +9042,7 @@ if(way.nodes){
               addcross(xxx+(r+0.25)*(si1),yyy-(r+0.25)*(co1),zzz+zsol0,r,co1,si1);
 			  //else if(j==jstart){addcross(xx-(r+0.15)*(si1),yy+(r+0.15)*(co1),zz+zsol0,r,-co1,-si1);}
 			  auxvar=icross;}*/	
-		   if(tparking==1 && j>jstart){
+		   /*if(tparking==1 && j>jstart){
 			var xx2=(xx+xxx)/2,yy2=(yy+yyy)/2;
 			var drk=0.00001+Math.sqrt((xx2-parkingx)*(xx2-parkingx)+(yy2-parkingy)*(yy2-parkingy));
 			var dk=parseInt(Math.max(4,8*drk));
@@ -9100,7 +9100,7 @@ if(way.nodes){
 			  //iroadcross=iroad;
 			  iroad+=1;
 			}}
-		   }
+		   }*/
             if(smallbridge==1 && di<3){di=3;}
 			dr=dr0/di;
 			var dh=0.005,dxdh=dx*1.2,dydh=dy*1.2;
@@ -9299,7 +9299,7 @@ if(way.nodes){
 			}
 			if(tparking==1 && (ii%5)==1){
 			    ttestroadcross=1;
-			    //addcross(xxx+(r+0.15)*(si1),yyy-(r+0.15)*(co1),zzz+zsol0,r+500,co1,si1);//parking
+			    addcross(xxx+(r+0.15)*(si1),yyy-(r+0.15)*(co1),zzz+zsol0,r+500,co1,si1);//parking
 			    addcross(xxx-(r+0.15)*(si1),yyy+(r+0.15)*(co1),zzz+zsol0,r+500,-co1,-si1);//parking
 				ttestroadcross=1;}
 			else if(r>2.7 && (ii%20)==10 && (parseInt(Math.abs(xxx+yyy))%4)==0){
