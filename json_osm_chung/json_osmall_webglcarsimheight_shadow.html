@@ -9042,11 +9042,11 @@ if(way.nodes){
 			var co1=dxx/dr,si1=dyy/dr;
 			var tan2=(zz-zzz)/(dr);
 			if(j==jstart){xxx0=xx;yyy0=yy;zzz0=zz;r0=r;co10=co1;si10=si1;}
-			else if((co1*co10+si1*si10)<(0.9-0.0003*Math.max(Math.abs(xx-xxx0),Math.abs(yy-yyy0)))){
+			else if((co1*co10+si1*si10)<(0.9-0.0005*Math.max(Math.abs(xx-xxx0),Math.abs(yy-yyy0)))){
      		  if((co1*si10-si1*co10)<0){//turn left
-			    addcross(xxx0+(r0+0.15)*(si10),yyy0-(r0+0.15)*(co10),zzz0+zsol0,r0+600,co10,si10);}
+			    addcross(xxx0+(r0+0.15)*si10+0.5*co10,yyy0-(r0+0.15)*co10+0.5*si10,zzz0+zsol0,r0+600,co10,si10);}
 			  else{//turn right
-			    addcross(xxx0+(r0+0.15)*(si10),yyy0-(r0+0.15)*(co10),zzz0+zsol0,r0+650,co10,si10);}
+			    addcross(xxx0+(r0+0.15)*si10-0.5*co10,yyy0-(r0+0.15)*co10-0.5*si10,zzz0+zsol0,r0+650,co10,si10);}
 			  xxx0=xx;yyy0=yy;zzz0=zz;r0=r;co10=co1;si10=si1;	
 			 }
             /*if(nodesignal[inode]){		      
