@@ -836,6 +836,7 @@ j+=20;context.fillText("powered by Google maps",20,j);
 j+=20;context.fillText("powered by responsivevoice",20,j);
 j+=20;context.fillText("powered by nominatim.openstreetmap.org/reverse",20,j);
 j+=20;context.fillText("powered by overpass-api.de/api",20,j);
+j+=20;context.fillText("powered by api.openweathermap.org",20,j);
 }
 printloading();
 function initwebgl(){
@@ -5212,9 +5213,9 @@ function initgmap(){
 		       height0[ij-1-n]=-1;}
 		   }
 		   if((height[ij]>0)){
-		      if(i>1 && j>1){
+		      /*if(i>1 && j>1){
 			    h=(h*8+height1[ij-1]+height1[ij+1]+height1[ij-n]+height1[ij+n])/12;
-			  }
+			  }*/
 		      if(h>0){height[ij]+=h*testsrtm;}}
 		   //if(zsolmin>height[ij]){zsolmin+=0.00025*(height[ij]-zsolmin);}
 		   }
@@ -5242,17 +5243,18 @@ function initgmap(){
         for(var j=0;j<n;j++){
 		   //if(height0[i*n+j]<0){height[i*n+j]=Math.min(zsolmin2,height1[i*n+j]-0.2);}
 		   if(height0[i*n+j]<0){
-		      height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[i*n+j]/3)*3-1);
+		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[i*n+j]/3)*3-1);
+			  height[i*n+j]=Math.max(-0.4,testsrtm*height1[i*n+j]);
 			  }
         }}//}
 
-        var kdh=1;//(18*hmax-18*12+12*12*2)/(hmax*hmax+12*12);
+        /*var kdh=1;//(18*hmax-18*12+12*12*2)/(hmax*hmax+12*12);
 		for (var i=0; i < n; i++) {
         for(var j=0;j<n;j++){
 		   ij=j*n+i;
 		   if(height[ij]>0){height[ij]*=kheight[ij]*kdh;}
 		   else if(height[ij]<-0.1){height[ij]=-0.4;}
-		}}
+		}}*/
 	}else{
 		for (var i=0; i < n; i++) {
         for(var j=0;j<n;j++){
