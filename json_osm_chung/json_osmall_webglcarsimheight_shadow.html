@@ -1423,6 +1423,7 @@ j+=20;context.fillText("powered by Google maps",20,j);
 j+=20;context.fillText("powered by responsivevoice",20,j);
 j+=20;context.fillText("powered by nominatim.openstreetmap.org/reverse",20,j);
 j+=20;context.fillText("powered by "+overpass,20,j);
+j+=20;context.fillText("powered by api.openweathermap.org",20,j);
 }
 printloading();
 function initwebgl(){
@@ -7055,7 +7056,7 @@ function initgmap(){
 			 //kheight[ij]=height[ij];
 		}}*/
 
-		var zsolmin2=9990,zsolmax2=1;
+		var zsolmin2=9990,zsolmax2=0.1;
 		var ij=0,h=0;
 	if(testsrtm>=0.1){	
 		updatesrtm();
@@ -7092,10 +7093,10 @@ function initgmap(){
 		       height0[ij-1-n]=-1;}
 		   }
 		   if((height[ij]>0)){
-		      if(i>1 && j>1){
+		      /*if(i>1 && j>1){
 			    //h=(h*8+height1[ij-1]+height1[ij+1]+height1[ij-n]+height1[ij+n])/12;
 			    h=(h*8+height1[ij22-1]+height1[ij22+1]+height1[ij22-n22]+height1[ij22+n22])/12;
-			  }
+			  }*/
 		      if(h>0){height[ij]+=h*testsrtm;}}
 		   }
 		}	
@@ -7121,19 +7122,21 @@ function initgmap(){
         for(var j=0;j<n;j++){
 		   //if(height0[i*n+j]<0){height[i*n+j]=Math.min(zsolmin2,height1[i*n+j]-0.2);}
 		   if(height0[i*n+j]<0){
-		      height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
+		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
+		      //height[i*n+j]=Math.max(zsolmin2,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/5)*5-0.1);
+			  height[i*n+j]=Math.max(-0.4,testsrtm*height1[(i+nsol2)*n22+j+nsol2]);
 			  }
         }}//}
 
         //var kdh=1;//(18*hmax-18*12+12*12*2)/(hmax*hmax+12*12);
-		for (var i=0; i < n; i++) {
+		/*for (var i=0; i < n; i++) {
         for(var j=0;j<n;j++){
 		   ij=j*n+i;
 		   //if(height[ij]>0){height[ij]*=kheight[ij]*kdh;}
 		   if(height[ij]<-0.1){height[ij]=-0.4;
 		                       var ij22=(i+nsol2)*n22+j+nsol2;
 		                       height1[ij22]=Math.min(0.001,height1[ij22]);}
-		}}
+		}}*/
 		flatterrainheight(eiffeltowerx,eiffeltowery);
 		flatterrainheight(libertystatuex,libertystatuey);
 		flatterrainheight(christriox,christrioy);
