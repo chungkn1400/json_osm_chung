@@ -284,6 +284,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		vTextureCoord=aTextureCoord*0.5;
 		float dx=0.2499;
 		if(r>999.0){r-=1000.0;vTextureCoord.y=aTextureCoord.y;dx=0.99;}//bridgecolour
+		else if(r>749.0){r-=750.0;vTextureCoord.x+=0.625;}//railstation
 		else if(r>699.0){r-=700.0;vTextureCoord.x+=0.5;}//hospital
 		else if(r>649.0){r-=650.0;vTextureCoord.x+=0.375;vTextureCoord.y+=0.5;}//turn right
 		else if(r>599.0){r-=600.0;vTextureCoord.x+=0.375;}//turn left
@@ -963,7 +964,7 @@ var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
-  nodes2=[];nstation=0;nhospital=0;
+  nodes2=[];nstation=0;nhospital=0;nrailstation=0;
   if(nodejson2.elements){nodes2=nodejson2.elements;}
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
@@ -987,7 +988,14 @@ function nodecallback2(r){//alert(r);
 		 hospitallon[nhospital]=nodes2[i].lon;
 		 nhospital+=1;
 		 }
+		 }
+	  if(nodes2[i].tags.railway){
+	   if(nodes2[i].tags.railway=="station"){
+		 railstationlat[nrailstation]=nodes2[i].lat;
+		 railstationlon[nrailstation]=nodes2[i].lon;
+		 nrailstation+=1;
 		 }}
+     }
 	 }
   //alert(msg);
   
@@ -1215,7 +1223,7 @@ var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
 var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
 //var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
-var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";";
+var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
 	if(i<inode2){nodeurl2+=";";}
@@ -7008,7 +7016,7 @@ function drawtexture(texture){
 	var crossVertexPositionBuffer=[];
     var crossVertexTextureCoordBuffer=[];
 	var crossvertices;
-	var ncross=1800;
+	var ncross=2100;
 	var citypanelVertexPositionBuffer=[];
     var citypanelVertexTextureCoordBuffer=[];
 	var citypanelvertices,citypaneltextureCoords;
@@ -9437,6 +9445,7 @@ if(way.nodes){
    //loading=0;
    addstationtest();
    addhospitaltest();
+   addrailstationtest();
    addtreetest();
    addlinetest();
    addbartest();
@@ -10101,6 +10110,7 @@ if(crossttestroad[i]==0 || testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
    roadcross[crossiroad[i]]=test;
    if(test==1){
       r+=10;co1*=0.87;si1*=0.87;}//stop
+   else if(rr>750){r+=750;co1*=1.4;si1*=1.4;h2=0.55;face=2;}//hospital
    else if(rr>700){r+=700;co1*=0.82;si1*=0.82;face=2;}//hospital
    else if(rr>650){r+=650;co1*=0.82;si1*=0.82;}//turn right
    else if(rr>600){r+=600;co1*=0.82;si1*=0.82;}//turn left
@@ -10246,8 +10256,31 @@ function addhospitaltest(){//auxvar3=nhospital;
 		   iroadcross=iroadnear0;
 		   var xxx=roadx[j],yyy=roady[j],zzz=roadz[j],r=roadr[j],co1=roadco1[j],si1=roadsi1[j];
 		   var l=roadl[j];
+           ttestroadcross=0;
 		   if(dxyiroadnear<0){addcross(xxx+(r+0.3)*(si1),yyy+(r+0.3)*(-co1),zzz+zsol0,r+700,co1,si1);}//hospital
 		   else{addcross(xxx+l*co1+(r+0.3)*(-si1),yyy+l*si1+(r+0.3)*(co1),zzz+zsol0,r+700,-co1,-si1);}
+           ttestroadcross=1;
+		   }
+	 }
+  }
+}
+var nrailstation=0,railstationlon=[],railstationlat=[];
+function addrailstationtest(){auxvar3=nrailstation;
+  for(var i=0;i<nrailstation;i++){
+	 var px=(railstationlon[i]-lngx0)*scale/klon;
+	 var py=(railstationlat[i]-latx0)*scale;
+	 var test=testroadnear(px,py,latx0,lngx0,65,1.3);
+	 if(test==0){test=testroadnear(px,py,latx0,lngx0,65,1);}
+	 if(test==1){
+		var j=iroadnear0;
+		if(j>=0){
+		   iroadcross=iroadnear0;
+		   var xxx=roadx[j],yyy=roady[j],zzz=roadz[j],r=roadr[j],co1=roadco1[j],si1=roadsi1[j];
+		   var l=roadl[j];
+           ttestroadcross=0;
+		   if(dxyiroadnear<0){addcross(xxx+(r+0.4)*(si1),yyy+(r+0.4)*(-co1),zzz+zsol0,r+750,co1,si1);}//railstation
+		   else{addcross(xxx+l*co1+(r+0.4)*(-si1),yyy+l*si1+(r+0.4)*(co1),zzz+zsol0,r+750,-co1,-si1);}
+           ttestroadcross=1;
 		   }
 	 }
   }
