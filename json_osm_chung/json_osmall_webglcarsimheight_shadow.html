@@ -1149,7 +1149,7 @@ keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|t
 //keyway="(way[amenity~'fuel']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon2+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 var keyway2="way['building:height']"+latlon2+";way['building']['height']"+latlon2+";way['building']['levels']"+latlon2+";way['building:levels']"+latlon2;
-keyway="%28"+keyway2+";way[amenity~'parking']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
+keyway="%28"+keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
 //keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
@@ -8884,6 +8884,7 @@ for(var i=iway;i<ways.length;i++){
    var di=1,xx0=0,yy0=0,zz0=0,xxx0=0,yyy0=0,zzz0=0;
    var dr0=1,oneway=0,bridge=0,colour="",structure="",icolor=0;
    var tparking=0,parkingx=0,parkingy=0,parkingz=0,parkingco1=1,parkingsi1=0;
+   var building="",amenity="";
    waytype="none";wayname="";taddbar=0;layer=0;
    if(way.tags){
     if(way.tags.highway){
@@ -8910,10 +8911,12 @@ for(var i=iway;i<ways.length;i++){
 		  }else if(ty<1999.9){gl_FragColor = vec4(1.0,0.0,0.0,1.0);//red
 		  */
     if(way.tags.building){
-      waytype="building";}
+      waytype="building";building=way.tags.building;}
     if(way.tags.amenity){
 	  if(way.tags.amenity=="parking"){waytype="parking";}
-	  else if(waytype="none"){waytype="building";}}
+	  else if(waytype="none"){waytype="building";}
+	  amenity=way.tags.amenity;
+	  }
     if(way.tags.aeroway){
       waytype=way.tags.aeroway;}
     if(way.tags.landuse){
@@ -8931,6 +8934,7 @@ for(var i=iway;i<ways.length;i++){
    //  test=0;}
 if(way.nodes){
    test=1;
+   if(building=="hospital" || amenity=="hospital" || amenity=="clinic"){addhospital(way);}
    if(waytype=="building"){
      if(indexhouse<(maxvertice*3-1) && indextower<(maxvertice2*3-1)){
 		if(way.nodes.length>0){
@@ -10196,7 +10200,34 @@ function addstationtest(){
   }
 }
 var nhospital=0,hospitallon=[],hospitallat=[];
-function addhospitaltest(){
+function addhospital(way){
+if(way.nodes){
+   var jj=way.nodes.length;
+   if(jj>4){
+     var j=0;
+     var inode=way.nodes[j];
+     if(latnodes[inode]){hospitallat[nhospital]=latnodes[inode];
+	                     hospitallon[nhospital]=lonnodes[inode];
+						 nhospital+=1;}
+     j=parseInt(jj/4);
+     inode=way.nodes[j];
+     if(latnodes[inode]){hospitallat[nhospital]=latnodes[inode];
+	                     hospitallon[nhospital]=lonnodes[inode];
+						 nhospital+=1;}
+     j=parseInt(2*jj/4);
+     inode=way.nodes[j];
+     if(latnodes[inode]){hospitallat[nhospital]=latnodes[inode];
+	                     hospitallon[nhospital]=lonnodes[inode];
+						 nhospital+=1;}
+     j=parseInt(3*jj/4);
+     inode=way.nodes[j];
+     if(latnodes[inode]){hospitallat[nhospital]=latnodes[inode];
+	                     hospitallon[nhospital]=lonnodes[inode];
+						 nhospital+=1;}
+   }  
+   }
+}
+function addhospitaltest(){//auxvar3=nhospital;
   for(var i=0;i<nhospital;i++){
 	 var px=(hospitallon[i]-lngx0)*scale/klon;
 	 var py=(hospitallat[i]-latx0)*scale;
@@ -10204,7 +10235,7 @@ function addhospitaltest(){
 	 if(test==0){test=testroadnear(px,py,latx0,lngx0,65,1);}
 	 if(test==1){
 		var j=iroadnear0;
-		if(j>=0){
+		if(j>=0){//auxvar3+=1000;
 		   iroadcross=iroadnear0;
 		   var xxx=roadx[j],yyy=roady[j],zzz=roadz[j],r=roadr[j],co1=roadco1[j],si1=roadsi1[j];
 		   var l=roadl[j];
@@ -10602,22 +10633,6 @@ if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
                trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
 			   trottoirr[ntrottoir]=(Math.abs(latmid-latmid2)+Math.abs(lonmid-lonmid2)/klon)/2;
 			   ntrottoir+=1;}
-if(latmid>-89 && (amenity=="hospital" || amenity=="clinic" || building=="hospital") && nhospital<40){
-                                      hospitallat[nhospital]=latmid;
-                                      hospitallon[nhospital]=lonmid;
-									  nhospital+=1;
-                                      hospitallat[nhospital]=latmid2;
-                                      hospitallon[nhospital]=lonmid2;
-									  nhospital+=1;
-                                      /*hospitallat[nhospital]=(latmid+latmid2)/2;
-                                      hospitallon[nhospital]=(lonmid+lonmid2)/2;
-									  nhospital+=1;*/
-                                      hospitallat[nhospital]=(latmid+latmid2)/2+(lonmid-lonmid2)/2;
-                                      hospitallon[nhospital]=(lonmid+lonmid2)/2-(latmid-latmid2)/2;
-									  nhospital+=1;
-                                      hospitallat[nhospital]=(latmid+latmid2)/2-(lonmid-lonmid2)/2;
-                                      hospitallon[nhospital]=(lonmid+lonmid2)/2+(latmid-latmid2)/2;
-									  nhospital+=1;}
 if(h0>3 || hmin>0.1){//tower
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
