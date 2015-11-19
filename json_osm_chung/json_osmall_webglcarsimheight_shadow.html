@@ -963,7 +963,7 @@ var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
-  nodes2=[];nstation=0;
+  nodes2=[];nstation=0;nhospital=0;
   if(nodejson2.elements){nodes2=nodejson2.elements;}
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
@@ -981,7 +981,13 @@ function nodecallback2(r){//alert(r);
 		 stationlat[nstation]=nodes2[i].lat;
 		 stationlon[nstation]=nodes2[i].lon;
 		 nstation+=1;
-		 }}}
+		 }
+	   if(nodes2[i].tags.amenity=="hospital"){
+		 hospitallat[nhospital]=nodes2[i].lat;
+		 hospitallon[nhospital]=nodes2[i].lon;
+		 nhospital+=1;
+		 }
+		 }}
 	 }
   //alert(msg);
   
@@ -1209,7 +1215,7 @@ var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
 var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
 //var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
-var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel']"+latlon+";";
+var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
 	if(i<inode2){nodeurl2+=";";}
@@ -8866,7 +8872,7 @@ indextree=0;indextree2=0;
 indexline=0;indexlinetext=0;
 indexcross=0;
 tairport=0;airportx=999999;airportname="";distairport1=999999;distairport2=999999;
-ntrottoir=0,nhospital=0;
+ntrottoir=0;
 //resettree2();
 //resettree22();
 //if(Math.max(Math.abs(latx-lat0),Math.abs(lngx-lng0))>0.001){
@@ -10201,6 +10207,7 @@ function addstationtest(){
 }
 var nhospital=0,hospitallon=[],hospitallat=[];
 function addhospital(way){
+if(nhospital>50){return;}
 if(way.nodes){
    var jj=way.nodes.length;
    if(jj>4){
