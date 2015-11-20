@@ -2419,7 +2419,7 @@ y=(latx-lat0)*scale;
 	}
 
 testx=0;
-if(loading==0){dtloading=Math.min(dtloading,tframe+4000);}
+if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
 if(tframe>dtloading+20000){dtloading=tframe;resetkeys();
 	      tloadsol=tframe+30000;
 		  tupdatesoltexture=2;loading=77;tdraw=0;tdraw2=0;
@@ -3353,7 +3353,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 	}
 	function setskydometexture(){
 	  if(skydomeTexture){
-		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome3_1024.jpg";
         }else if(wclouds<50){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
         }else if(wclouds<75){skydomeTexture.imagesrc2 = "skydome2_1024.jpg";
 		}else{skydomeTexture.imagesrc2 = "skydome2_1024.jpg";}
@@ -3481,7 +3481,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         if(Math.abs(wclouds-50.1)<0.001){wclouds=Math.sqrt(Math.random())*Math.random()*90;}
         //wclouds=80;
-		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome3_1024.jpg";
         }else if(wclouds<50){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
         }else if(wclouds<75){skydomeTexture.imagesrc2 = "skydome2_1024.jpg";
 		}else{skydomeTexture.imagesrc2 = "skydome2_1024.jpg";}
