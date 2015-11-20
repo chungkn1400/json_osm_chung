@@ -1933,7 +1933,7 @@ if(twebaudio==1 && tradio==0){
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
 		           loading=22;dtloading=tframe;tinitgmap=0;
 		           latsol0=latsol;lngsol0=lngsol;initgmap();
-		           loading=1;tdraw=2;tskip2=timer()+dtime+400;
+		           loading=1;tdraw=2;tskip2=timer()+dtime+400;trygetways=1;
 				   }
 		if(tdraw==1){tdraw=0;setinode2();}
 		if(tdraw==2){tdraw=0;drawglroad(0);drawgl(0);}
