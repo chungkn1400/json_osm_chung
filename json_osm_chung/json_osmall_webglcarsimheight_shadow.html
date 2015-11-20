@@ -2619,7 +2619,7 @@ if(twebaudio==1 && tradio==0){
         gl.clearColor(1,1,1, 1.0);auxvar2=loading;//auxvar2=tinitgmap;
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
-		if(tinit==1){tinit=2;trygetways=1;//loading=1;tupdatebuffer=1;
+		if(tinit==1){tinit=2;trygetways=1;setskydometexture();//loading=1;tupdatebuffer=1;
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
                             if(trygetweather==1){trygetweather=0;getweather();}
