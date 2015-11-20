@@ -2619,7 +2619,7 @@ if(twebaudio==1 && tradio==0){
         gl.clearColor(1,1,1, 1.0);auxvar2=loading;//auxvar2=tinitgmap;
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
-		if(tinit==1){tinit=2;trygetways=1;setskydometexture();//loading=1;tupdatebuffer=1;
+		if(tinit==1){tinit=2;trygetways=1;//loading=1;tupdatebuffer=1;
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
                             if(trygetweather==1){trygetweather=0;getweather();}
@@ -3353,12 +3353,12 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 	}
 	function setskydometexture(){
 	  if(skydomeTexture){
-		if(wclouds<12){skydomeTexture.image.src2 = "skydome_1024.jpg";
-        }else if(wclouds<50){skydomeTexture.image.src2 = "skydome_1024.jpg";
-        }else if(wclouds<75){skydomeTexture.image.src2 = "skydome2_1024.jpg";
-		}else{skydomeTexture.image.src2 = "skydome2_1024.jpg";}
-		if(skydomeTexture.image.src!=skydomeTexture.image.src2){
-		   skydomeTexture.image.src=skydomeTexture.image.src2;}
+		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+        }else if(wclouds<50){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+        }else if(wclouds<75){skydomeTexture.imagesrc2 = "skydome2_1024.jpg";
+		}else{skydomeTexture.imagesrc2 = "skydome2_1024.jpg";}
+		if(skydomeTexture.image.src!=skydomeTexture.imagesrc2){
+		   skydomeTexture.image.src=skydomeTexture.imagesrc2;}
 	}}
     function initTexture2() {
         roadTexture = gl.createTexture();
@@ -3481,14 +3481,11 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         if(Math.abs(wclouds-50.1)<0.001){wclouds=Math.sqrt(Math.random())*Math.random()*90;}
         //wclouds=80;
-		setskydometexture();
-		/*if(wclouds<12){skydomeTexture.image.src2 = "skydome_1024.jpg";
-        }else if(wclouds<50){skydomeTexture.image.src2 = "skydome_1024.jpg";
-        }else if(wclouds<75){skydomeTexture.image.src2 = "skydome2_1024.jpg";
-		}else{skydomeTexture.image.src2 = "skydome2_1024.jpg";}
-		if(skydomeTexture.image.src!=skydomeTexture.image.src2){
-		   skydomeTexture.image.src=skydomeTexture.image.src2;}
-		*/
+		if(wclouds<12){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+        }else if(wclouds<50){skydomeTexture.imagesrc2 = "skydome_1024.jpg";
+        }else if(wclouds<75){skydomeTexture.imagesrc2 = "skydome2_1024.jpg";
+		}else{skydomeTexture.imagesrc2 = "skydome2_1024.jpg";}
+		skydomeTexture.image.src=skydomeTexture.imagesrc2;
 
         treeTexture = gl.createTexture();
         treeTexture.image = new Image();
