@@ -1795,21 +1795,21 @@ if(tmap==0){
 		 while(do1pilot<-180){do1pilot+=360;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-	  var ko3v=60/(60+Math.abs(o3volant));
-	  if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant>64){o3volant=64;};}
-      if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant<-64){o3volant=-64;};}
 	  var dxx=x+1.5*cos1+0.64*sin1-nx[0],testxx=0;
 	  if(Math.abs(dxx)<1){
 	    var dyy=y+1.5*sin1-0.64*cos1-ny[0];
 	    if(Math.abs(dyy)<1){
-		      o3volant=Math.max(28,o3volant);testxx=1;}}
+		      piloto1=0.7;testxx=1;}}
 	  if(testxx==0){
 	    dxx=x+1.5*cos1-0.64*sin1-nx[0];
 	    if(Math.abs(dxx)<1){
 	      var dyy=y+1.5*sin1+0.64*cos1-ny[0];
 	      if(Math.abs(dyy)<1){
-		      o3volant=Math.min(-18,o3volant);}}
+		      piloto1=-0.5;}}
 	  }
+	  var ko3v=60/(60+Math.abs(o3volant));
+	  if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant>64){o3volant=64;};}
+      if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant<-64){o3volant=-64;};}
 	  if(Math.abs(o3volant)>0.2){
 	     var vcar3=vcar*0.5/(0.5+Math.abs(vcar));
 		 var do13=0;
