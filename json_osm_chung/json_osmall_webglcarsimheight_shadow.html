@@ -66,9 +66,6 @@ div {
     <button id="radioexpand"  onclick="radioexpand();">radio</button>
     <button id="radiocanal"  onclick="radiocanal();">ch</button>
 	</div>
-    <div id="radiodiv2" style="position:absolute;top:6100px;left:0px;width:89px;height:56px;z-index:400;" onblur="tfocus=1;" onfocus="tfocus=0;" >
-    <iframe id="radio2" src="" style="top:0px;left:0px;width:86px;height:48px;" ></iframe>
-	</div>
     <div id="streetviewdiv" style="position:absolute;top:7000px;left:0px;width:98%;height:98%;" onblur="tfocus=1;" onfocus="tfocus=0;" >
     <iframe id="streetview" src="" style="top:0px;left:0px;width:87%;height:94%;" ></iframe>
 	<button id="quitstreetview"  onclick="quitstreetview();">quit view</button>
@@ -1536,7 +1533,7 @@ context.fillText(locationname,ix,iy);
 }
 function draw(){
 var windx0=canvas.width,windy0=canvas.height;
-context.clearRect (0,0,canvas.width,canvas.height);
+context.clearRect (0,0,canvas.width-256,canvas.height);
 printlocationname();
 context.lineWidth = 1;
 //auxvar=context.getImageData(200,100,1,1).data[0];
@@ -2320,6 +2317,7 @@ if(tfoot==0){
  if(keys[vk_2]){cockpith-=1;resetkeys();if(cockpith<-20){cockpith=-20;};}
 }
 if(keys[vk_9]){subtest();resetkeys();}
+if(keys[vk_0]){subgirlimage();sleep(200);resetkeys();}
 if(keys[vk_f]){subfog();resetkeys();}
 if(keys[vk_e] && keys[vk_shift]){subgirl();resetkeys();}
 if(keys[vk_h]){if(keys[vk_shift]==0){subhelp();}else{subshadow();};resetkeys();}
@@ -3301,7 +3299,7 @@ function initGL(canvasgl){
 	var marisolTexture,womanTexture,churchTexture,boeingTexture;
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
-	var stationTexture;
+	var stationTexture,girlimage;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -3315,8 +3313,77 @@ function initGL(canvasgl){
 		   gldeleteTexture(texturelist[i]);
 		}
     }
+function initrtttexture(){
+        rttFramebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+        rttFramebuffer.width = 2048;
+        rttFramebuffer.height = 2048;
+        rttTexture = gl.createTexture();
+        rttTexture.width=rttFramebuffer.width;
+        rttTexture.height=rttFramebuffer.height;
+		gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        //gl.enable(gl.depth_texture);
+		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rttFramebuffer.width,rttFramebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
+        renderbuffer = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rttFramebuffer.width, rttFramebuffer.height);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+        rtt2Framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, rtt2Framebuffer);
+        rtt2Framebuffer.width = 2048;
+        rtt2Framebuffer.height = 2048;
+        rtt2Texture = gl.createTexture();
+        rtt2Texture.width=rtt2Framebuffer.width;
+        rtt2Texture.height=rtt2Framebuffer.height;
+		gl.bindTexture(gl.TEXTURE_2D, rtt2Texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rtt2Framebuffer.width, rtt2Framebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        //gl.enable(gl.depth_texture);
+		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rtt2Framebuffer.width,rtt2Framebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
+        renderbuffer2 = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer2);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rtt2Framebuffer.width, rtt2Framebuffer.height);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rtt2Texture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer2);
+
+        rtt3Framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, rtt3Framebuffer);
+        rtt3Framebuffer.width = 2048;
+        rtt3Framebuffer.height = 2048;
+        rtt3Texture = gl.createTexture();
+        rtt3Texture.width=rtt3Framebuffer.width;
+        rtt3Texture.height=rtt3Framebuffer.height;
+		gl.bindTexture(gl.TEXTURE_2D, rtt3Texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rtt3Framebuffer.width, rtt3Framebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        //gl.enable(gl.depth_texture);
+		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rtt3Framebuffer.width,rtt3Framebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
+        renderbuffer3 = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer3);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rtt3Framebuffer.width, rtt3Framebuffer.height);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rtt3Texture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer3);
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
 	var tinitsol0=1,tgirl=0;
     function initTexture() {
+	    initrtttexture();
         solTexture = gl.createTexture();
         solTexture.image = new Image();
         solTexture.image.onload = function () {
@@ -3550,73 +3617,6 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         greenTexture.image.src = "green.bmp";
 
-        rttFramebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
-        rttFramebuffer.width = 2048;
-        rttFramebuffer.height = 2048;
-        rttTexture = gl.createTexture();
-        rttTexture.width=rttFramebuffer.width;
-        rttTexture.height=rttFramebuffer.height;
-		gl.bindTexture(gl.TEXTURE_2D, rttTexture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        //gl.enable(gl.depth_texture);
-		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rttFramebuffer.width,rttFramebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
-        renderbuffer = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rttFramebuffer.width, rttFramebuffer.height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-
-        rtt2Framebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, rtt2Framebuffer);
-        rtt2Framebuffer.width = 2048;
-        rtt2Framebuffer.height = 2048;
-        rtt2Texture = gl.createTexture();
-        rtt2Texture.width=rtt2Framebuffer.width;
-        rtt2Texture.height=rtt2Framebuffer.height;
-		gl.bindTexture(gl.TEXTURE_2D, rtt2Texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rtt2Framebuffer.width, rtt2Framebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        //gl.enable(gl.depth_texture);
-		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rtt2Framebuffer.width,rtt2Framebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
-        renderbuffer2 = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer2);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rtt2Framebuffer.width, rtt2Framebuffer.height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rtt2Texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer2);
-
-        rtt3Framebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, rtt3Framebuffer);
-        rtt3Framebuffer.width = 2048;
-        rtt3Framebuffer.height = 2048;
-        rtt3Texture = gl.createTexture();
-        rtt3Texture.width=rtt3Framebuffer.width;
-        rtt3Texture.height=rtt3Framebuffer.height;
-		gl.bindTexture(gl.TEXTURE_2D, rtt3Texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA, rtt3Framebuffer.width, rtt3Framebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        //gl.enable(gl.depth_texture);
-		//gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT,rtt3Framebuffer.width,rtt3Framebuffer.height,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_SHORT, null);
-        renderbuffer2 = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer2);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rtt3Framebuffer.width, rtt3Framebuffer.height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rtt3Texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer2);
-
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
         cloudTexture = gl.createTexture();
         cloudTexture.image = new Image();
         cloudTexture.image.onload = function () {
@@ -3801,6 +3801,8 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 		arrowgreenleft.src="arrowgreenleft.png";
 		arrowgreenright=new Image();
 		arrowgreenright.src="arrowgreenright.png";
+		girlimage=new Image();
+		girlimage.src="girl2.jpg";
 
         }
 
@@ -8869,7 +8871,7 @@ var taddbar=0,layer=0,distairport1=0,distairport2=0;
 function drawgl(iway){
 if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 if(iway==0){
-context.clearRect (0,0,canvas.width,canvas.height);
+context.clearRect (0,0,canvas.width-256,canvas.height);
 printlocationname();
 msgload("drawgl");
 iroad=0;itree=0;iline=0;icross=0;iwoman=0,iwall=0,iwalltree=0,ibar=0;
@@ -10484,6 +10486,15 @@ function updatecitypanelx(){
        if(Math.max(Math.abs(xx-x),Math.abs(yy-y))>300){
 	      citypanelr[i]=0;citypanelx[i]=9999;}}
 	   }
+}
+var tgirlimage=0;
+function subgirlimage(){
+var w=256,h=200;
+if(tgirlimage==0){tgirlimage=1;
+       context.drawImage(girlimage,0,0,girlimage.width,girlimage.height, canvas.width-w,canvas.height-h,w,h);}
+else if(tgirlimage==1){tgirlimage=2;var i=w/2,j=h/2;
+       context.drawImage(girlimage,i,j,girlimage.width-i,girlimage.height-j, canvas.width-w,canvas.height-h,w,h);}
+else{tgirlimage=0;context.clearRect(canvas.width-w,canvas.height-h,canvas.width,canvas.height);}
 }
 function subtest(){
 var srtmfich='http://caper.ws/terrain-srtm30-plus/tms7/14/24.png';
