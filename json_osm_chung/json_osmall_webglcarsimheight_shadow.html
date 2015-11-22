@@ -1460,7 +1460,7 @@ function initwebgl2(){
 		     setTimeout("initwebgl2();",500);return;}
 		  if(!solTexture2.datasize){
 		     setTimeout("initwebgl2();",500);return;}
-		  if(solTexture2.datasize<200 || !ways || !nodes){
+		  if(solTexture2.datasize<200 || !ways || !nodes || testtexturelistloaded()==0){
 		     setTimeout("initwebgl2();",500);return;}
 		}else{alert("soltexture2.data not loaded !");
 		      if(confirm("retry ?")){document.location.href=document.location.href+" ";}}
@@ -3268,6 +3268,10 @@ function initGL(canvasgl){
 	function deleteimagelist(i){
 	    var texture=texturelist[i];
 		texture.image.src=null;
+	}
+	function testtexturelistloaded(){
+	  for(var i=1;i<=itexturelist;i++){if(texturelist[i].image.width>1){return 0;}}
+	  return 1;
 	}
     function gettexturedata(texture){
 	  // Create a framebuffer backed by the texture
