@@ -302,7 +302,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		z0=-xyz.z-0.1;//-0.35;
 		if(z0<1.0){z0=0.0;}
 		//z=floor(z*20.0)/20.0;
-		z0=z0*z0/5000.0;
+		 z0=z0*z0/5000.0;
 		}
 </script>
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -8872,6 +8872,7 @@ for(var i=iway;i<ways.length;i++){
    //updatebuffers();
 }
 var taddbar=0,layer=0,distairport1=0,distairport2=0;
+var layernode2=[],ilayer2=0,ilayernode2=[];
 function drawgl(iway){
 if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 if(iway==0){
@@ -8902,6 +8903,40 @@ ntrottoir=0;
 //resettree22();
 //if(Math.max(Math.abs(latx-lat0),Math.abs(lngx-lng0))>0.001){
 //   latx0=latx;lngx0=lngx;}
+layernode2=[];ilayer2=0;ilayernode2=[];
+for(var i=0;i<ways.length;i++){
+  var way=ways[i];
+  if(way.tags){
+    if(way.tags.layer){
+	  var layer=Math.min(1,way.tags.layer+0);
+	  if(way.nodes){
+	   if(layer>0.1){
+	    ilayer2+=1;ilayernode2[ilayer2]=way.nodes[0];
+	    layernode2[ilayernode2[ilayer2]]=1;
+	    ilayer2+=1;ilayernode2[ilayer2]=way.nodes[way.nodes.length-1];
+		layernode2[ilayernode2[ilayer2]]=1;}}}
+    else if(way.tags.bridge){
+	  if(way.nodes){
+	    ilayer2+=1;ilayernode2[ilayer2]=way.nodes[0];
+	    layernode2[ilayernode2[ilayer2]]=1;
+	    ilayer2+=1;ilayernode2[ilayer2]=way.nodes[way.nodes.length-1];
+		layernode2[ilayernode2[ilayer2]]=1;}}
+	}
+}
+auxvar3=0;
+for(var i=1;i<=ilayer2;i++){
+   var inode=ilayernode2[i];
+   if(latnodes[inode]){
+     for(var j=i+1;j<=ilayer2;j++){
+	    if(i!=j){
+		  var inode2=ilayernode2[j];
+		  if(latnodes[inode2]){
+		    if(Math.abs(latnodes[inode]-latnodes[inode2])<0.00005){
+			  if(Math.abs(lonnodes[inode]-lonnodes[inode2])<0.00005*klon){
+			     layernode2[inode]+=1;
+				 layernode2[inode2]+=1;}}
+		   }}}}
+}
 }
 for(var i=iway;i<ways.length;i++){
    if(i>iway+Math.max(200,ways.length/4)){
@@ -9038,6 +9073,7 @@ if(way.nodes){
    var xxx0=0,yyy0=0,zzz0=0,r0=0,co10=0,si10=0;
    if((layer>0 || bridge>0) &&(jmax<5)){smallbridge=1;dzlayer=Math.max(dzlayer,0.82);}
    var airportx1=0,airporty1=0,nairport1=0;
+   var dhr2=0;
    for(var j=0;j<=jmax;j++){
      if(j>0 && smallbridge==1 && j<jmax){j=jmax;}
 	 var inode=way.nodes[j];
@@ -9058,6 +9094,9 @@ if(way.nodes){
 	   //if (zz>0.001){zz=0;}else{zz=0.0012;}
 	   dx0=dx;dy0=dy;
 	   if(jstart==0){jstart=j+1;//context.moveTo(xx,yy);
+			if(layernode2[inode]){if(layernode2[inode]>1.9){dhr2=0.82;}
+			else if(layernode[inode]){dhr2=Math.max(0,Math.min(0.82,layernode[inode]*0.82));}}
+	        zz+=dhr2;
 	   }else{//context.lineTo(xx,yy);
 	        dxx=xx-xxx;dyy=yy-yyy;
 			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
@@ -9075,7 +9114,9 @@ if(way.nodes){
 			else if(j==jmax){xx+=dy*0.4;yy-=dx*0.4;
 			        if(smallbridge==1){dx0=dx;dy0=dy;}
 			}
-			if(layernode[inode]){zz+=Math.max(0,layernode[inode]*0.82);}
+			if(j==jmax){dhr2=0;}
+			if(layernode2[inode]){if(layernode2[inode]>1.9){dhr2=0.82;}
+			else if(layernode[inode]){dhr2=Math.max(0,Math.min(0.82,layernode[inode]*0.82));}}
 			else if(j>1 && j<jmax-1){zz+=dzlayer;}
 			dr0=dr;
 			var co1=dxx/dr,si1=dyy/dr;
@@ -9205,9 +9246,9 @@ if(way.nodes){
 			}
 			//zz=setterrainheight(lonxx,latxx,co1,si1,tan2);
 			if(smallbridge==1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
-			           if(ii<di){zz+=dzlayer;}}
+			           if(ii<di){zz+=dzlayer;}else{zz+=dhr2;}}
 			else if(bridge>=1){zz=(getterrainheight(lonxx+dlon2,latxx+dlat2)+dhr);
-			           if(ii<di){zz+=dzlayer;}
+			           if(ii<di){zz+=dzlayer;}else{zz+=dhr2;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));
 			              //zz=Math.max(zz,zz1+(zz2-zz1)/(di-ii+1));
 			              //zz1=zz;
@@ -10282,7 +10323,7 @@ function addhospitaltest(){//auxvar3=nhospital;
   }
 }
 var nrailstation=0,railstationlon=[],railstationlat=[];
-function addrailstationtest(){auxvar3=nrailstation;
+function addrailstationtest(){
   for(var i=0;i<nrailstation;i++){
 	 var px=(railstationlon[i]-lngx0)*scale/klon;
 	 var py=(railstationlat[i]-latx0)*scale;
