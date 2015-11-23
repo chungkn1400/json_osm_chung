@@ -208,7 +208,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 
     void main(void) {
         vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
-		xyz.y *=4.03;
+		//xyz.y *=4.03;
 	    gl_Position= uPMatrix *xyz;
         vTextureCoord = aTextureCoord;
 		vec3 normal=aVertexNormal;
@@ -301,7 +301,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
         //gl_Position = uPMatrix*(uMVMatrix*vec4(x,y,z, 1.0));
         //gl_Position = (uMVMatrix*vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
-		if(ushadow2==1){xyz.y *=4.03;}
+		//if(ushadow2==1){xyz.y *=4.03;}
 		gl_Position = uPMatrix *xyz;
 		z0=-xyz.z-0.1;//-0.35;
 		if(z0<1.0){z0=0.0;}
@@ -557,7 +557,7 @@ float r,g,b,color;
 		  color0*=0.4+abs(dot(lightdir,normal))*0.6;
 		}
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
-		xyz.y *=4.03;
+		//xyz.y *=4.03;
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -683,7 +683,7 @@ float decodefloatrgb( vec3 rgb ) {
 		//vTextureCoord3.x=aVertexPosition.x*30.0;// /2.5;
 		//vTextureCoord3.y=aVertexPosition.y*30.0;// /2.5;
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
-		xyz.y *=4.03;
+		//xyz.y *=4.03;
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -786,7 +786,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		//gl_Position = uPMatrix * (uMVMatrix * vec4(x,y,z, 1.0));
 		//gl_Position = (uMVMatrix * vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
-		if(ushadow2==1){xyz.y *=4.03;}
+		//if(ushadow2==1){xyz.y *=4.03;}
 		gl_Position = uPMatrix *xyz;
 		xyz0=xyz.xyz;
 		z0=-xyz.z-0.1;//-0.35;
@@ -4202,6 +4202,7 @@ var tshadownight=0;
 		drawroofs2();
 		drawwoman2();
 		drawroc2();
+		drawroads2();
 	}else{
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(tlight==0){tshadow=0;return;}
@@ -4264,6 +4265,7 @@ var tshadownight=0;
 		drawroofs2();
 		drawwoman2();
 		drawroc2();
+		drawroads2();
 	}else{
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
@@ -4735,6 +4737,33 @@ function setmatrix2(){
 	//mat4.multiply(pMatrix,mvMatrix,pvMatrix2);
 	mat4.set(pMatrix,pMatrix2);
 	mat4.set(mvMatrix,mvMatrix2);
+	mvPopMatrix();
+}
+function drawroads2(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,-0.02]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  roadTexture);
+    gl.uniform1i(shader2Program.samplerUniform, 0);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, roadVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, roadVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, roadVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=0;
+	setMatrixUniforms2();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl.drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawtowers2(){
