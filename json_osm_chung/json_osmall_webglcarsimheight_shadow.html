@@ -147,6 +147,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 
     void main(void) {
         vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
+		//xyz.y *=4.03;
 		gl_Position = uPMatrix *xyz;
         vTextureCoord = aTextureCoord;
 		z=-xyz.z;
@@ -207,7 +208,8 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 
     void main(void) {
         vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
-		gl_Position = uPMatrix *xyz;
+		xyz.y *=4.03;
+	    gl_Position= uPMatrix *xyz;
         vTextureCoord = aTextureCoord;
 		vec3 normal=aVertexNormal;
 		//if(max(abs(xyz.x),abs(xyz.y))>10.0){z=0.0;}
@@ -269,6 +271,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
     uniform mat4 uPMatrix;
 	uniform float ucos1;
 	uniform float usin1;
+	uniform int ushadow2;
 	
 	varying vec2 vTextureCoord;
 	varying float z0;
@@ -298,6 +301,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
         //gl_Position = uPMatrix*(uMVMatrix*vec4(x,y,z, 1.0));
         //gl_Position = (uMVMatrix*vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
+		if(ushadow2==1){xyz.y *=4.03;}
 		gl_Position = uPMatrix *xyz;
 		z0=-xyz.z-0.1;//-0.35;
 		if(z0<1.0){z0=0.0;}
@@ -553,6 +557,7 @@ float r,g,b,color;
 		  color0*=0.4+abs(dot(lightdir,normal))*0.6;
 		}
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
+		xyz.y *=4.03;
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -562,7 +567,7 @@ float r,g,b,color;
 		float py=pxyz.y*0.5+0.5; 
 		vTextureCoord2.x=px; 
 		vTextureCoord2.y=py;
-        if(px<0.02 || px>0.98 || py<0.02 || py>0.98){z=0.0;} 		
+        if(px<0.002 || px>0.998 || py<0.002 || py>0.998){z=0.0;} 		
 		//gl_Position=xyz;
         float x=aVertexPosition.x-cloudx;
         float y=aVertexPosition.y-cloudy;		
@@ -678,6 +683,7 @@ float decodefloatrgb( vec3 rgb ) {
 		//vTextureCoord3.x=aVertexPosition.x*30.0;// /2.5;
 		//vTextureCoord3.y=aVertexPosition.y*30.0;// /2.5;
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
+		xyz.y *=4.03;
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -687,7 +693,7 @@ float decodefloatrgb( vec3 rgb ) {
 		float py=pxyz.y*0.5+0.5; 
 		vTextureCoord4.x=px; 
 		vTextureCoord4.y=py;
-        if(px<0.02 || px>0.98 || py<0.02 || py>0.98){z=0.0;} 		
+        if(px<0.002 || px>0.998 || py<0.002 || py>0.998){z=0.0;} 		
 		//gl_Position=xyz;
 		//float distshadow=400.0;
         float x=aVertexPosition.x-cloudx;
@@ -755,6 +761,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
     uniform mat4 uPMatrix;
 	uniform float ucos1;
 	uniform float usin1;
+	uniform int ushadow2;
 
     varying vec2 vTextureCoord;
 	varying float z0;
@@ -779,6 +786,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		//gl_Position = uPMatrix * (uMVMatrix * vec4(x,y,z, 1.0));
 		//gl_Position = (uMVMatrix * vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
+		if(ushadow2==1){xyz.y *=4.03;}
 		gl_Position = uPMatrix *xyz;
 		xyz0=xyz.xyz;
 		z0=-xyz.z-0.1;//-0.35;
@@ -3085,6 +3093,7 @@ function initGL(canvasgl){
         lineProgram.cos1Uniform = gl.getUniformLocation(lineProgram, "ucos1");
         lineProgram.sin1Uniform = gl.getUniformLocation(lineProgram, "usin1");
         lineProgram.shadowUniform = gl.getUniformLocation(lineProgram, "ushadow");
+        lineProgram.shadowUniform2 = gl.getUniformLocation(lineProgram, "ushadow2");
 
         gl.useProgram(shaderProgram);
 
@@ -3172,6 +3181,7 @@ function initGL(canvasgl){
         treeProgram.sin1Uniform = gl.getUniformLocation(treeProgram, "usin1");
         treeProgram.samplerUniform = gl.getUniformLocation(treeProgram, "uSampler");
         treeProgram.shadowUniform = gl.getUniformLocation(treeProgram, "ushadow");
+        treeProgram.shadowUniform2 = gl.getUniformLocation(treeProgram, "ushadow2");
         treeProgram.lightUniform = gl.getUniformLocation(treeProgram, "tlight");
         treeProgram.fog = gl.getUniformLocation(treeProgram, "fog");
 	
@@ -3937,6 +3947,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
          gl.uniform1f(lineProgram.sin1Uniform,k*sunsi1);
         }		
 		gl.uniform1i(lineProgram.shadowUniform,tshadow);
+		gl.uniform1i(lineProgram.shadowUniform2,tshadow);
     }
 	var dmaxuniform=99999;
     function setMatrixUniforms00() {
@@ -4062,6 +4073,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 	    //mat4.multiply(pMatrix,mvMatrix,pvMatrix);
         //gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, pvMatrix);
 		gl.uniform1i(treeProgram.shadowUniform,tshadow);
+		gl.uniform1i(treeProgram.shadowUniform2,tshadow);
         if(tshadownight==1){gl.uniform1f(treeProgram.lightUniform,2-tlight);}
 		else{gl.uniform1f(treeProgram.lightUniform,0);}
         gl.uniform1f(treeProgram.fog,fog);
@@ -4228,9 +4240,9 @@ var tshadownight=0;
 		sunco2=dx/dz;sunsi2=sunz/dz;
 		sunco1=sunx/dx;sunsi1=suny/dx;
 	if(irtt==0){
-        mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,100.0, 1900.0, pMatrix);
+        //last//mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,100.0, 1900.0, pMatrix);
         //mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,10.0, 9000.0, pMatrix);
-        //mat4.ortho(-wx,wx,-wy,wy,10.0, 10000.0, pMatrix);
+        mat4.ortho(-wx,wx,-wy,wy,10.0, 10000.0, pMatrix);
 		var xv=x+sunx*300/dz,yv=y+suny*300/dz,zv=zsol+sunz*300/dz;//20*sunz+51000;
 		mat4.lookAt([xv,yv,zv],[x,y,zsol],[-sunx,-suny,-0.1],mvMatrix);
    		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -8923,7 +8935,6 @@ for(var i=0;i<ways.length;i++){
 		layernode2[ilayernode2[ilayer2]]=1;}}
 	}
 }
-auxvar3=0;
 for(var i=1;i<=ilayer2;i++){
    var inode=ilayernode2[i];
    if(latnodes[inode]){
