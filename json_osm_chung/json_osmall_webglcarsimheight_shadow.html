@@ -2326,6 +2326,8 @@ if(tfoot==0){
 }
 if(keys[vk_9]){subtest();resetkeys();}
 if(keys[vk_0]){subgirlimage();sleep(200);resetkeys();}
+if(keys[169]){subtgirlimage();sleep(200);resetkeys();}//')'
+if(keys[61]){subgirlimage3();sleep(200);resetkeys();}//'='
 if(keys[vk_f]){subfog();resetkeys();}
 if(keys[vk_e] && keys[vk_shift]){subgirl();resetkeys();}
 if(keys[vk_h]){if(keys[vk_shift]==0){subhelp();}else{subshadow();};resetkeys();}
@@ -3313,7 +3315,7 @@ function initGL(canvasgl){
 	var marisolTexture,womanTexture,churchTexture,boeingTexture;
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
-	var stationTexture,girlimage;
+	var stationTexture,girlimage,girlimage2,girlimage3;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -3817,6 +3819,10 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 		arrowgreenright.src="arrowgreenright.png";
 		girlimage=new Image();
 		girlimage.src="girl2.jpg";
+		girlimage2=new Image();
+		girlimage2.src="girl3.jpg";
+		girlimage3=new Image();
+		girlimage3.src="girl4.jpg";
 
         }
 
@@ -4744,7 +4750,7 @@ function drawroads2(){
     gl.enable(gl.DEPTH_TEST);
     mvPushMatrix();
     //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [0,0,-0.02]);
+	mat4.translate(mvMatrix, [0,0,-0.105]);
     var sc=0.5;
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE0);
@@ -10572,16 +10578,63 @@ function updatecitypanelx(){
 	      citypanelr[i]=0;citypanelx[i]=9999;}}
 	   }
 }
-var tgirlimage=0;
+var tgirlimage=0,tgirlimage2=0,tgirlimage3=0,kw5=0.48;
 function subgirlimage(){
+if(tgirlimage2==1){subgirlimage2();return;}
 var w=256,h=200;
-if(tgirlimage==0){tgirlimage=1;
-       context.drawImage(girlimage,0,0,girlimage.width,girlimage.height, canvas.width-w,canvas.height-h,w,h);}
-else if(tgirlimage==1){tgirlimage=2;var i=w/2,j=h/2;
-       context.drawImage(girlimage,i,j,girlimage.width-i,girlimage.height-j, canvas.width-w,canvas.height-h,w,h);}
-else{tgirlimage=0;context.clearRect(canvas.width-w,canvas.height-h,canvas.width,canvas.height);}
+var ix=canvas.width-w,jx=canvas.height-h,di=w,dj=h;
+var h2=canvas.height*kw5,w2=h2*256/200;
+var ix2=canvas.width-w2,jx2=canvas.height-h2,di2=w2,dj2=h2;
+if(keys[vk_shift]){tgirlimage3=(tgirlimage3+1)%2;
+   if(tgirlimage3==0){context.clearRect(ix2,jx2,ix2+di2,jx2+dj2);}
+   else{ix=ix2;jx=jx2;di=di2;dj=dj2;}
+   if(tgirlimage>0){tgirlimage-=1;}
 }
-function subtest(){
+if(tgirlimage3==1){ix=ix2;jx=jx2;di=di2;dj=dj2;}
+if(tgirlimage==0){tgirlimage=1;
+       context.drawImage(girlimage,0,0,girlimage.width,girlimage.height, ix,jx,di,dj);}
+else if(tgirlimage==1){tgirlimage=2;var i=w/2,j=h/2;
+       context.drawImage(girlimage,i,j,girlimage.width-i,girlimage.height-j, ix,jx,di,dj);}
+else{tgirlimage=0;context.clearRect(ix,jx,ix+di,jx+dj);}
+}
+function subgirlimage2(){
+var w=256,h=200;
+var ix=canvas.width-w,jx=canvas.height-h,di=w,dj=h;
+var h2=canvas.height*kw5,w2=h2*256/200;
+var ix2=canvas.width-w2,jx2=canvas.height-h2,di2=w2,dj2=h2;
+if(keys[vk_shift]){tgirlimage3=(tgirlimage3+1)%2;
+   if(tgirlimage3==0){context.clearRect(ix2,jx2,ix2+di2,jx2+dj2);}
+   else{ix=ix2;jx=jx2;di=di2;dj=dj2;}
+   if(tgirlimage>0){tgirlimage-=1;}
+}
+if(tgirlimage3==1){ix=ix2;jx=jx2;di=di2;dj=dj2;}
+if(tgirlimage==0){tgirlimage=1;
+       context.drawImage(girlimage2,0,0,girlimage2.width,girlimage2.height,  ix,jx,di,dj);}
+else if(tgirlimage==1){tgirlimage=2;var i=w/2,j=h/2;
+       context.drawImage(girlimage2,i,j,girlimage2.width-i,girlimage2.height-j,  ix,jx,di,dj);}
+else{tgirlimage=0;context.clearRect(ix,jx,ix+di,jx+dj);}
+}
+function subtgirlimage(){
+tgirlimage2=(tgirlimage2+1)%2;
+tgirlimage-=1;subgirlimage();
+}
+function subgirlimage3(){
+var w=256,h=200;
+var ix=canvas.width-w,jx=canvas.height-h,di=w,dj=h;
+var h2=canvas.height*kw5,w2=h2*256/200;
+var ix2=canvas.width-w2,jx2=canvas.height-h2,di2=w2,dj2=h2;
+if(keys[vk_shift]){tgirlimage3=(tgirlimage3+1)%2;
+   if(tgirlimage3==0){context.clearRect(ix2,jx2,ix2+di2,jx2+dj2);}
+   else{ix=ix2;jx=jx2;di=di2;dj=dj2;}
+   if(tgirlimage>0){tgirlimage-=1;}
+}
+if(tgirlimage3==1){ix=ix2;jx=jx2;di=di2;dj=dj2;}
+if(tgirlimage==2){tgirlimage=1;var i=w/4,j=h/4;
+       context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
+else{tgirlimage=2;var i=w/2.5,j=h/2.5;
+       context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
+}
+function subtest(){return;
 var srtmfich='http://caper.ws/terrain-srtm30-plus/tms7/14/24.png';
 var srtmimg=new Image();
 //srtmimg.crossOrigin = "anonymous";
