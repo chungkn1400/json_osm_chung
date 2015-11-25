@@ -153,6 +153,59 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 		z=-xyz.z;
 		}
 </script>
+<script id="shader-fs22" type="x-shader/x-fragment">
+    precision lowp float;
+    //precision mediump float;
+	//precision highp float;
+
+	varying float z;
+
+	const vec4 v41=vec4(1.0, 255.0, 65025.0, 160581375.0)/5000.0;
+	const vec4 v42=vec4(1.0/255.0,1.0/255.0,1.0/255.0,1.0/255.0);
+
+vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
+  if(v>5000.0){return vec4(1.0,1.0,1.0,1.0);}
+  vec4 enc = fract(v41*v);//vec4(1.0, 255.0, 65025.0, 160581375.0) * (v/5000.0);
+  //enc = fract(enc);
+  return enc - enc.yzww * v42;//vec4(1.0/255.0,1.0/255.0,1.0/255.0,1.0/255.0);
+  //return enc;
+}
+/*float decodefloatrgba( vec4 rgba ) {
+  return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) )*5000.0;
+}*/
+
+  void main(void) {
+        //gl_FragColor = texture2D(uSampler, vTextureCoord);
+	    //float z=gl_FragCoord.z;
+		if(z<1.0){discard;}
+        else{
+      gl_FragColor=encodefloatrgba(z);
+		}
+    }
+</script>
+<script id="shader-vs22" type="x-shader/x-vertex">
+    precision lowp float;
+	//precision highp float;
+    attribute vec3 aVertexPosition;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+	//uniform float dmax;
+
+    varying float z;
+
+    void main(void) {
+        vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
+		//xyz.y *=4.03;
+	    gl_Position= uPMatrix *xyz;
+		//if(max(abs(xyz.x),abs(xyz.y))>10.0){z=0.0;}
+		//else{
+		z=-xyz.z;
+		if(z<1.0){z=0.0;}
+		//z=floor(z*20.0)/20.0;
+		z=z*z/5000.0;//}
+    }
+</script>
 <script id="shader-fs2" type="x-shader/x-fragment">
     precision lowp float;
     //precision mediump float;
@@ -2931,10 +2984,12 @@ function initGL(canvasgl){
 
     var shaderProgram,treeProgram,solProgram;
 	var lineProgram,sunProgram,program2d,shader2Program,shader0Program;
-    var shaderaProgram;
+    var shaderaProgram,shader22Program;
     function initShaders() {
         var fragmentShader0 = getShader(gl, "shader-fs0");
         var vertexShader0 = getShader(gl, "shader-vs0");
+        var fragmentshader22 = getShader(gl, "shader-fs22");
+        var vertexshader22 = getShader(gl, "shader-vs22");
         var fragmentShader2 = getShader(gl, "shader-fs2");
         var vertexShader2 = getShader(gl, "shader-vs2");
         var fshaderline = getShader(gl, "shader-fl");
@@ -2957,6 +3012,15 @@ function initGL(canvasgl){
 
         if (!gl.getProgramParameter(shader0Program, gl.LINK_STATUS)) {
             alert("Could not initialise shader0");
+        }
+
+        shader22Program = gl.createProgram();
+        gl.attachShader(shader22Program, vertexshader22);
+        gl.attachShader(shader22Program, fragmentshader22);
+        gl.linkProgram(shader22Program);
+
+        if (!gl.getProgramParameter(shader22Program, gl.LINK_STATUS)) {
+            alert("Could not initialise shader22");
         }
 
         shader2Program = gl.createProgram();
@@ -3031,7 +3095,7 @@ function initGL(canvasgl){
             alert("Could not initialise solshaders");
         }
 
-        gl.useProgram(shader2Program);
+        gl.useProgram(shader0Program);
 
         shader0Program.vertexPositionAttribute = gl.getAttribLocation(shader0Program, "aVertexPosition");
         gl.enableVertexAttribArray(shader0Program.vertexPositionAttribute);
@@ -3044,6 +3108,14 @@ function initGL(canvasgl){
         shader0Program.samplerUniform = gl.getUniformLocation(shader0Program, "uSampler");
         shader0Program.colorUniform = gl.getUniformLocation(shader0Program, "ucolor");
         shader0Program.fog = gl.getUniformLocation(shader0Program, "fog");
+
+        gl.useProgram(shader22Program);
+
+        shader22Program.vertexPositionAttribute = gl.getAttribLocation(shader22Program, "aVertexPosition");
+        gl.enableVertexAttribArray(shader22Program.vertexPositionAttribute);
+
+        shader22Program.pMatrixUniform = gl.getUniformLocation(shader22Program, "uPMatrix");
+        shader22Program.mvMatrixUniform = gl.getUniformLocation(shader22Program, "uMVMatrix");
 
         gl.useProgram(shader2Program);
 
@@ -4126,6 +4198,10 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(program2d.dxUniform,dx2d);
         gl.uniform1f(program2d.dyUniform,dy2d);
    }
+     function setMatrixUniforms22() {
+        gl.uniformMatrix4fv(shader22Program.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shader22Program.mvMatrixUniform, false, mvMatrix);
+    }
      function setMatrixUniforms2() {
         gl.uniformMatrix4fv(shader2Program.pMatrixUniform, false, pMatrix);
         gl.uniformMatrix4fv(shader2Program.mvMatrixUniform, false, mvMatrix);
@@ -4196,7 +4272,7 @@ var tshadownight=0;
    	}else{mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
-		gl.useProgram(shader2Program);
+		gl.useProgram(shader22Program);
 	if(irtt==0){
 		setmatrix2();
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
@@ -4214,6 +4290,7 @@ var tshadownight=0;
 		if(tlight==0){tshadow=0;return;}
 		//if(iview==1 && tfoot==0){drawcarobj2();}
 		//else if(tfoot==0){drawcarobj2();}//drawcar2();}
+   		gl.useProgram(shader2Program);
 		drawncarobj2();
    		//gl.useProgram(shaderProgram);
 		//drawcloud22();
@@ -4259,7 +4336,7 @@ var tshadownight=0;
    	}else{mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
-		gl.useProgram(shader2Program);
+		gl.useProgram(shader22Program);
 	if(irtt==0){
 		setmatrix2();
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
@@ -4275,6 +4352,7 @@ var tshadownight=0;
 	}else{
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
+   		gl.useProgram(shader2Program);
 		if(iview==1 && tfoot==0){drawcarobj2();}
 		else if(tfoot==0){drawcarobj2();}//drawcar2();}
 		drawncarobj2();
@@ -4755,19 +4833,13 @@ function drawroads2(){
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  roadTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, roadVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, roadVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, roadVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, roadVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms2();
+	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl.drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
@@ -4785,19 +4857,13 @@ function drawtowers2(){
 	//mat4.set(mvMatrix,mvMatrix2);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  towerTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, towerVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, towerVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, towerVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms2();
+	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl.drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
@@ -4815,19 +4881,13 @@ function drawchurchs2(){
 	//mat4.set(mvMatrix,mvMatrix2);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  churchTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, churchVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, churchVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, churchVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, churchVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms2();
+	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl.drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
@@ -4842,19 +4902,13 @@ function drawhouses2(){
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  houseTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, houseVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, houseVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, houseVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, houseVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms2();
+	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl.drawArrays(gl.TRIANGLES, 0, houseVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
@@ -4869,19 +4923,13 @@ function drawroofs2(){
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  roofTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, roofVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, roofVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, roofVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, roofVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms2();
+	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
@@ -5145,8 +5193,8 @@ function drawcarre(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms00();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
@@ -5158,8 +5206,8 @@ function drawcarre2(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms00();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
@@ -5191,8 +5239,8 @@ function drawcarrea(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformsa();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
@@ -5204,10 +5252,17 @@ function drawcarresun(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(sunProgram.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(sunProgram.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(sunProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformssun();
+    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+}
+function drawcarreshadow22(){
+    gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+	setMatrixUniforms22();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarreshadow(){
@@ -5217,8 +5272,8 @@ function drawcarreshadow(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms2();
     gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
@@ -5508,8 +5563,8 @@ function drawcarwheel(){
     gl.bindBuffer(gl.ARRAY_BUFFER, carwheelVertexPositionBuffer);
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, carwheelVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniformsa();
     gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
@@ -5521,8 +5576,8 @@ function drawcarwheel2(){
     gl.bindBuffer(gl.ARRAY_BUFFER, carwheelVertexPositionBuffer);
     gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, carwheelVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms2();
     gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
@@ -5548,8 +5603,8 @@ function drawcar2(){if(tfoot==1 || iview>=1){return;}
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexPositionBuffer);
     gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    //gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    //gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    //gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    //gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
     */
     colorr=1;colorg=1;colorb=1;colora=0;
     //setMatrixUniforms2();
@@ -5594,8 +5649,8 @@ function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexPositionBuffer);
     gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, towerVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms2();
     gl.drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
@@ -6001,15 +6056,12 @@ for(var i=0;i<nroc;i++){
 function drawroc2(){
  	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  rocTexture);
-    gl.uniform1i(shader2Program.samplerUniform, 0);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
     
-    gl.bindBuffer(gl.ARRAY_BUFFER, rocVertexTextureCoordBuffer);
-    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, rocVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, rocVertexPositionBuffer);
-    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, rocVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, rocVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    setMatrixUniforms2(); 
+    setMatrixUniforms22(); 
 var distmax=50;
 for(var i=0;i<nroc;i++){		
     if(rocz[i]>zroc){
@@ -6024,9 +6076,9 @@ for(var i=0;i<nroc;i++){
 		var sc=rocscale[i]*0.015;
 		mat4.scale(mvMatrix,[sc,sc,sc]);
     
-    gl.uniformMatrix4fv(shader2Program.mvMatrixUniform, false, mvMatrix);
+    gl.uniformMatrix4fv(shader22Program.mvMatrixUniform, false, mvMatrix);
 	    //mat4.multiply(pMatrix,mvMatrix,pvMatrix);
-        //gl.uniformMatrix4fv(shader2Program.mvMatrixUniform, false, pvMatrix);
+        //gl.uniformMatrix4fv(shader22Program.mvMatrixUniform, false, pvMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, rocVertexPositionBuffer.numItems);
 		
 		mvPopMatrix();
@@ -6273,10 +6325,10 @@ for(var i=0;i<iwoman0;i++){
 	   gl.bindTexture(gl.TEXTURE_2D,woman1Texture);
     }	
 	//gl.bindTexture(gl.TEXTURE_2D,woman2Texture);
-	gl.uniform1i(shader2Program.samplerUniform, 0);
+	gl.uniform1i(shader22Program.samplerUniform, 0);
 
     colorr=1;colorg=1;colorb=1;colora=1;	
-    drawcarreshadow();
+    drawcarreshadow22();
     colorr=1;colorg=1;colorb=1;colora=1;	
 
 	mvPopMatrix();
@@ -7038,6 +7090,7 @@ function drawtexture(texture){
 	var towerVertexTextureCoordBuffer=[];
 	var towervertices,towertextureCoords;
 	var towerVertexNormalBuffer=[];
+	var tower0VertexNormalBuffer=[];
 	var towernormals;
 	var churchVertexPositionBuffer=[];
 	var churchVertexTextureCoordBuffer=[];
@@ -7531,7 +7584,7 @@ function updatebuffersol(){
         gl.bindBuffer(gl.ARRAY_BUFFER, roadbandVertexNormalBuffer[ibuff]);
         if(ibuff==0){roadbandnormals = new Float32Array(3*maxvertice4);
 		}
-		//var px=0,py=0,pz=0;
+		px=0,py=0,pz=1;
 		index=0;
 		for(var i=0;i<maxvertice4;i++){
 		   append(roadbandnormals,[
@@ -7589,6 +7642,19 @@ function updatebuffersol(){
         gl.bufferData(gl.ARRAY_BUFFER, (towernormals), gl.STATIC_DRAW);
         towerVertexNormalBuffer[ibuff].itemSize = 3;
         towerVertexNormalBuffer[ibuff].numItems = maxvertice2;
+
+        tower0VertexNormalBuffer[ibuff] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+		index=0;
+		for(var i=0;i<maxvertice2;i++){
+		   append(towernormals,[
+             0,0,1
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (towernormals), gl.STATIC_DRAW);
+        tower0VertexNormalBuffer[ibuff].itemSize = 3;
+        tower0VertexNormalBuffer[ibuff].numItems = maxvertice2;
 
         churchVertexPositionBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexPositionBuffer[ibuff]);
