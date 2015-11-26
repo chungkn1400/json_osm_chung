@@ -10244,7 +10244,8 @@ h=(0.075+0.025)*barh[i];
  var test=0;
  if(barcolor[i]==0){//not bridge
    test=testroad2((xx+xxx+barsi1[i]*rr)/4,(yy+yyy-barco1[i]*rr)/4,latx0,lngx0,rr/2.2);
- }else{var r4=6*barside[i];test=testroad23((xx+xxx+barsi1[i]*(rr+r4))/4,(yy+yyy-barco1[i]*(rr+r4))/4,zzz,latx0,lngx0,rr/2.2);
+ }else{var r4=6*barside[i],zzzi=barz[i]+rr*bartan2[i];
+       test=testroad23((xx+xxx+barsi1[i]*(rr+r4))/4,(yy+yyy-barco1[i]*(rr+r4))/4,zzzi,latx0,lngx0,rr/2.2);
  }
  if(test==0){
    r=0;
