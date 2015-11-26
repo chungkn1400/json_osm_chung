@@ -4286,16 +4286,6 @@ var tshadownight=0;
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(tlight==0){tshadow=0;return;}
 		drawsol2();
-		/*drawtowers2();
-		drawchurchs2();
-		drawhouses2();
-		drawroofs2();
-		drawwoman2();
-		drawroc2();
-		drawroads2();*/
-	}else{
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
-		if(tlight==0){tshadow=0;return;}
 		drawtowers2();
 		drawchurchs2();
 		drawhouses2();
@@ -4303,6 +4293,9 @@ var tshadownight=0;
 		drawwoman2();
 		drawroc2();
 		drawroads2();
+	}else{
+		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(tlight==0){tshadow=0;return;}
 		//if(iview==1 && tfoot==0){drawcarobj2();}
 		//else if(tfoot==0){drawcarobj2();}//drawcar2();}
    		gl.useProgram(shader2Program);
@@ -4311,7 +4304,7 @@ var tshadownight=0;
 		//drawcloud22();
 		//drawroads2();
 	}
-	if(irtt==1){
+	if(irtt==0){
    		gl.useProgram(treeProgram);
 		drawtree();
 		drawtree2();
@@ -4363,19 +4356,12 @@ var tshadownight=0;
 		drawchurchs2();
 		drawhouses2();
 		drawroofs2();
-		//drawwoman2();
-		//drawroc2();
+		drawwoman2();
+		drawroc2();
 		drawroads2();
 	}else{
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
-		drawtowers2();
-		drawchurchs2();
-		drawhouses2();
-		drawroofs2();
-		drawwoman2();
-		drawroc2();
-		drawroads2();
    		gl.useProgram(shader2Program);
 		if(iview==1 && tfoot==0){drawcarobj2();}
 		else if(tfoot==0){drawcarobj2();}//drawcar2();}
@@ -4384,7 +4370,7 @@ var tshadownight=0;
 		//drawcloud22();
 		//drawroads2();
 	}
-	if(irtt==1){
+	if(irtt==0){
    		gl.useProgram(treeProgram);
 		drawtree();
 		drawtree2();
@@ -8538,7 +8524,7 @@ if(pautoroad>=0 && (auto==0 || pautoroad0<0)){
      var dy2=road0y[j]+road0l[j]*road0si1[j]/2-py;
 	 if(Math.abs(dx2*sin1-dy2*cos1)<Math.abs(dx*sin1-dy*cos1)){
 	   dx=dx2;dy=dy2;}
-	if(Math.abs(dx)>25 || Math.abs(dy)>25){
+	if(Math.abs(dx)>30.25 || Math.abs(dy)>30.25){
        pautoroad=-1;}   
     if(Math.abs(dx)<r){
 	 if(Math.abs(dy)<r){
@@ -8563,7 +8549,7 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
      var dy2=road0y[j]+road0l[j]*road0si1[j]/2-py;
 	 if(dxy*(dx2*sin1-dy2*cos1)<dxy*(dx*sin1-dy*cos1)){
 	   dx=dx2;dy=dy2;}*/
-	if(Math.abs(dx)>25 || Math.abs(dy)>25){
+	if(Math.abs(dx)>30.25 || Math.abs(dy)>30.25){
        pautoroad=-1;}   
     if(Math.abs(dx)<r){
 	 if(Math.abs(dy)<r){
@@ -8575,7 +8561,7 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
 	}
 vrun=0.48;
 if(vcar<0.08){vrun=0.74;}
-if(vcar<0.04){vrun=1.50;vcar=Math.max(0.01,vcar);}
+if(vcar<0.04){vrun=1.80;vcar=Math.max(0.015,vcar);}
 if(pautoroad>=0){
    dxyroad0=dxyroad;
    dxyroad=dx*road0si1[j]-dy*road0co1[j];
