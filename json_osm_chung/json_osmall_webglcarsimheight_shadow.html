@@ -426,7 +426,7 @@ float r,g,b,color;
 		    //vec4 xyz=texture2D(uSampler2, vTextureCoord2);
 		    float z0=decodefloatrgba(texture2D(uSampler2, vTextureCoord2));
 		    if(z>(z0+0.01)){color=0.4;}//min(color,0.4);}//shadow
-			else{z0=decodefloatrgba(texture2D(uSampler3, vTextureCoord2));
+			else{z0=decodefloatrgba(texture2D(uSampler3, vTextureCoord2*2.0-0.5));
 			     if(z>(z0+0.01)){color=0.4;}}//min(color,0.4);}}
             //setlight();
 			}
@@ -681,7 +681,7 @@ float decodefloatrgb( vec3 rgb ) {
 	 float light=1.10;
 	 if(z>(decodefloatrgb(texture2D(uSampler4, vTextureCoord4).rgb)+0.01)){light=0.44;}//shadow
 	 else{//z0=decodefloatrgba(texture2D(uSampler5, vTextureCoord4));
-	      if(z>(decodefloatrgb(texture2D(uSampler5, vTextureCoord4).rgb)+0.01)){light=0.44;}}
+	      if(z>(decodefloatrgb(texture2D(uSampler5, vTextureCoord4*2.0-0.5).rgb)+0.01)){light=0.44;}}
 	/*if(xyz0.y<0.065 && ulight==1){
 	 z0=-xyz0.z-0.02;
 	 if(abs(xyz0.x-0.01-0.2*z0)<z0*0.6){
@@ -3407,10 +3407,11 @@ function initGL(canvasgl){
 		}
     }
 function initrtttexture(){
+        var s1024=1024;
         rttFramebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
-        rttFramebuffer.width = 2048;
-        rttFramebuffer.height = 2048;
+        rttFramebuffer.width = s1024;
+        rttFramebuffer.height = s1024;
         rttTexture = gl.createTexture();
         rttTexture.width=rttFramebuffer.width;
         rttTexture.height=rttFramebuffer.height;
@@ -3430,8 +3431,8 @@ function initrtttexture(){
 
         rtt2Framebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rtt2Framebuffer);
-        rtt2Framebuffer.width = 2048;
-        rtt2Framebuffer.height = 2048;
+        rtt2Framebuffer.width = s1024;
+        rtt2Framebuffer.height = s1024;
         rtt2Texture = gl.createTexture();
         rtt2Texture.width=rtt2Framebuffer.width;
         rtt2Texture.height=rtt2Framebuffer.height;
@@ -3451,8 +3452,8 @@ function initrtttexture(){
 
         rtt3Framebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rtt3Framebuffer);
-        rtt3Framebuffer.width = 2048;
-        rtt3Framebuffer.height = 2048;
+        rtt3Framebuffer.width = s1024;
+        rtt3Framebuffer.height = s1024;
         rtt3Texture = gl.createTexture();
         rtt3Texture.width=rtt3Framebuffer.width;
         rtt3Texture.height=rtt3Framebuffer.height;
@@ -4274,7 +4275,9 @@ var tshadownight=0;
 		//mat4.rotate(mvMatrix, degtorad(o1), [0, 0, 1]);
 		mat4.set(pMatrix,pMatrix0);
         mat4.set(mvMatrix,mvMatrix0);
-   	}else{mat4.set(pMatrix0,pMatrix);
+   	}else{
+          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,300.3, 900.0, pMatrix);
+	      //mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
 		gl.useProgram(shader22Program);
@@ -4283,6 +4286,16 @@ var tshadownight=0;
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(tlight==0){tshadow=0;return;}
 		drawsol2();
+		/*drawtowers2();
+		drawchurchs2();
+		drawhouses2();
+		drawroofs2();
+		drawwoman2();
+		drawroc2();
+		drawroads2();*/
+	}else{
+		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(tlight==0){tshadow=0;return;}
 		drawtowers2();
 		drawchurchs2();
 		drawhouses2();
@@ -4290,9 +4303,6 @@ var tshadownight=0;
 		drawwoman2();
 		drawroc2();
 		drawroads2();
-	}else{
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
-		if(tlight==0){tshadow=0;return;}
 		//if(iview==1 && tfoot==0){drawcarobj2();}
 		//else if(tfoot==0){drawcarobj2();}//drawcar2();}
    		gl.useProgram(shader2Program);
@@ -4301,7 +4311,7 @@ var tshadownight=0;
 		//drawcloud22();
 		//drawroads2();
 	}
-	if(irtt==0){
+	if(irtt==1){
    		gl.useProgram(treeProgram);
 		drawtree();
 		drawtree2();
@@ -4338,7 +4348,9 @@ var tshadownight=0;
 		//mat4.rotate(mvMatrix, degtorad(o1), [0, 0, 1]);
 		mat4.set(pMatrix,pMatrix0);
         mat4.set(mvMatrix,mvMatrix0);
-   	}else{mat4.set(pMatrix0,pMatrix);
+   	}else{
+          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,10.0, 10000.0, pMatrix);
+	      //mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
 		gl.useProgram(shader22Program);
@@ -4351,12 +4363,19 @@ var tshadownight=0;
 		drawchurchs2();
 		drawhouses2();
 		drawroofs2();
-		drawwoman2();
-		drawroc2();
+		//drawwoman2();
+		//drawroc2();
 		drawroads2();
 	}else{
 		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
+		drawtowers2();
+		drawchurchs2();
+		drawhouses2();
+		drawroofs2();
+		drawwoman2();
+		drawroc2();
+		drawroads2();
    		gl.useProgram(shader2Program);
 		if(iview==1 && tfoot==0){drawcarobj2();}
 		else if(tfoot==0){drawcarobj2();}//drawcar2();}
@@ -4365,7 +4384,7 @@ var tshadownight=0;
 		//drawcloud22();
 		//drawroads2();
 	}
-	if(irtt==0){
+	if(irtt==1){
    		gl.useProgram(treeProgram);
 		drawtree();
 		drawtree2();
