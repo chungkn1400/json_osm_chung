@@ -2192,10 +2192,11 @@ if(tfly==1){
 	   var kvv=1+3*Math.max(0,vcar);
 	   latx-=sin1*vv*kvv/4;lngx-=cos1*klon*vv*kvv/4;testx=1;tcollide=0;}
 	 tcollide=0;
-	 if(troad==1 && tautopilot==1 && tcar==1 && vcar>0.02){
-	   if(testroad(xx+cos1*1.8,yy+sin1*1.8,lat0,lng0,0.5)==0){vcar=Math.max(0.02,vcar-0.02*dt*(vcar+0.05));}}
 	 var piloto1=0;
 	 if(tautopilot>=1 && tframe>dtautopilot){
+	     if(troad==1 && vcar>0.02){
+	       if(testroad(xx+cos1*2.4,yy+sin1*2.4,lat0,lng0,0.4)==0){
+	               vrun=Math.min(0.3,vrun);vcar=Math.max(0.03,vcar-0.02*dt*(vcar+0.05));}}
 	     vrunauto0=Math.max(0.3,Math.min(1.0,vrunauto0));
 	     vrun+=(vrunauto0-vrun)*dtime*0.0005;
 		 if(troad==0){vrun=Math.min(vrunmax*0.45,Math.max(0.1,vrun));}
@@ -8530,7 +8531,7 @@ if(pautoroad>=0 && (auto==0 || pautoroad0<0)){
 	 if(Math.abs(dy)<r){
 	   pautoroad0=pautoroad;pautoroad=-1;
     }}
-	if(dx*cos1+dy*sin1<-8){
+	if(dx*cos1+dy*sin1<-5.08*road0r[j] && pautoroad>0){
 	   pautoroad0=pautoroad;pautoroad=-1;
 	}
 	}
@@ -8555,7 +8556,7 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
 	 if(Math.abs(dy)<r){
 	   pautoroad0=pautoroad;pautoroad=-1;
     }}
-	if(dx*cos1+dy*sin1<-8){
+	if(dx*cos1+dy*sin1<-5.08*road0r[j] && pautoroad>0){
 	   pautoroad0=pautoroad;pautoroad=-1;
 	}
 	}
@@ -8664,7 +8665,7 @@ iautoroad=-1;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);
+		  dxy0+=Math.max(0,(road0r[i]-0.5)*kdxy0);//-1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
 		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
@@ -8679,7 +8680,7 @@ iautoroad=-1;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);
+		  dxy0+=Math.max(0,(road0r[i]-0.5)*kdxy0);//-1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
 		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
