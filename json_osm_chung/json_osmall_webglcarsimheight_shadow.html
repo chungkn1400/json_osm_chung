@@ -16,7 +16,8 @@ div {
 	<div id="mydiv" style="position:absolute;top:0px;left:0px;z-index:200;" >
 	<canvas id="canvasgl" style="border:none;top:0px;left:0px;" width="600" height="400"></canvas>
     </div>
-	<div id="mydiv2" style="position:absolute;top:0px;left:0px;z-index:300;" onmousedown="submouse2down(event);"  onmouseup="submouse2up(event);" onmousemove="submouse2move(event);">
+	<!--div id="mydiv2" style="position:absolute;top:0px;left:0px;z-index:300;" onmousedown="submouse2down(event);"  onmouseup="submouse2up(event);" onmousemove="submouse2move(event);"-->
+	<div id="mydiv2" style="position:absolute;top:0px;left:0px;z-index:300;" >
 	<canvas id="canvas" style="border:none;top:0px;left:0px;" width="600" height="400"></canvas>
 	<br />
 	<button id="fullscreen"  onclick="sizescreen();">fullscreen</button>
@@ -5855,6 +5856,7 @@ if(tgirl==2){drawcarcockpit3();return;}
 		to1=o1+o1head-o1save;
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
+		if(o1head>120){to1=230;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [20,-15,-60]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -5938,7 +5940,7 @@ function drawcarcockpit2(){
 		to1=o1+o1head-o1save;
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
-		if(o1head>120){to1=220;}
+		if(o1head>120){to1=230;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [0,2.3,-84]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -5994,6 +5996,7 @@ function drawcarcockpit3(){
 		to1=o1+o1head-o1save;
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
+		if(o1head>120){to1=230;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [20,-17.35,-60]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
