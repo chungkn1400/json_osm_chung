@@ -2193,10 +2193,12 @@ if(tfly==1){
 	   latx-=sin1*vv*kvv/4;lngx-=cos1*klon*vv*kvv/4;testx=1;tcollide=0;}
 	 tcollide=0;
 	 var piloto1=0;
-	 if(tautopilot>=1 && tframe>dtautopilot){
+	 if(tautopilot>=1 && tframe>dtautopilot-2000){
 	     if(troad==1 && vcar>0.02){
 	       if(testroad(xx+cos1*2.4,yy+sin1*2.4,lat0,lng0,0.4)==0){
-	               vrun=Math.min(0.3,vrun);vcar=Math.max(0.03,vcar-0.02*dt*(vcar+0.05));}}
+		           dtautopilot=0;
+	               vrun=Math.min(0.3,vrun);vcar=Math.max(0.03,vcar-0.02*dt*(vcar+0.05));}}}
+	 if(tautopilot>=1 && tframe>dtautopilot){
 	     vrunauto0=Math.max(0.3,Math.min(1.0,vrunauto0));
 	     vrun+=(vrunauto0-vrun)*dtime*0.0005;
 		 if(troad==0){vrun=Math.min(vrunmax*0.45,Math.max(0.1,vrun));}
@@ -9054,8 +9056,8 @@ for(var i=1;i<=ilayer2;i++){
 	    if(i!=j){
 		  var inode2=ilayernode2[j];
 		  if(latnodes[inode2]){
-		    if(Math.abs(latnodes[inode]-latnodes[inode2])<0.00005){
-			  if(Math.abs(lonnodes[inode]-lonnodes[inode2])<0.00005*klon){
+		    if(Math.abs(latnodes[inode]-latnodes[inode2])<0.000035){
+			  if(Math.abs(lonnodes[inode]-lonnodes[inode2])<0.000035*klon){
 			     layernode2[inode]+=1;
 				 layernode2[inode2]+=1;}}
 		   }}}}
