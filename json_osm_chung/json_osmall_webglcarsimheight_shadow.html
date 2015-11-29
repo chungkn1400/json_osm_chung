@@ -1439,6 +1439,7 @@ function reversecallback(r){//alert(r);
    var rr=r.substr(i+6,30)+'"';
    i=rr.indexOf('"');
     rr=rr.substr(0,i);
+	if(isletter(rr)==0 && cityname!=""){rr=cityname;}
     if(ireverse==0){locationname=rr;}else{locationname2=rr;}//alert(rr);
 	if(treversecity==0){locationname=rr;locationname2=rr;latrev20=latrev2;lngrev20=lngrev2;}
 	else if(locationname!=locationname2){
