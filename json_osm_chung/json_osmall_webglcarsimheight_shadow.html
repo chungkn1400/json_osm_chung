@@ -1151,6 +1151,7 @@ function weathercallback(r){//alert(r);
   humidity=weatherjson.main.humidity;//alert(humidity);
   temp=parseInt((weatherjson.main.temp-273)*10)/10;//alert(temp);
   fogweather=Math.min(1,Math.max(0,(humidity-50)*0.15/Math.max(3,temp)));
+  fogweather*=fogweather;
   if(Math.abs(loading-1.44)<0.001){loading=0;msgload("");}
   setskydometexture();
 }
