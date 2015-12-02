@@ -2036,8 +2036,8 @@ if(window.requestAnimationFrame){window.requestAnimFrame = window.requestAnimati
 document.getElementById('msg').focus();
 document.getElementById('msg').value="H => help /  arrow keys => move";
 
-var icombo=2,combotext="deauville marinas";
-var flytolat=48.82612529173,flytolng=2.3570559500472;
+var icombo=3,combotext="deauville marinas";
+var flytolat=48.8261252,flytolng=2.35705595;
 var flytoname="flyto",combolat=lat,combolng=lng;
 function formatname(text){
 var exclude='&",;?#',text1="",c="";
@@ -8559,12 +8559,12 @@ var searchtxt="",parms=[],iparm=0;
 function addparm(parm){
    searchtxt+=(parseInt(parm*1000)/1000)+"&";
 }
-var tsea=0,tinitcombo=0,latinit=0,lnginit=0;
+var tsea=0,tinitcombo=0,latinit=0,lnginit=0,hash0="";
 function initparms(){
-  var hash0=document.location.search;//parent.location.hash;
+  hash0=document.location.search;//parent.location.hash;
   if(hash0.indexOf("reset",0)>=0 || hash0.indexOf("nocook",0)>=0){hash0="";
   }else{readcookie();}
-  var hash0=document.location.search;//parent.location.hash;
+  //var hash0=document.location.search;//parent.location.hash;
   getparms(hash0);
   latinit/=100;
   lnginit/=100;
@@ -8657,7 +8657,7 @@ var j=mycookie.indexOf(";",i);
 if(j<i){return;}
 var mycookie=mycookie.substring(i,j);
 //alert(mycookie);
-var hash0="?"+mycookie;getparms(hash0);
+hash0="?"+mycookie;getparms(hash0);
 }
 function savecookie(){
 var mycookie="";
