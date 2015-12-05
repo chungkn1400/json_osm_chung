@@ -51,9 +51,9 @@ div {
           <option id="washington">washington</option>
           <option id="tajmahal">tajmahal</option>
      </select>
-	 <input type="text" id="msg" maxlength="85" size="85" />
+	 <input type="text" id="msg" maxlength="99" size="99" />
 	 <!--input type="text"  readonly="readonly" id="msg" maxlength="70" size="70" /-->
-     <button id="quit"  onclick="subquit();">quit</button>
+     <!--button id="quit"  onclick="subquit();">quit</button-->
      </div>
 	<div id="mapdiv" style="position:absolute;top:4022px;left:0px;width:100%;height:95%;" >
     </div>
@@ -1868,6 +1868,7 @@ msg+="P => auto pilot   /   F => fog"+crlf;
 msg+="A => ascend (climb walls,foot mode)"+crlf;
 msg+="Z => climb road"+crlf;
 msg+="7 => change season"+crlf;
+msg+="shift+X => scalex"+crlf;
 msg+="space+arrows => turn head"+crlf;
 msg+="shift+E => change cockpit"+crlf;
 msg+="button 1 => accelerate"+crlf;
@@ -2029,6 +2030,7 @@ var xmin=-30000,xmax=30000,ymin=-30000,ymax=30000;
 var quit=0,tmsg=0,tmsg2=0,lat0=lat,lng0=lng,latx=lat,lngx=lng;
 var scale=0.3*windy/dlat,x00=0,y00=0;
 scale=0.3*400/dlat;//scale*=0.8;
+var scale0=scale,kscalex=1;
 var tmap=0,dxmax=25,tfoot=0,vcar=0,t300=30;
 var tmove=0,trot=0;
 var tfocus=1,tdisplay=0,x0=0,y0=0,z0=0,tcar=0,vzz=0;
@@ -2061,6 +2063,7 @@ if(tmsg<(tframe-150)){tmsg=tframe;
  var msg="x="+xx+"  y="+yy+"  z="+zz+"  v="+vv+"  prop="+pp
  if(test==1){msg+="  o1="+oo1+" o2="+oo2+" o3="+oo3;};
  msg+=" fps="+ff;
+ msg+=" tri="+ntri;
  if(distairportxx<4000){msg+=" airport="+parseInt(distairportxx);}
  if(auxvar!=null){msg+=" aux="+auxvar;}
  if(auxvar2!=null){msg+=" aux2="+auxvar2;}
@@ -2390,6 +2393,7 @@ if(tfoot==0){
  if(keys[vk_2]){cockpith-=1;resetkeys();if(cockpith<-20){cockpith=-20;};}
 }
 if(keys[vk_9]){subtest();resetkeys();}
+if(keys[vk_x] & keys[vk_shift]){subscalex();resetkeys();}
 if(keys[vk_0]){subgirlimage();sleep(200);resetkeys();}
 if(keys[169]){subtgirlimage();sleep(200);resetkeys();}//')'
 if(keys[61]){subgirlimage3();sleep(200);resetkeys();}//'='
@@ -2671,6 +2675,7 @@ if(twebaudio==1 && tradio==0){
 		     if(keys[vk_m] || keys[vk_escape] || keys[vk_space]){quitstreetview();sleep(200);resetkeys();}}
         if(tmouseup==1){testmouseup();}
 		tskip=0;
+		ndraw=0;ntri=0;
 		//if(x<xmin){x+=xmax-xmin;tskip=1;};
 		//if(x>xmax){x-=xmax-xmin;tskip=1;};
 		//if(y<ymin){y+=ymax-ymin;tskip=1;};
@@ -4690,7 +4695,7 @@ function drawroads(){
         if(tdrawminimap==1){setMatrixUniforms00();}
 		else{setMatrixUniforms0();}}
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawroadbands(){
@@ -4720,7 +4725,7 @@ function drawroadbands(){
         if(tdrawminimap==1){setMatrixUniforms00();}
 		else{setMatrixUniforms0();}}
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, roadbandVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, roadbandVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawtowers(){
@@ -4749,7 +4754,7 @@ function drawtowers(){
 	setMatrixUniforms();
     gl.uniform1f(shaderProgram.lightUniform,0);
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawchurchs(){
@@ -4776,7 +4781,7 @@ function drawchurchs(){
     colorr=1;colorg=1;colorb=1;colora=1;
 	setMatrixUniforms();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }function drawhouses(){
     gl.disable(gl.CULL_FACE);
@@ -4802,7 +4807,7 @@ function drawchurchs(){
     colorr=1;colorg=1;colorb=1;colora=1;
 	setMatrixUniforms();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, houseVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, houseVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawroofs(){
@@ -4827,7 +4832,7 @@ function drawroofs(){
 	if(tmap==0){setMatrixUniforms();}
 	else{setMatrixUniforms00();}
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function setmatrix2(){
@@ -4859,7 +4864,7 @@ function drawroads2(){
     colorr=1;colorg=1;colorb=1;colora=0;
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, roadVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawtowers2(){
@@ -4883,7 +4888,7 @@ function drawtowers2(){
     colorr=1;colorg=1;colorb=1;colora=0;
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, towerVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawchurchs2(){
@@ -4907,7 +4912,7 @@ function drawchurchs2(){
     colorr=1;colorg=1;colorb=1;colora=0;
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawhouses2(){
@@ -4928,7 +4933,7 @@ function drawhouses2(){
     colorr=1;colorg=1;colorb=1;colora=0;
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, houseVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, houseVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawroofs2(){
@@ -4949,7 +4954,7 @@ function drawroofs2(){
     colorr=1;colorg=1;colorb=1;colora=0;
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 var timerain=0,train0=0,wclouds=50.1;
@@ -5034,7 +5039,7 @@ function drawcarre2D(){
     gl.vertexAttribPointer(program2d.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms2D();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarrecockpit(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, cockpitVertexTextureCoordBuffer);
@@ -5044,7 +5049,7 @@ function drawcarrecockpit(){
     gl.vertexAttribPointer(shader0Program.vertexPositionAttribute, cockpitVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformssh0();
-    gl.drawArrays(gl.TRIANGLES, 0, cockpitVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, cockpitVertexPositionBuffer.numItems);
 }
 function drawbouss0(){
   var xx=windx-40,yy=40,r=14;
@@ -5215,7 +5220,7 @@ function drawcarre(){
     gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms00();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarre2(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, bouss2VertexTextureCoordBuffer);
@@ -5228,7 +5233,7 @@ function drawcarre2(){
     gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms00();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarresh0(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexTextureCoordBuffer);
@@ -5238,7 +5243,7 @@ function drawcarresh0(){
     gl.vertexAttribPointer(shader0Program.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformssh0();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarre2sh0(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, bouss2VertexTextureCoordBuffer);
@@ -5248,7 +5253,7 @@ function drawcarre2sh0(){
     gl.vertexAttribPointer(shader0Program.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformssh0();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarrea(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexTextureCoordBuffer);
@@ -5261,7 +5266,7 @@ function drawcarrea(){
     gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformsa();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarresun(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexTextureCoordBuffer);
@@ -5274,14 +5279,14 @@ function drawcarresun(){
     gl.vertexAttribPointer(sunProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniformssun();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarreshadow22(){
     gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexPositionBuffer);
     gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, boussVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms22();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 function drawcarreshadow(){
 	gl.bindBuffer(gl.ARRAY_BUFFER, boussVertexTextureCoordBuffer);
@@ -5294,7 +5299,7 @@ function drawcarreshadow(){
     gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
 	setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
 var skydomeo1=Math.random()*360;
 function drawsky(){
@@ -5538,7 +5543,7 @@ function drawcarobj(){
     if(typcar==5){colorr=1;colorg=0;colorb=1;colora=0;}
 	setMatrixUniformsa();
 	colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
 
     o3wheel+=vcar*dtime*3;
 	if(o3wheel>3600){o3wheel-=3600;}
@@ -5555,21 +5560,21 @@ function drawcarobj(){
     mat4.rotate(mvMatrix, degtorad(-o3volant0/2), [0, 0, 1]);	
     mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
     setMatrixUniformsa();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
     mvPushMatrix();
 	mat4.translate(mvMatrix, [-88,57,14.77]);
 	sc=0.19;mat4.scale(mvMatrix,[sc,sc,sc]);
     mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
     setMatrixUniformsa();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
     mvPushMatrix();
 	mat4.translate(mvMatrix, [-88,-56,14.77]);
 	sc=0.19;mat4.scale(mvMatrix,[sc,-sc,sc]);
     mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
     setMatrixUniformsa();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
 
 	mvPopMatrix();
@@ -5585,7 +5590,7 @@ function drawcarwheel(){
     gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniformsa();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 }
 function drawcarwheel2(){
     gl.bindBuffer(gl.ARRAY_BUFFER, carwheelVertexTextureCoordBuffer);
@@ -5598,7 +5603,7 @@ function drawcarwheel2(){
     gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 }
 function drawcar2(){if(tfoot==1 || iview>=1){return;}
 		tmovertt=1;
@@ -5626,7 +5631,7 @@ function drawcar2(){if(tfoot==1 || iview>=1){return;}
     */
     colorr=1;colorg=1;colorb=1;colora=0;
     //setMatrixUniforms2();
-    //gl.drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
+    //gl_drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
 	drawcarreshadow();
     colorr=1;colorg=1;colorb=1;colora=1;
 
@@ -5671,7 +5676,7 @@ function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
     gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
 
 	mvPushMatrix();
 	mat4.translate(mvMatrix, [112,57,14.77]);
@@ -5684,19 +5689,19 @@ function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
 	sc=0.19;mat4.scale(mvMatrix,[sc,-sc,sc]);
     mat4.rotate(mvMatrix, degtorad(-o3volant0/2), [0, 0, 1]);	
     setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
     mvPushMatrix();
 	mat4.translate(mvMatrix, [-88,57,14.77]);
 	sc=0.19;mat4.scale(mvMatrix,[sc,sc,sc]);
     setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
     mvPushMatrix();
 	mat4.translate(mvMatrix, [-88,-56,14.77]);
 	sc=0.19;mat4.scale(mvMatrix,[sc,-sc,sc]);
     setMatrixUniforms2();
-    gl.drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
 
 	mvPopMatrix();
@@ -5724,7 +5729,7 @@ function drawstationobj(){auxvar=nstation0;
 	colorr=1;colorg=1;colorb=1;colora=1;
 	setMatrixUniformsa();
 	colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, stationVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, stationVertexPositionBuffer.numItems);
 
 	mvPopMatrix();
 	}}
@@ -5829,7 +5834,7 @@ gl.useProgram(shaderProgram);
 		if(height2[ixy]<0 && (i+j)%2==0){colorb+=0.1;colorg+=0.1;colorr+=0.1;} 
 		//colorr*=1.5;colorg*=1.5;colorb*=1.5;
 	    setMatrixUniforms00();
-        gl.drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
+        gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
       }
 	}
     mat4.identity(mvMatrix);
@@ -6123,7 +6128,7 @@ for(var i=0;i<nroc;i++){
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 	    //mat4.multiply(pMatrix,mvMatrix,pvMatrix);
         //gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, pvMatrix);
-    gl.drawArrays(gl.TRIANGLES, 0, rocVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, rocVertexPositionBuffer.numItems);
 		
 		mvPopMatrix();
     }}
@@ -6156,7 +6161,7 @@ for(var i=0;i<nroc;i++){
     gl.uniformMatrix4fv(shader22Program.mvMatrixUniform, false, mvMatrix);
 	    //mat4.multiply(pMatrix,mvMatrix,pvMatrix);
         //gl.uniformMatrix4fv(shader22Program.mvMatrixUniform, false, pvMatrix);
-    gl.drawArrays(gl.TRIANGLES, 0, rocVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, rocVertexPositionBuffer.numItems);
 		
 		mvPopMatrix();
     }}
@@ -6225,7 +6230,7 @@ if(Math.abs(treetypez-zsol)>20 || tframe>ttreetype){
     gl.vertexAttribPointer(treeProgram.vertexPositionAttribute, treeVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
     
     setMatrixUniformstree(); 
-    gl.drawArrays(gl.TRIANGLES, 0, treeVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, treeVertexPositionBuffer[ibuff].numItems);
 		
 		mvPopMatrix();
 }
@@ -6260,7 +6265,7 @@ function drawtree2(){
     gl.vertexAttribPointer(treeProgram.vertexPositionAttribute, tree2VertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
     
     setMatrixUniformstree(); 
-    gl.drawArrays(gl.TRIANGLES, 0, tree2VertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, tree2VertexPositionBuffer[ibuff].numItems);
 		
 		mvPopMatrix();
 }
@@ -6286,7 +6291,7 @@ function drawline(){
     setMatrixUniformsline();
     colorr=1;colorg=1;colorb=1;	
     //gl.lineWidth(4);
-    gl.drawArrays(gl.TRIANGLES, 0, lineVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, lineVertexPositionBuffer[ibuff].numItems);
 		
 		mvPopMatrix();
 }
@@ -6311,7 +6316,7 @@ function drawcross(){
 	colorr=0.7;colorg=0.7;colorb=0.7;colora=1;
     setMatrixUniformsline();
     colorr=1;colorg=1;colorb=1;colora=1;	
-    gl.drawArrays(gl.TRIANGLES, 0, crossVertexPositionBuffer[ibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, crossVertexPositionBuffer[ibuff].numItems);
 		
 		mvPopMatrix();
 }
@@ -6438,7 +6443,7 @@ function drawcitypanel(){
 	colorr=0.7;colorg=0.7;colorb=0.7;colora=1;
     setMatrixUniformsline();
     colorr=1;colorg=1;colorb=1;colora=1;	
-    gl.drawArrays(gl.TRIANGLES, 0, citypanelVertexPositionBuffer[nibuff].numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, citypanelVertexPositionBuffer[nibuff].numItems);
 		
 		mvPopMatrix();
 	}}
@@ -7074,7 +7079,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
     colorr=1;colorg=1;colorb=1;colora=1;
 	setMatrixUniformssol();
     colorr=1;colorg=1;colorb=1;colora=1;
-    gl.drawArrays(gl.TRIANGLES, 0, solVertexPositionBuffer.numItems);
+    gl_drawArrays(gl.TRIANGLES, 0, solVertexPositionBuffer.numItems);
 	mvPopMatrix();
 }
 function drawsol2(){
@@ -7222,6 +7227,8 @@ function drawtexture(texture){
 	//var maxvertice4=parseInt(maxvertice/24)*6;
 	var maxvertice4=2500*6*2;
 	var maxvertice6=1500*6*2;
+	//var nsol=80;nsol=96;//128;
+	//var n=nsol,nsol2=16,n22=nsol+nsol2+nsol2;
 	var nsol=80;nsol=96;//128;
 	var n=nsol,nsol2=16,n22=nsol+nsol2+nsol2;
 	var height,kheight,height1,height2,tinitgmap=0;
@@ -10296,9 +10303,9 @@ h=(0.075+0.025)*barh[i];
    zzz=zz+rr*bartan2[i];
  var test=0;
  if(barcolor[i]==0){//not bridge
-   test=testroad2((xx+xxx+barsi1[i]*rr)/4,(yy+yyy-barco1[i]*rr)/4,latx0,lngx0,rr/2.2);
+   test=testroad2((xx+xxx+barsi1[i]*rr*kscalex)/4,(yy+yyy-barco1[i]*rr*kscalex)/4,latx0,lngx0,rr/2.2);
  }else{var r4=6*barside[i],zzzi=barz[i]+rr*bartan2[i];
-       test=testroad23((xx+xxx+barsi1[i]*(rr+r4))/4,(yy+yyy-barco1[i]*(rr+r4))/4,zzzi,latx0,lngx0,rr/2.2);
+       test=testroad23((xx+xxx+barsi1[i]*(rr+r4)*kscalex)/4,(yy+yyy-barco1[i]*(rr+r4)*kscalex)/4,zzzi,latx0,lngx0,rr/2.2);
  }
  if(test==0){
    r=0;
@@ -11517,6 +11524,14 @@ var cssx0=cssscale,cssy0=cssscaley;
     fullscreen-=1;sizescreen();
   }else{cssscale=cssx0;cssscaley=cssy0;}	
 }
+function subscalex(){
+var k0=parseInt(100*kscalex)/100;
+var k=prompt("scalex : enter a number 0.25 - 2.0 last="+k0)
+if(k){k=Math.max(0.25,Math.min(2.0,k));}
+if(k>=0.25 && k<=2.0){kscalex=k;scale=kscalex*scale0;
+                      if(loading==0 || loading==1.4){drawgl(0);}else{trygetways=1;}
+   } 
+}
 var geolocation="";
 function geolocate(){
 geolocation = "paris france";
@@ -11783,6 +11798,7 @@ function initparms(){
   latinit/=100;
   lnginit/=100;
   latx=latinit;lngx=lnginit;
+  if(kscalex>=0.25 && kscalex<=2.0){scale=scale0*kscalex;}
   if(noshadow>=1){noshadow=1;}
   if(flytoname){
     document.getElementById('combo')[1].text=flytoname;}
@@ -11818,6 +11834,7 @@ function getparms(hash){
     tgirl=evaln(parms[i]);i+=1;if(i>=n){return;}
     mouse2dx=evaln(parms[i]);i+=1;if(i>=n){return;}
     mouse2dy=evaln(parms[i]);i+=1;if(i>=n){return;}
+    kscalex=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 function setlink(){
@@ -11859,6 +11876,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(tgirl);
   addparm(mouse2dx);
   addparm(mouse2dy);
+  addparm(kscalex);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
@@ -12442,6 +12460,13 @@ function quitstreetview(){
 tstreetview=0;
 document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
+}
+var ntri=0,ndraw=0;
+function gl_drawArrays(glTRIANGLES, x0, numItems){
+ndraw+=1;ntri+=numItems/3;gl.drawArrays(glTRIANGLES, x0, numItems);
+}
+function gl_drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0){
+ndraw+=1;ntri+=numItems/3;gl.drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0);
 }
 var thour=0;
 var hour=new Date().getHours()+new Date().getMinutes()/60.0+ thour;

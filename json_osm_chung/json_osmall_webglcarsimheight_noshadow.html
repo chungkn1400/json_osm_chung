@@ -1184,6 +1184,7 @@ msg+="shift+C => collide  /  C => clouds(on/off)"+crlf;
 msg+="P => auto pilot"+crlf;
 msg+="A => ascend (climb walls,foot mode)"+crlf;
 msg+="7 => change season"+crlf;
+msg+="shift+X => scalex"+crlf;
 msg+="shift+E => change cockpit"+crlf;
 msg+="button 1 => accelerate"+crlf;
 msg+="button 2 => decelerate"+crlf;
@@ -1312,6 +1313,7 @@ var xmin=-30000,xmax=30000,ymin=-30000,ymax=30000;
 var quit=0,tmsg=0,tmsg2=0,lat0=lat,lng0=lng,latx=lat,lngx=lng;
 var scale=0.3*windy/dlat,x00=0,y00=0;
 scale=0.3*400/dlat;//scale*=0.8;
+var scale0=scale,kscalex=1;
 var tmap=0,dxmax=25,tfoot=0,vcar=0,t300=30;
 var tmove=0,trot=0;
 var tfocus=1,tdisplay=0,x0=0,y0=0,z0=0,tcar=0,vzz=0;
@@ -1652,6 +1654,7 @@ if(tfoot==0){
  if(keys[vk_2]){cockpith-=1;resetkeys();if(cockpith<-20){cockpith=-20;};}
 }
 if(keys[vk_9]){subtest();resetkeys();}
+if(keys[vk_x] & keys[vk_shift]){subscalex();resetkeys();}
 if(keys[vk_e] && keys[vk_shift]){subgirl();resetkeys();}
 if(keys[vk_h]){keys[vk_h]=0;subhelp();}
 if(keys[vk_v]){keys[vk_v]=0;iview+=1;if(iview>2){iview=0;};}
@@ -7458,8 +7461,8 @@ xx=barx[i];yy=bary[i];
    zzz=zz+rr*bartan2[i];
  var test=0;
  if(barcolor[i]==0){//not bridge
-   test=testroad2((xx+xxx+barsi1[i]*rr)/4,(yy+yyy-barco1[i]*rr)/4,latx0,lngx0,rr/2.2);
- }else{var r4=6*barside[i];test=testroad23((xx+xxx+barsi1[i]*(rr+r4))/4,(yy+yyy-barco1[i]*(rr+r4))/4,zzz,latx0,lngx0,rr/2.2);
+   test=testroad2((xx+xxx+barsi1[i]*rr*kscalex)/4,(yy+yyy-barco1[i]*rr*kscalex)/4,latx0,lngx0,rr/2.2);
+ }else{var r4=6*barside[i];test=testroad23((xx+xxx+barsi1[i]*(rr+r4)*kscalex)/4,(yy+yyy-barco1[i]*(rr+r4)*kscalex)/4,zzz,latx0,lngx0,rr/2.2);
  }
  if(test==0){
    r=0;h=(0.075+0.05)*barh[i];
@@ -8319,6 +8322,14 @@ var cssx0=cssscale,cssy0=cssscaley;
     fullscreen-=1;sizescreen();
   }else{cssscale=cssx0;cssscaley=cssy0;}	
 }
+function subscalex(){
+var k0=parseInt(100*kscalex)/100;
+var k=prompt("scalex : enter a number 0.25 - 2.0 last="+k0)
+if(k){k=Math.max(0.25,Math.min(2.0,k));}
+if(k>=0.25 && k<=2.0){kscalex=k;scale=kscalex*scale0;
+                      if(loading==0 || loading==1.4){drawgl(0);}else{trygetways=1;}
+   } 
+}
 var geolocation="";
 function geolocate(){
 geolocation = "paris france";
@@ -8569,6 +8580,7 @@ function initparms(){
   latinit/=100;
   lnginit/=100;
   latx=latinit;lngx=lnginit;
+  if(kscalex>=0.25 && kscalex<=2.0){scale=scale0*kscalex;}
   if(flytoname){
     document.getElementById('combo')[1].text=flytoname;}
   if(icombo>0){document.getElementById('combo').selectedIndex=icombo;
@@ -8603,6 +8615,7 @@ function getparms(hash){
     tgirl=evaln(parms[i]);i+=1;if(i>=n){return;}
     mouse2dx=evaln(parms[i]);i+=1;if(i>=n){return;}
     mouse2dy=evaln(parms[i]);i+=1;if(i>=n){return;}
+    kscalex=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 var noshadow=0;
@@ -8645,6 +8658,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(tgirl);
   addparm(mouse2dx);
   addparm(mouse2dy);
+  addparm(kscalex);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
