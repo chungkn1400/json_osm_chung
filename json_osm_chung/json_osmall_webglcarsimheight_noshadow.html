@@ -1322,7 +1322,7 @@ var tscroll=0,tscale=0,tscale0=0,tgaz=0,vcruise=0.8;
 var o2sol=0,o3sol=0,vcar0=0,vmx=0,vmy=0,vmz=0;
 var vmx2=0,vmy2=0,vmz2=0,vmxyz0=0,tprop0=0;
 var tcollide=0,zsol=0,troad=0,dtroad=0;
-var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0;
+var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
 var timer0=0,timer1=0;
@@ -1386,7 +1386,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
     if (keys[vk_s]){z-=dt*0.002;}
     if(tfly==0){z=Math.min(zsol+1.8,z);};	
     if(z<zsol+0.55){if(tfoot==1){tfly=0;z=zsol+0.58;}
-	                else{z=zsol+1;o2=Math.max(8,o2);soundpneu();}}
+	                else{z=zsol+0.60;o2=Math.max(8,o2);soundpneu();}}
 	if(tfoot==1){if(tfly==0){z=zsol+0.58;
 	         if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}}}
      vcar=0;landing=1;vrun=0;o3=0;
@@ -1456,7 +1456,7 @@ if(tfly==1){
                        cos2=Math.cos(degtorad(o2));
                        sin2=Math.sin(degtorad(o2));
 					   landing=1;vzz=0;z=zsol+0.698;
-	   }else{landing=0;
+	   }else{if(z>zsol+1){landing=0;}
 	         z+=(vzz-0.03)*dt*0.003;
 	   }
 	   z=Math.max(zsol+0.698,z);
@@ -1549,6 +1549,11 @@ if(tfly==1){
          soundpneu();}
 	  vmxyz0=vmxyz;
       }	  
+	 }else{
+	   if (keys[vk_left] || mouseleft || keys[vk_a] || button[5] || keys[58]) {o3volant+=ko3v*dt*0.18/(1+tfly);if(o3volant>64){o3volant=64;};pautoroad=-1;pautoroad0=-1;
+	                                                dtautopilot=tframe+4000;}
+       else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {o3volant-=ko3v*dt*0.18/(1+tfly);if(o3volant<-64){o3volant=-64;};pautoroad=-1;pautoroad0=-1;
+	                                                dtautopilot=tframe+4000;}												
 	 }
    	 var vrun10=vrun;
 	 if(tfly==0){
