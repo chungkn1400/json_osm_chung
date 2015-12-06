@@ -2958,7 +2958,8 @@ function initGL(canvasgl){
          canvas3.setAttribute('height', 600);
          canvassrtm=canvas3.getContext("2d");*/
 
-     	   gl = canvasgl.getContext("experimental-webgl");
+     	   gl = canvasgl.getContext("webgl");
+     	   if(!gl){gl = canvasgl.getContext("experimental-webgl");}
            //gl = canvasgl.getContext("webgl");
 		   gl.viewportWidth = canvasgl.width;
            gl.viewportHeight = canvasgl.height;
