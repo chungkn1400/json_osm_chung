@@ -310,10 +310,10 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		  }else if(ty<139.9){gl_FragColor = vec4(0.0,0.7,0.0,1.0);//green
 		  }else if(ty<149.9){gl_FragColor = vec4(0.1,0.1,0.8,1.0);//blue
 		  }else if(ty<1999.9){gl_FragColor = vec4(1.0,0.0,0.0,1.0);//red
-		  }else if(ty>99999.0){float s=ty-100000.0;
-		                      float r=floor(s/(256.0*256.0));s-=r*256.0*256.0;float g=floor(s/256.0);float b=(s-256.0*g)/256.0;
-		                      r/=256.0;g/=256.0;
-							  gl_FragColor=vec4(r,g,b,1.0);}
+		  }else if(ty>19999.0){float ss=floor((ty-20000.0)/256.0);float r=floor(ss/(256.0));ss-=r*256.0;float g=floor(ss/16.0);
+		                                float b=floor(ss-16.0*g)/15.0;//hextodec
+		                                r/=15.0;g/=15.0;
+									     gl_FragColor=vec4(r,g,b,1.0);}
 		  }
         else if(texture2D(uSampler,vTextureCoord).a<0.5){discard;}
 		else{gl_FragColor=encodefloatrgba(z0);}
@@ -10364,7 +10364,7 @@ h=(0.075+0.025)*barh[i];
     indexline=index;
 	index=indexlinetext;
 	var ty=0,t1=0.03;
-	if(barcolor[i]>0){if(barcolor[i]<99000){ty=parseInt(100+10*barcolor[i]-5);}
+	if(barcolor[i]>0){if(barcolor[i]<19000){ty=parseInt(100+10*barcolor[i]-5);}
 	                  else{ty=parseInt(barcolor[i]);}}
 		   append(linetexturecoords,[
              0,ty,  0,ty+t1,  1,ty+t1,
