@@ -310,12 +310,16 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		  }else if(ty<139.9){gl_FragColor = vec4(0.0,0.7,0.0,1.0);//green
 		  }else if(ty<149.9){gl_FragColor = vec4(0.1,0.1,0.8,1.0);//blue
 		  }else if(ty<1999.9){gl_FragColor = vec4(1.0,0.0,0.0,1.0);//red
-		  }else if(ty>19999.0){float ss=floor((ty-20000.0)/256.0);float r=floor(ss/(256.0));ss-=r*256.0;float g=floor(ss/16.0);
-		                                float b=floor(ss-16.0*g)/15.0;//hextodec
-		                                r/=15.0;g/=15.0;
-									     gl_FragColor=vec4(r,g,b,1.0);}
-		  }
-        else if(texture2D(uSampler,vTextureCoord).a<0.5){discard;}
+		  }else if(ty>19999.0){int ss=int(ty-20000.0)/256;float r=float(ss/(256));ss-=int(r*256.0);
+		                                float g=float(ss/16);
+		                                float b=float(ss-int(16.0*g));//hextodec
+     								    gl_FragColor=vec4(r/15.0,g/15.0,b/15.0,1.0);}
+                /*int u_color=int(ty-20000.0)/256;
+                float r = float(u_color / 256);
+                float g = float(u_color / 16 - int(r * 16.0));
+                float b = float(u_color - int(r * 256.0) - int(g * 16.0));
+                gl_FragColor = vec4(r / 15.0, g / 15.0, b / 15.0, 1.0);}*/
+        }else if(texture2D(uSampler,vTextureCoord).a<0.5){discard;}
 		else{gl_FragColor=encodefloatrgba(z0);}
 	}
 </script>
@@ -406,8 +410,9 @@ float r,g,b,color;
 		if(ucolor.a>0.001){
 	     if(gl_FragColor.a<0.5){discard;}else{
 		   if(s<-100.0){r=0.0;g=0.0;b=0.7;}
-		   else if(s>19999.0){float ss=floor((s-20000.0)/256.0);r=floor(ss/(256.0));ss-=r*256.0;g=floor(ss/16.0);
-		                                b=floor(ss-16.0*g)/15.0;//hextodec
+		   else if(s>19999.0){int ss=int(s-20000.0)/256;r=float(ss/(256));ss-=int(r*256.0);
+		                                g=float(ss/16);
+		                                b=float(ss-int(16.0*g))/15.0;//hextodec
 		                                r/=15.0;g/=15.0;
 									    }
 		   else if(s<400.0){r=1.0;g=1.0;b=1.0;}
