@@ -2050,6 +2050,7 @@ function subgirl(){
 var tfog=1,fog=0.45;if(Math.random()<0.5 && fogweather<0){tfog=0;fog=0;}
 function subfog(){
  if(tfog==0){if(confirm("set fog on ?")){tfog=1;fog=0.45;fog0=fog;}}
+ else if(tfog==1){if(confirm("set half fog?")){tfog=0.5;fog=0.5*0.45;fog0=fog;}}
  else{if(confirm("set fog off ?")){tfog=0;fog=0;fog0=fog;}}
 }
 var ttower=0;
@@ -5019,7 +5020,7 @@ var texscalex2=1,texscaley2=1,textdx2=0,textdy2=0;
 var trainfog=0,fog0=0.45,fogweather=-1;
 function drawrain(){
     var fog00=fog0*(1-0.55*Math.abs(12-hour)/12);
-	if(fogweather>=0 && tfog==1 && tframe>trainfog+5000){fog00=fogweather;}
+	if(fogweather>=0 && tfog>=0.1 && tframe>trainfog+5000){fog00=fogweather*tfog;}
     if(fog<fog00){fog+=(fog00-fog)*dtime*0.0003;}else{fog=fog00;}
     if(tframe<trainfog+5000){
          fog0=Math.max(tfog*0.1,(0.55+tfog*0.15)*(trainfog+5000-tframe)/5000);fog=fog00;}
