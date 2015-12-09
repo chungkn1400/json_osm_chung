@@ -284,6 +284,8 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 	
 	varying vec2 vTextureCoord;
 	varying float z0;
+	varying vec4 glFragColor;
+	
 	const vec4 v41=vec4(1.0, 255.0, 65025.0, 160581375.0)/5000.0;
 	const vec4 v42=vec4(1.0/255.0,1.0/255.0,1.0/255.0,1.0/255.0);
 
@@ -304,7 +306,8 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		       if(texture2D(uSampler,vec2(vTextureCoord.x,ty-10.0)).a<0.5){discard;}
 		  }else if(ty<99.9){gl_FragColor=texture2D(uSampler,vec2(vTextureCoord.x,ty-20.0));//city
 		       if(gl_FragColor.a<0.5){discard;}
-		  }else if(ty<109.9){gl_FragColor = vec4(1.0,1.0,1.0,1.0);//white
+		  }else{gl_FragColor=glFragColor;}
+		  /*}else if(ty<109.9){gl_FragColor = vec4(1.0,1.0,1.0,1.0);//white
 		  }else if(ty<119.9){gl_FragColor = vec4(1.0,0.3,0.0,1.0);//orange
 		  }else if(ty<129.9){gl_FragColor = vec4(0.55,0.55,0.55,1.0);//gray
 		  }else if(ty<139.9){gl_FragColor = vec4(0.0,0.7,0.0,1.0);//green
@@ -313,7 +316,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		  }else if(ty>19999.0){float ss=floor((ty-20000.0)/256.0);float r=floor(ss/(256.0));ss-=r*256.0;float g=floor(ss/16.0);
 		                                float b=floor(ss-16.0*g)/15.0;//hextodec
 		                                r/=15.0;g/=15.0;
-									     gl_FragColor=vec4(r,g,b,1.0);}
+									     gl_FragColor=vec4(r,g,b,1.0);}*/
 		  }
         else if(texture2D(uSampler,vTextureCoord).a<0.5){discard;}
 		else{gl_FragColor=encodefloatrgba(z0);}
@@ -332,6 +335,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 	
 	varying vec2 vTextureCoord;
 	varying float z0;
+	varying vec4 glFragColor;
 
     void main(void) {
 	    float x=aVertexPosition.x;
@@ -364,6 +368,18 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		if(z0<1.0){z0=0.0;}
 		//z=floor(z*20.0)/20.0;
 		 z0=z0*z0/5000.0;
+		 float ty=vTextureCoord.y;
+		  if(ty<109.9){glFragColor = vec4(1.0,1.0,1.0,1.0);//white
+		  }else if(ty<119.9){glFragColor = vec4(1.0,0.3,0.0,1.0);//orange
+		  }else if(ty<129.9){glFragColor = vec4(0.55,0.55,0.55,1.0);//gray
+		  }else if(ty<139.9){glFragColor = vec4(0.0,0.7,0.0,1.0);//green
+		  }else if(ty<149.9){glFragColor = vec4(0.1,0.1,0.8,1.0);//blue
+		  }else if(ty<1999.9){glFragColor = vec4(1.0,0.0,0.0,1.0);//red
+		  }else if(ty>19999.0){float ss=floor((ty-20000.0)/256.0);r=floor(ss/(256.0));ss-=r*256.0;float g=floor(ss/16.0);
+		                                float b=floor(ss-16.0*g)/15.0;//hextodec
+		                                r/=15.0;g/=15.0;
+									     glFragColor=vec4(r,g,b,1.0);}
+		  else{glFragColor = vec4(1.0,1.0,1.0,1.0);}
 		}
 </script>
 <script id="shader-fs" type="x-shader/x-fragment">
@@ -377,6 +393,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 	varying float color0;
     varying float z;
 	varying vec3 xyz0;
+	varying vec3 rgb;
 	
     uniform sampler2D uSampler;
 	uniform vec4 ucolor;
@@ -390,7 +407,7 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 float decodefloatrgba( vec4 rgba ) {
   return dot( rgba, v43);//vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) )*5000.0;
 }
-float r,g,b,color;
+float color;
 /*void setlight(){
 	if(xyz0.y<0.065 && ulight==1){
 	 float z0=-xyz0.z-0.02;
@@ -405,7 +422,7 @@ float r,g,b,color;
 		float s=vTextureCoord.y;
 		if(ucolor.a>0.001){
 	     if(gl_FragColor.a<0.5){discard;}else{
-		   if(s<-100.0){r=0.0;g=0.0;b=0.7;}
+		   /*if(s<-100.0){r=0.0;g=0.0;b=0.7;}
 		   else if(s>19999.0){float ss=floor((s-20000.0)/256.0);r=floor(ss/(256.0));ss-=r*256.0;g=floor(ss/16.0);
 		                                b=floor(ss-16.0*g)/15.0;//hextodec
 		                                r/=15.0;g/=15.0;
@@ -423,7 +440,7 @@ float r,g,b,color;
 		   else {r=1.7;g=1.7;b=0.0;}//fuel
 		   //else if(s<14000.0){r=1.7;g=1.7;b=0.0;}//fuel
 		   //else{r=0.3;g=0.7;b=0.5;}
-		   
+		   */
 		   //r=1.0;g=1.0;b=1.0;
 		   //gl_FragColor.a*=ucolor.a;
 		   //gl_FragColor.r*=ucolor.r*r;
@@ -456,7 +473,7 @@ float r,g,b,color;
 	     float cloudshadow=max(0.6,min(1.0,2.2-texture2D(uSampler6, vTextureCoord6).a*2.0));
 	     color=max(0.4,color*cloudshadow);
 		 gl_FragColor.rgb*=color*ucolor.rgb;
-		 gl_FragColor.rgb*=vec3(r,g,b);
+		 gl_FragColor.rgb*=rgb;//vec3(r,g,b);
 		 /*if(test==0){
 		   gl_FragColor.r*=ucolor.r*r;
 		   gl_FragColor.g*=ucolor.g*g;
@@ -479,6 +496,7 @@ float r,g,b,color;
 	varying float color0;
     varying float z;
 	varying vec3 xyz0;
+	varying vec3 rgb;
 	
     uniform sampler2D uSampler;
 	uniform vec4 ucolor;
@@ -561,6 +579,7 @@ float r,g,b,color;
 	varying float color0;
     varying float z;
 	varying vec3 xyz0;
+	varying vec3 rgb;
 	
     uniform sampler2D uSampler;
 	uniform vec4 ucolor;
@@ -599,6 +618,7 @@ float r,g,b,color;
 	varying float color0;
 	varying float z;
 	varying vec3 xyz0;
+	varying vec3 rgb;
 
     void main(void) {
         //gl_Position = uPMatrix * (uMVMatrix * vec4(aVertexPosition, 1.0));
@@ -630,7 +650,7 @@ float r,g,b,color;
 		float py=pxyz.y*0.5+0.5; 
 		vTextureCoord2.x=px; 
 		vTextureCoord2.y=py;
-        if(px<0.002 || px>0.998 || py<0.002 || py>0.998){z=0.0;} 		
+		if(px<0.002 || px>0.998 || py<0.002 || py>0.998){z=0.0;} 		
 		//gl_Position=xyz;
         float x=aVertexPosition.x-cloudx;
         float y=aVertexPosition.y-cloudy;		
@@ -638,6 +658,24 @@ float r,g,b,color;
 		vTextureCoord6.y=0.5-(x*sunco1+y*sunsi1)*0.5*300.0/400.0;
 		}
 		}
+	   float s=vTextureCoord.y,r,g,b;
+		   if(s<-100.0){r=0.0;g=0.0;b=0.7;}
+		   else if(s>19999.0){float ss=floor((s-20000.0)/256.0);r=floor(ss/(256.0));ss-=r*256.0;g=floor(ss/16.0);
+		                                b=floor(ss-16.0*g)/15.0;//hextodec
+		                                r/=15.0;g/=15.0;
+									    }
+		   else if(s<400.0){r=1.0;g=1.0;b=1.0;}
+		   else if(s<800.0){r=0.7;g=0.7;b=0.7;}
+		   else if(s<1200.0){r=0.4;g=0.4;b=0.4;}
+		   else if(s<1600.0){r=1.0;g=0.4;b=0.4;}
+		   else if(s<2000.0){r=0.7;g=0.7;b=1.5;}
+		   else if(s<2400.0){r=0.5;g=0.5;b=1.0;}
+		   else if(s<2800.0){r=1.0;g=1.0;b=0.5;}
+		   else if(s<3200.0){r=0.7;g=1.5;b=0.7;}
+		   else if(s<3600.0){r=0.5;g=1.0;b=0.5;}
+		   else if(s<4000.0){r=0.3;g=0.7;b=0.5;}
+		   else {r=1.7;g=1.7;b=0.0;}//fuel
+	   rgb=vec3(r,g,b);	   
     }
 </script>
 <script id="shader-fssol" type="x-shader/x-fragment">
@@ -4539,9 +4577,9 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 	gl.activeTexture(gl.TEXTURE15);
     gl.bindTexture(gl.TEXTURE_2D,  rttTexture);
     gl.uniform1i(shaderProgram.samplerUniform2, 15);
-	gl.activeTexture(gl.TEXTURE16);
+	gl.activeTexture(gl.TEXTURE13);
     gl.bindTexture(gl.TEXTURE_2D,  rtt2Texture);
-    gl.uniform1i(shaderProgram.samplerUniform3, 16);
+    gl.uniform1i(shaderProgram.samplerUniform3, 13);
 	gl.activeTexture(gl.TEXTURE14);
     gl.bindTexture(gl.TEXTURE_2D,  rtt3Texture);
     gl.uniform1i(shaderProgram.samplerUniform6, 14);
@@ -4585,9 +4623,9 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 	gl.activeTexture(gl.TEXTURE15);
     gl.bindTexture(gl.TEXTURE_2D,  rttTexture);
     gl.uniform1i(solProgram.samplerUniform4, 15);
-	gl.activeTexture(gl.TEXTURE16);
+	gl.activeTexture(gl.TEXTURE13);
     gl.bindTexture(gl.TEXTURE_2D,  rtt2Texture);
-    gl.uniform1i(solProgram.samplerUniform5, 16);
+    gl.uniform1i(solProgram.samplerUniform5, 13);
 	gl.activeTexture(gl.TEXTURE14);
     gl.bindTexture(gl.TEXTURE_2D,  rtt3Texture);
     gl.uniform1i(solProgram.samplerUniform6, 14);
