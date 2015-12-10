@@ -1882,8 +1882,8 @@ function resetkeys(){
 resetkeys();
 function keydown(e){
 var key=eval(e.which || e.keyCode)
-var t=timer();
-if(key>0 && key<256){keys[key]=1;tkeys[key]=t;keys0[key]=1;}
+//var t=timer();
+if(key>0 && key<256){keys[key]=1;tkeys[key]=tframe;keys0[key]=1;}
 }
 function keyup(e){
 var key=eval(e.which || e.keyCode)
@@ -2038,7 +2038,9 @@ function subshadow(){
  if(noshadow==0){if(confirm("set shadow off ?")){noshadow=1;}}
  else{if(confirm("set shadow on ?")){noshadow=0;}}
 }
+var tcockpitok=0;
 function subgirl(){
+ tcockpitok=0;
  //if(tgirl==0){if(confirm("set girl on ?")){tgirl=1;carTexture.image.src = "chevy2girl.png";}}
  //else{if(confirm("set girl off ?")){tgirl=0;carTexture.image.src = "chevy2.png";}}
  var msg="";
@@ -3661,14 +3663,15 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         carobjTexture = gl.createTexture();
         carobjTexture.image = new Image();
         carobjTexture.image.onload = function () {
-            handleLoadedTexture(carobjTexture)
+            handleLoadedTexture(carobjTexture);
         }
         carobjTexture.image.src = "car.png";
 
         carTexture = gl.createTexture();
         carTexture.image = new Image();
         carTexture.image.onload = function () {
-            handleLoadedTexture(carTexture)
+            handleLoadedTexture(carTexture);
+			tcockpitok=1;
         }
         if(tgirl>=3){carTexture.image.src = "cadillac.png";}//"chevy.jpg";
         else if(tgirl>=2){carTexture.image.src = "volvo.png";}//"chevy.jpg";
@@ -3685,35 +3688,35 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         volantTexture = gl.createTexture();
         volantTexture.image = new Image();
         volantTexture.image.onload = function () {
-            handleLoadedTexture(volantTexture)
+            handleLoadedTexture(volantTexture);
         }
         volantTexture.image.src = "volant2.png";//"volant.jpg";
 
         arrowTexture = gl.createTexture();
         arrowTexture.image = new Image();
         arrowTexture.image.onload = function () {
-            handleLoadedTexture(arrowTexture)
+            handleLoadedTexture(arrowTexture);
         }
         arrowTexture.image.src = "arrow.png";
 
         rpmTexture = gl.createTexture();
         rpmTexture.image = new Image();
         rpmTexture.image.onload = function () {
-            handleLoadedTexture(rpmTexture)
+            handleLoadedTexture(rpmTexture);
         }
         rpmTexture.image.src = "rpm.png";
 
         boussTexture = gl.createTexture();
         boussTexture.image = new Image();
         boussTexture.image.onload = function () {
-            handleLoadedTexture(boussTexture)
+            handleLoadedTexture(boussTexture);
         }
         boussTexture.image.src = "bouss.png";
 
         skydomeTexture = gl.createTexture();
         skydomeTexture.image = new Image();
         skydomeTexture.image.onload = function () {
-            handleLoadedTexture(skydomeTexture)
+            handleLoadedTexture(skydomeTexture);
         }
         if(Math.abs(wclouds-50.1)<0.001){wclouds=Math.sqrt(Math.random())*Math.random()*90;}
         //wclouds=80;
@@ -3726,112 +3729,112 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         treeTexture = gl.createTexture();
         treeTexture.image = new Image();
         treeTexture.image.onload = function () {
-            handleLoadedTexture(treeTexture)
+            handleLoadedTexture(treeTexture);
         }
         treeTexture.image.src = "tree14.jpg";
 
         tree2Texture = gl.createTexture();
         tree2Texture.image = new Image();
         tree2Texture.image.onload = function () {
-            handleLoadedTexture(tree2Texture)
+            handleLoadedTexture(tree2Texture);
         }
         tree2Texture.image.src = "tree1.jpg";
 		
         tree3Texture = gl.createTexture();
         tree3Texture.image = new Image();
         tree3Texture.image.onload = function () {
-            handleLoadedTexture(tree3Texture)
+            handleLoadedTexture(tree3Texture);
         }
         tree3Texture.image.src = 'tree22.jpg';//pine
 
         autumntreeTexture = gl.createTexture();
         autumntreeTexture.image = new Image();
         autumntreeTexture.image.onload = function () {
-            handleLoadedTexture(autumntreeTexture)
+            handleLoadedTexture(autumntreeTexture);
         }
         autumntreeTexture.image.src = "autumn_tree.jpg";
 
         autumntree2Texture = gl.createTexture();
         autumntree2Texture.image = new Image();
         autumntree2Texture.image.onload = function () {
-            handleLoadedTexture(autumntree2Texture)
+            handleLoadedTexture(autumntree2Texture);
         }
         autumntree2Texture.image.src = "autumn_tree2.jpg";
 		
         sunTexture = gl.createTexture();
         sunTexture.image = new Image();
         sunTexture.image.onload = function () {
-            handleLoadedTexture(sunTexture)
+            handleLoadedTexture(sunTexture);
         }
         sunTexture.image.src = "sun.png";
 		
         seaTexture = gl.createTexture();
         seaTexture.image = new Image();
         seaTexture.image.onload = function () {
-            handleLoadedTexture(seaTexture)
+            handleLoadedTexture(seaTexture);
         }
         seaTexture.image.src = "water.jpg";
 		
         rainTexture = gl.createTexture();
         rainTexture.image = new Image();
         rainTexture.image.onload = function () {
-            handleLoadedTexture(rainTexture)
+            handleLoadedTexture(rainTexture);
         }
         rainTexture.image.src = "rain.jpg";
 
         greenTexture = gl.createTexture();
         greenTexture.image = new Image();
         greenTexture.image.onload = function () {
-            handleLoadedTexture(greenTexture)
+            handleLoadedTexture(greenTexture);
         }
         greenTexture.image.src = "green.bmp";
 
         cloudTexture = gl.createTexture();
         cloudTexture.image = new Image();
         cloudTexture.image.onload = function () {
-            handleLoadedTexture(cloudTexture)
+            handleLoadedTexture(cloudTexture);
         }
         cloudTexture.image.src = "cloud.png";
 
         crossTexture = gl.createTexture();
         crossTexture.image = new Image();
         crossTexture.image.onload = function () {
-            handleLoadedTexture(crossTexture)
+            handleLoadedTexture(crossTexture);
         }
         crossTexture.image.src = "stopcross2.png";
 
         woman1Texture = gl.createTexture();
         woman1Texture.image = new Image();
         woman1Texture.image.onload = function () {
-            handleLoadedTexture(woman1Texture)
+            handleLoadedTexture(woman1Texture);
         }
         woman1Texture.image.src = "margaretright.png";
 
         woman2Texture = gl.createTexture();
         woman2Texture.image = new Image();
         woman2Texture.image.onload = function () {
-            handleLoadedTexture(woman2Texture)
+            handleLoadedTexture(woman2Texture);
         }
         woman2Texture.image.src = "margaretfront.png";
 
         woman3Texture = gl.createTexture();
         woman3Texture.image = new Image();
         woman3Texture.image.onload = function () {
-            handleLoadedTexture(woman3Texture)
+            handleLoadedTexture(woman3Texture);
         }
         woman3Texture.image.src = "margaretleft.png";
 
         smokeTexture = gl.createTexture();
         smokeTexture.image = new Image();
         smokeTexture.image.onload = function () {
-            handleLoadedTexture(smokeTexture)
+            handleLoadedTexture(smokeTexture);
         }
         smokeTexture.image.src = "smoke.bmp";
 
         citypanelTexture = gl.createTexture();
         citypanelTexture.image = new Image();
         citypanelTexture.image.onload = function () {
-            //handleLoadedTexture(citypanelTexture)
+            //handleLoadedTexture(citypanelTexture);
  	canvas2.setAttribute('width', 512);
     canvas2.setAttribute('height', 64);
 	canvastext.drawImage(citypanelTexture.image, 0,0,512,64);
@@ -3848,98 +3851,98 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         eiffeltowerTexture = gl.createTexture();
         eiffeltowerTexture.image = new Image();
         eiffeltowerTexture.image.onload = function () {
-            handleLoadedTexture(eiffeltowerTexture)
+            handleLoadedTexture(eiffeltowerTexture);
         }
         eiffeltowerTexture.image.src = "eiffeltower3.png";
 
         libertystatueTexture = gl.createTexture();
         libertystatueTexture.image = new Image();
         libertystatueTexture.image.onload = function () {
-            handleLoadedTexture(libertystatueTexture)
+            handleLoadedTexture(libertystatueTexture);
         }
         libertystatueTexture.image.src = "libertystatue.png";
 
         christrioTexture = gl.createTexture();
         christrioTexture.image = new Image();
         christrioTexture.image.onload = function () {
-            handleLoadedTexture(christrioTexture)
+            handleLoadedTexture(christrioTexture);
         }
         christrioTexture.image.src = "christrio.png";
 
         domerockTexture = gl.createTexture();
         domerockTexture.image = new Image();
         domerockTexture.image.onload = function () {
-            handleLoadedTexture(domerockTexture)
+            handleLoadedTexture(domerockTexture);
         }
         domerockTexture.image.src = "domerock.png";
 
         gizahTexture = gl.createTexture();
         gizahTexture.image = new Image();
         gizahTexture.image.onload = function () {
-            handleLoadedTexture(gizahTexture)
+            handleLoadedTexture(gizahTexture);
         }
         gizahTexture.image.src = "gizah.png";
 
         capitoleTexture = gl.createTexture();
         capitoleTexture.image = new Image();
         capitoleTexture.image.onload = function () {
-            handleLoadedTexture(capitoleTexture)
+            handleLoadedTexture(capitoleTexture);
         }
         capitoleTexture.image.src = "capitole.png";
 
         tajmahalTexture = gl.createTexture();
         tajmahalTexture.image = new Image();
         tajmahalTexture.image.onload = function () {
-            handleLoadedTexture(tajmahalTexture)
+            handleLoadedTexture(tajmahalTexture);
         }
         tajmahalTexture.image.src = "tajmahal.png";
 
         buddahTexture = gl.createTexture();
         buddahTexture.image = new Image();
         buddahTexture.image.onload = function () {
-            handleLoadedTexture(buddahTexture)
+            handleLoadedTexture(buddahTexture);
         }
         buddahTexture.image.src = "buddah.png";
 
         rocTexture = gl.createTexture();
         rocTexture.image = new Image();
         rocTexture.image.onload = function () {
-            handleLoadedTexture(rocTexture)
+            handleLoadedTexture(rocTexture);
         }
         rocTexture.image.src = "roc.jpg";
 
         roadarrowTexture = gl.createTexture();
         roadarrowTexture.image = new Image();
         roadarrowTexture.image.onload = function () {
-            handleLoadedTexture(roadarrowTexture)
+            handleLoadedTexture(roadarrowTexture);
         }
         roadarrowTexture.image.src = "roadarrow.png";
 
         photoTexture = gl.createTexture();
         photoTexture.image = new Image();
         photoTexture.image.onload = function () {
-            handleLoadedTexture(photoTexture)
+            handleLoadedTexture(photoTexture);
         }
         photoTexture.image.src = "nathalie.jpg";
 
         bikiniTexture = gl.createTexture();
         bikiniTexture.image = new Image();
         bikiniTexture.image.onload = function () {
-            handleLoadedTexture(bikiniTexture)
+            handleLoadedTexture(bikiniTexture);
         }
         bikiniTexture.image.src = "bikini.jpg";
 
         marisolTexture = gl.createTexture();
         marisolTexture.image = new Image();
         marisolTexture.image.onload = function () {
-            handleLoadedTexture(marisolTexture)
+            handleLoadedTexture(marisolTexture);
         }
         marisolTexture.image.src = "marisol.jpg";
 
         womanTexture = gl.createTexture();
         womanTexture.image = new Image();
         womanTexture.image.onload = function () {
-            handleLoadedTexture(womanTexture)
+            handleLoadedTexture(womanTexture);
         }
         womanTexture.image.src = "woman.jpg";
 
@@ -5913,6 +5916,7 @@ gl.useProgram(shaderProgram);
 }
 var cockpith=0;
 function drawcarcockpit(){
+if(tcockpitok==0){return;}
 if(tgirl==1){drawcarcockpit2();return;}
 if(tgirl==2){drawcarcockpit3();return;}
 if(tgirl==3){drawcarcockpit4();return;}
