@@ -1125,11 +1125,12 @@ else if(e.originalEvent){
      if(e.originalEvent.touches[0].pageX){mouse2x= e.originalEvent.touches[0].pageX;}
      if(e.originalEvent.touches[0].pageY){mouse2y= e.originalEvent.touches[0].pageY;}
 }};
-if(tmouse2move==0){tmouse2move=1;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;
-}else if(tmouse2move==1){tmouse2move=2;//mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
-}else{tmouse2move=0;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
+//if(tmouse2move==0){tmouse2move=1;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;
+//}else if(tmouse2move==1){tmouse2move=2;//mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
+//}else{tmouse2move=0;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
 }
-function submouse2move(e){if(tfocus==0){return;}
+function submouse2move(e){return;
+if(tfocus==0){return;}
 if(tmouse2move==1){
 if(e.clientX){mouse2x=e.clientX;mouse2y=e.clientY;}
 else if(e.x){mouse2x=e.x;mouse2y=e.y;}
@@ -1584,6 +1585,10 @@ if(tfly==1){
      if (keys[vk_shift] || button[6]) {//vrun-=dt*0.0009;if(vrun<0){vrun=0;};
 	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
 		             if(vcar<0.001){vcar=0.001;};}
+     if (keys[vk_down] && Math.abs(vrun)<0.01) {//vrun-=dt*0.0009;if(vrun<0){vrun=0;};
+	                 //vcar-=0.0022*dt*(vcar+0.05);
+	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
+		             if(vcar<0.001){vcar=0.001;};}
 	 if(tgaz==0){if(vrun>vrunmax){vrun=vrunmax;};
 	 }else{if(vrun>vrunmax+0.2){vrun=vrunmax+0.2;}}
 	 
@@ -1646,7 +1651,7 @@ if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  
 if(keys[vk_t] && keys[vk_shift]==0){//subtower();
-                                 if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
+                                 //if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
                                  resetkeys();}  
 if(keys[vk_t] && keys[vk_shift]) {thour+=3.5;if(thour>24){thour-=24;};
     hour=new Date().getHours()+thour;
