@@ -1111,7 +1111,7 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  auxvar3=nmarket;
+  auxvar3=nmarket;auxvar2=0;
   if(inode3>0){setTimeout('getnodes3();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
@@ -1339,8 +1339,8 @@ var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
 var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
 //var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
-var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";";
-//var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";node[shop~'mall|supermarket']"+latlon+";";
+//var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";";
+var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";node[shop~'mall|supermarket']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
 	if(i<inode2){nodeurl2+=";";}
@@ -2447,7 +2447,7 @@ if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  
 if(keys[vk_t] && keys[vk_shift]==0){//subtower();
-                                 //if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
+                                 if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
                                  resetkeys();}  
 if(keys[vk_t]  && keys[vk_shift]) {thour+=3.5;if(thour>24){thour-=24;};
     hour=new Date().getHours()+thour;
@@ -5944,6 +5944,7 @@ if(tgirl==3){drawcarcockpit4();return;}
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
 		if(o1head>120){to1=230;}
+		if(tmouse3move==1 && Math.abs(to1)>120){to1=320;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [20,-15,-60]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -5951,7 +5952,7 @@ if(tgirl==3){drawcarcockpit4();return;}
 		mat4.rotate(mvMatrix, degtorad(-planedo3*2.7), [0, 0, 1]);
 		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
 		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
-		else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+		///else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
 	    //mat4.identity(rotMatrix);
         //mat4.translate(rotMatrix, [x,y,z]);
         //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
@@ -6028,6 +6029,7 @@ function drawcarcockpit2(){
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
 		if(o1head>120){to1=230;}
+		if(tmouse3move==1 && Math.abs(to1)>120){to1=320;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [0,2.3,-84]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -6035,7 +6037,7 @@ function drawcarcockpit2(){
 		mat4.rotate(mvMatrix, degtorad(-planedo3*2.7), [0, 0, 1]);
 		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
 		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
-		else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+		///else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
 	    //mat4.identity(rotMatrix);
         //mat4.translate(rotMatrix, [x,y,z]);
         //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
@@ -6084,6 +6086,7 @@ function drawcarcockpit3(){
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
 		if(o1head>120){to1=230;}
+		if(tmouse3move==1 && Math.abs(to1)>120){to1=320;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [20,-17.35,-60]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -6091,7 +6094,7 @@ function drawcarcockpit3(){
 		mat4.rotate(mvMatrix, degtorad(-planedo3*2.7), [0, 0, 1]);
 		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
 		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
-		else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+		///else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
 	    //mat4.identity(rotMatrix);
         //mat4.translate(rotMatrix, [x,y,z]);
         //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
@@ -6141,6 +6144,7 @@ function drawcarcockpit4(){
 		while(to1>180){to1-=360;}
 		while(to1<-180){to1+=360;}
 		if(o1head>120){to1=230;}
+		if(tmouse3move==1 && Math.abs(to1)>120){to1=320;}
 		mat4.rotate(mvMatrix, degtorad(to1*0.4), [0, -1, 0]);
 		mat4.translate(mvMatrix, [10.5,-11.7,-60]);
 		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -6148,7 +6152,7 @@ function drawcarcockpit4(){
 		mat4.rotate(mvMatrix, degtorad(-planedo3*2.7), [0, 0, 1]);
 		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
 		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
-		else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+		///else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
 	    //mat4.identity(rotMatrix);
         //mat4.translate(rotMatrix, [x,y,z]);
         //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
@@ -11157,6 +11161,7 @@ if(amenity=="place_of_worship"){h=Math.max(3.1,h);}
 var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
+if(tmarket==1){var r=3,g=15,b=3;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 var dty=0;if(icolor>19999){dty=icolor;}
 if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
                trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
