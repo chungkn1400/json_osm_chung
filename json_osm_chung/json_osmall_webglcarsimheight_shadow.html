@@ -1111,7 +1111,7 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  //auxvar3=nmarket;
+  auxvar3=nmarket;
   if(inode3>0){setTimeout('getnodes3();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
@@ -11136,7 +11136,7 @@ function addtower(way){
 	   for(var i=0;i<nmarket;i++){
 	       if(marketlat[i]>latmin && marketlat[i]<latmax){
 	        if(marketlon[i]>lonmin && marketlon[i]<lonmax){
-			   tmarket=1;break;
+			   tmarket=1;auxvar2+=1;break;
 	   }}}}
 	   //ztree=(latnodes[i0]+lonnodes[i0])*1000000;
 	   //ztree=(ztree-100*parseInt(ztree/100))/2000;
