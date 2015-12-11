@@ -1066,11 +1066,12 @@ function nodecallback(r){//alert(r);
   
   tdraw=1;loading=1.5;//drawgl(0);;	 
 }
+var nmarket=0,marketlon=[],marketlat=[];
 var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
   nodejson2=JSON.parse(r);
   //var msg="";
-  nodes2=[];nstation=0;nhospital=0;nrailstation=0;
+  nodes2=[];nstation=0;nhospital=0;nrailstation=0;nmarket=0;
   if(nodejson2.elements){nodes2=nodejson2.elements;}
   //msg+="len2="+nodes2.length;
   for(var i=0;i<nodes2.length;i++){
@@ -1101,10 +1102,16 @@ function nodecallback2(r){//alert(r);
 		 railstationlon[nrailstation]=nodes2[i].lon;
 		 nrailstation+=1;
 		 }}
+	  if(nodes2[i].tags.shop){
+	   if(nodes2[i].tags.shop=="mall" || nodes2[i].tags.shop=="supermarket"){
+		 marketlat[nmarket]=nodes2[i].lat;
+		 marketlon[nmarket]=nodes2[i].lon;
+		 nmarket+=1;
+		 }}
      }
 	 }
   //alert(msg);
-  
+  //auxvar3=nmarket;
   if(inode3>0){setTimeout('getnodes3();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
@@ -1332,7 +1339,7 @@ var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
 var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
 //var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
-var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";";
+var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";node[shop~'mall|supermarket']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
 	if(i<inode2){nodeurl2+=";";}
@@ -1805,9 +1812,9 @@ else if(e.originalEvent){
      if(e.originalEvent.touches[0].pageX){mousex= e.originalEvent.touches[0].pageX;}
      if(e.originalEvent.touches[0].pageY){mousey= e.originalEvent.touches[0].pageY;}
 }};
-if(tmousemove==0){tmousemove=1;}else{tmousemove=0;}
+//if(tmousemove==0){tmousemove=1;}else{tmousemove=0;}
 }
-function submousemove(e){
+function submousemove(e){return;
 if(tmousemove==1){
 if(e.clientX){mousex=e.clientX;mousey=e.clientY;}
 else if(e.x){mousex=e.x;mousey=e.y;}
@@ -1855,11 +1862,12 @@ else if(e.originalEvent){
      if(e.originalEvent.touches[0].pageX){mouse2x= e.originalEvent.touches[0].pageX;}
      if(e.originalEvent.touches[0].pageY){mouse2y= e.originalEvent.touches[0].pageY;}
 }};
-if(tmouse2move==0){tmouse2move=1;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;
-}else if(tmouse2move==1){tmouse2move=2;//mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
-}else{tmouse2move=0;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
+//if(tmouse2move==0){tmouse2move=1;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;
+//}else if(tmouse2move==1){tmouse2move=2;//mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
+//}else{tmouse2move=0;mouse2x0=mouse2x;mouse2y0=mouse2y;mouse2dx=0;mouse2dy=0;}
 }
-function submouse2move(e){if(tfocus==0){return;}
+function submouse2move(e){return;
+if(tfocus==0){return;}
 if(tmouse2move==1){
 if(e.clientX){mouse2x=e.clientX;mouse2y=e.clientY;}
 else if(e.x){mouse2x=e.x;mouse2y=e.y;}
@@ -2372,6 +2380,10 @@ if(tfly==1){
 	                 //vcar-=0.0022*dt*(vcar+0.05);
 	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
 		             if(vcar<0.001){vcar=0.001;};}
+     if (keys[vk_down] && Math.abs(vrun)<0.01) {//vrun-=dt*0.0009;if(vrun<0){vrun=0;};
+	                 //vcar-=0.0022*dt*(vcar+0.05);
+	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
+		             if(vcar<0.001){vcar=0.001;};}
 	 if(tgaz==0){if(vrun>vrunmax){vrun=vrunmax;};
 	 }else{if(vrun>vrunmax+0.2){vrun=vrunmax+0.2;}}
 	 
@@ -2434,7 +2446,7 @@ if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  
 if(keys[vk_t] && keys[vk_shift]==0){//subtower();
-                                 if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
+                                 //if(tmouse3move==0){tmouse3move=1;}else{tmouse3move=0;}
                                  resetkeys();}  
 if(keys[vk_t]  && keys[vk_shift]) {thour+=3.5;if(thour>24){thour-=24;};
     hour=new Date().getHours()+thour;
@@ -11047,7 +11059,7 @@ function addtower(way){
    var xx=0,xxx=0,yy=0,yyy=0,r=1,dr=1;
    var dxx=0,dyy=0,zz=0,zzz=0;
    var s=0,t=0,tt=0;
-   var h=1,amenity="",building="",hmin=0,h00=0;
+   var h=1,amenity="",building="",hmin=0,h00=0,tmarket=0;
    if(way.tags){
     if(way.tags.height){h00=way.tags.height/6;
 	        }
@@ -11079,9 +11091,12 @@ function addtower(way){
    var larg=1,ilarg=way.nodes[parseInt(jmax*0.51)];
    var i0=way.nodes[0];
    var xmid=0,ymid=0,zmid=0,ztree=-9999,larg2=1,latmid=-90,lonmid=0,latmid2=-90,lonmid2=0;
+   var latmid0=-90,lonmid0=0,latmid20=-90,lonmid20=0;
    if(latnodes[ilarg] && latnodes[i0]){
    	   latmid=latnodes[i0];lonmid=lonnodes[i0];
    	   latmid2=latnodes[ilarg];lonmid2=lonnodes[ilarg];
+	   latmid0=latmid;lonmid0=lonmid;
+	   latmid20=latmid2;lonmid20=lonmid2;
 	   yyy=(latnodes[i0]-latx0)*scale*2;
 	   xxx=((lonnodes[i0]-lngx0)/klon)*scale*2;
    	   yy=(latnodes[ilarg]-latx0)*scale*2;
@@ -11110,9 +11125,19 @@ function addtower(way){
 	   xmid=(xx+xxx)/2;
 	   ymid=(yy+yyy)/2;
 	   zmid=99999;
-      }	  
+      }
 	   zmid=Math.min(zmid,getterrainheight(lonnodes[i0],latnodes[i0]));
 	   zmid=Math.min(zmid,getterrainheight(lonnodes[ilarg],latnodes[ilarg]));
+      if(latmid0>-89 && latmid20>-89){	  
+	   var latmin=Math.min(latmid,Math.min(latmid2,Math.min(latmid0,latmid20)));
+	   var lonmin=Math.min(lonmid,Math.min(lonmid2,Math.min(lonmid0,lonmid20)));
+	   var latmax=Math.max(latmid,Math.max(latmid2,Math.max(latmid0,latmid20)));
+	   var lonmax=Math.max(lonmid,Math.max(lonmid2,Math.max(lonmid0,lonmid20)));
+	   for(var i=0;i<nmarket;i++){
+	       if(marketlat[i]>latmin && marketlat[i]<latmax){
+	        if(marketlon[i]>lonmin && marketlon[i]<lonmax){
+			   tmarket=1;break;
+	   }}}}
 	   //ztree=(latnodes[i0]+lonnodes[i0])*1000000;
 	   //ztree=(ztree-100*parseInt(ztree/100))/2000;
 	   //ztree+=zsol0-0.01;//-0.06+zsol0;
