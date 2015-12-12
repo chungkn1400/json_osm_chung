@@ -1152,12 +1152,12 @@ function resetkeys(){
 }
 resetkeys();
 function keydown(e){
-var key=eval(e.which || e.keyCode)
+var key=eval(e.which || e.keyCode);
 //var t=timer();
 if(key>0 && key<256){keys[key]=1;tkeys[key]=tframe;keys0[key]=1;}
 }
 function keyup(e){
-var key=eval(e.which || e.keyCode)
+var key=eval(e.which || e.keyCode);
 if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
 }
 function subhelp(){
