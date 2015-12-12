@@ -11978,7 +11978,7 @@ var tsea=0,tinitcombo=0,latinit=0,lnginit=0,hash0="";
 function initparms(){
   hash0=document.location.search;//parent.location.hash;
   if(hash0.indexOf("reset",0)>=0 || hash0.indexOf("nocook",0)>=0){hash0="";
-  }else{readcookie();}
+  }else if(hash0==""){readcookie();}
   //var hash0=document.location.search;//parent.location.hash;
   getparms(hash0);
   latinit/=100;
