@@ -106,6 +106,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="carwheelobjtxt.js"></script>
 <script src="rocobjtxt.js"></script>
 <script src="station2objtxt.js"></script>
+<script src="loganobjtxt.js"></script>
 <script id="shader-fs0" type="x-shader/x-fragment">
     precision lowp float;
     //precision mediump float;
@@ -3475,7 +3476,7 @@ function initGL(canvasgl){
 	var tree2Texture,sunTexture,rainTexture,greenTexture;
 	var cloudTexture,roadbandTexture,crossTexture;
 	var cloudTexture,roadbandTexture,crossTexture;
-	var carobjTexture,woman1Texture,woman2Texture;
+	var carobjTexture,woman1Texture,woman2Texture,loganobjTexture;
 	var woman3Texture,smokeTexture,citypanelTexture;
 	var carTexture2,rocTexture,roadarrowTexture;
 	var eiffeltowerTexture,libertystatueTexture;
@@ -3683,6 +3684,13 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
             handleLoadedTexture(carobjTexture);
         }
         carobjTexture.image.src = "car.png";
+
+        loganobjTexture = gl.createTexture();
+        loganobjTexture.image = new Image();
+        loganobjTexture.image.onload = function () {
+            handleLoadedTexture(loganobjTexture);
+        }
+        loganobjTexture.image.src = "logan.jpg";
 
         carTexture = gl.createTexture();
         carTexture.image = new Image();
@@ -5602,8 +5610,9 @@ for(var i=1;i<=ncar;i++){
 loadcar(0);
 typecar=0;
 }
-var o3volant0=0,o3wheel=0,typecar=0;
+var o3volant0=0,o3wheel=0,typecar=0,tlogan=0;
 function drawcarobj(){
+if(tlogan==1){drawloganobj();return;}
         mvPushMatrix();
 		//mat4.identity(mvMatrix);
         var zzz=Math.max(zsol,z-0.68);//iview==1
@@ -5626,7 +5635,7 @@ function drawcarobj(){
     gl.vertexAttribPointer(shaderaProgram.textureCoordAttribute, carVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
@@ -5699,6 +5708,82 @@ function drawcarwheel2(){
     setMatrixUniforms2();
     gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 }
+function drawloganobj(){
+        mvPushMatrix();
+		//mat4.identity(mvMatrix);
+        var zzz=Math.max(zsol,z-0.68);//iview==1
+		mat4.translate(mvMatrix, [x,y, zzz]);
+		if(tautopilot>=1){o3volant0+=(o3volant-o3volant0)*0.001*dtime;}
+		else{o3volant0=o3volant;}
+		var o22=o2,o33=o3;
+		if(typecar==0){o22=Math.max(-50,Math.min(50,o2-planedo2*0.24-2.7));
+                       o33=o3+planedo3*1.2;}
+        mat4.rotate(mvMatrix, degtorad(o1+o3volant0/8), [0, 0, 1]);
+        mat4.rotate(mvMatrix, degtorad(-o22), [0, 1, 0]);
+        mat4.rotate(mvMatrix, degtorad(-o33), [1, 0, 0]);
+		//planedo3=sin3*24;
+	var sc=0.0030;mat4.scale(mvMatrix,[sc,0.0035,sc]);
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, loganobjTexture);
+    gl.uniform1i(shaderaProgram.samplerUniform, 11);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderaProgram.textureCoordAttribute, loganVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, loganVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    var typcar=1+typecar%5;if(typecar==0){typcar=0;}
+	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
+    if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
+    if(typcar==2){colorr=0;colorg=0;colorb=1;colora=0;}
+    if(typcar==3){colorr=1;colorg=1;colorb=0;colora=0;}
+    if(typcar==4){colorr=0;colorg=1;colorb=1;colora=0;}
+    if(typcar==5){colorr=1;colorg=0;colorb=1;colora=0;}
+	mvPushMatrix();
+    mat4.rotate(mvMatrix, degtorad(-90), [0, 0, 1]);
+	setMatrixUniformsa();
+	colorr=1;colorg=1;colorb=1;colora=1;
+    gl_drawArrays(gl.TRIANGLES, 0, loganVertexPositionBuffer.numItems);
+	mvPopMatrix();
+
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, carobjTexture);
+    gl.uniform1i(shaderaProgram.samplerUniform, 11);
+    o3wheel+=vcar*dtime*3;
+	if(o3wheel>3600){o3wheel-=3600;}
+	mvPushMatrix();
+	mat4.translate(mvMatrix, [102,54,14.77]);
+	sc=0.165;mat4.scale(mvMatrix,[sc,sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(o3volant0/2), [0, 0, 1]);	
+    mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
+	drawcarwheel();
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [102,-54,14.77]);
+	sc=0.165;mat4.scale(mvMatrix,[sc,-sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(-o3volant0/2), [0, 0, 1]);	
+    mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
+    setMatrixUniformsa();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-98,57,14.77]);
+	sc=0.170;mat4.scale(mvMatrix,[sc,sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
+    setMatrixUniformsa();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-98,-57,14.77]);
+	sc=0.170;mat4.scale(mvMatrix,[sc,-sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(o3wheel), [0, 1, 0]);	
+    setMatrixUniformsa();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+
+	mvPopMatrix();
+}
 function drawcar2(){if(tfoot==1 || iview>=1){return;}
 		tmovertt=1;
         mvPushMatrix();
@@ -5747,6 +5832,7 @@ loadcar(0);
 typecar=0;
 }
 function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
+if(tlogan==1){drawloganobj2();return;}
         mvPushMatrix();
 		//mat4.identity(mvMatrix);
         var zzz=Math.max(zsol,z-0.68);//iview==1
@@ -5794,6 +5880,73 @@ function drawcarobj2(){//if(tfoot==1 || iview!=1){return;}
     mvPushMatrix();
 	mat4.translate(mvMatrix, [-88,-56,14.77]);
 	sc=0.19;mat4.scale(mvMatrix,[sc,-sc,sc]);
+    setMatrixUniforms2();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+
+	mvPopMatrix();
+}
+function drawloganobj2(){
+        mvPushMatrix();
+		//mat4.identity(mvMatrix);
+        var zzz=Math.max(zsol,z-0.68);//iview==1
+		mat4.translate(mvMatrix, [x,y, zzz]);
+		if(tautopilot>=1){o3volant0+=(o3volant-o3volant0)*0.001*dtime;}
+		else{o3volant0=o3volant;}
+		var o22=o2,o33=o3;
+		if(typecar==0){o22=Math.max(-50,Math.min(50,o2-planedo2*0.24-2.7));
+                       o33=o3+planedo3*1.2;}
+        mat4.rotate(mvMatrix, degtorad(o1+o3volant0/8), [0, 0, 1]);
+        mat4.rotate(mvMatrix, degtorad(-o22), [0, 1, 0]);
+        mat4.rotate(mvMatrix, degtorad(-o33), [1, 0, 0]);
+		//planedo3=sin3*24;
+	var sc=0.0030;mat4.scale(mvMatrix,[sc,0.0035,sc]);
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, loganobjTexture);
+    gl.uniform1i(shader2Program.samplerUniform, 11);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shader2Program.textureCoordAttribute, loganVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexPositionBuffer);
+    gl.vertexAttribPointer(shader2Program.vertexPositionAttribute, loganVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shader2Program.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+	mvPushMatrix();
+    mat4.rotate(mvMatrix, degtorad(-90), [0, 0, 1]);
+	setMatrixUniforms2();
+    gl_drawArrays(gl.TRIANGLES, 0, loganVertexPositionBuffer.numItems);
+	mvPopMatrix();
+
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, carobjTexture);
+    gl.uniform1i(shader2Program.samplerUniform, 11);
+    o3wheel+=vcar*dtime*3;
+	if(o3wheel>3600){o3wheel-=3600;}
+	mvPushMatrix();
+	mat4.translate(mvMatrix, [102,54,14.77]);
+	sc=0.165;mat4.scale(mvMatrix,[sc,sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(o3volant0/2), [0, 0, 1]);	
+	drawcarwheel2();
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [102,-54,14.77]);
+	sc=0.165;mat4.scale(mvMatrix,[sc,-sc,sc]);
+    mat4.rotate(mvMatrix, degtorad(-o3volant0/2), [0, 0, 1]);	
+    setMatrixUniforms2();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-98,57,14.77]);
+	sc=0.170;mat4.scale(mvMatrix,[sc,sc,sc]);
+    setMatrixUniforms2();
+    gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
+	mvPopMatrix();
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-98,-57,14.77]);
+	sc=0.170;mat4.scale(mvMatrix,[sc,-sc,sc]);
     setMatrixUniforms2();
     gl_drawArrays(gl.TRIANGLES, 0, carwheelVertexPositionBuffer.numItems);
 	mvPopMatrix();
@@ -5928,6 +6081,7 @@ gl.useProgram(shaderProgram);
 		if(height2[ixy]<0 && (i+j)%2==0){colorb+=0.1;colorg+=0.1;colorr+=0.1;} 
 		//colorr*=1.5;colorg*=1.5;colorb*=1.5;
 	    setMatrixUniforms00();
+		gl.uniform1f(shaderProgram.fog,0);
         gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
       }
 	}
@@ -8818,7 +8972,7 @@ var nlngx=[],nlatx=[],no1=[],ncos1=[],nsin1=[];
 var ncos2=[],nsin2=[],ncos3=[],nsin3=[],nvrun=[];
 var no2=[],no3=[],nx=[],ny=[],nz=[],nvcar=[];
 var nvmx=[],nvmy=[],nvmz=[],nvmx2=[],nvmy2=[],nvmz2=[];
-var nzsol=[],no3volant0=[],no3volant=[],no3wheel=[];
+var nzsol=[],no3volant0=[],no3volant=[],no3wheel=[],ntlogan=[];
 function initncar(){
 for(var i=0;i<=ncar;i++){
    npautoroad[i]=-1;npautoroad0[i]=-1;no1pilot[i]=0;
@@ -8829,7 +8983,7 @@ for(var i=0;i<=ncar;i++){
    nzsol[i]=0;no3volant0[i]=0;no3volant[i]=0;
    no3wheel[i]=0;nvcar[i]=0;nvrun[i]=vrun;
    nvmx[i]=vmx;nvmy[i]=vmy;nvmz[i]=vmz;
-   nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;
+   nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;ntlogan[i]=parseInt(Math.random()*1.9);
 }}
 function loadcar(i){
    pautoroad=npautoroad[i];pautoroad0=npautoroad0[i];o1pilot=no1pilot[i];
@@ -8840,7 +8994,7 @@ function loadcar(i){
    zsol=nzsol[i];o3volant0=no3volant0[i];o3volant=no3volant[i];
    o3wheel=no3wheel[i];vcar=nvcar[i];vrun=nvrun[i];
    vmx=nvmx[i];vmy=nvmy[i];vmz=nvmz[i];
-   vmz2=nvmx2[i];vmy2=nvmy2[i];vmz2=nvmz2[i];
+   vmz2=nvmx2[i];vmy2=nvmy2[i];vmz2=nvmz2[i];tlogan=ntlogan[i];
 }
 function savecar(i){
    npautoroad[i]=pautoroad;npautoroad0[i]=pautoroad0;no1pilot[i]=o1pilot;
@@ -8851,7 +9005,7 @@ function savecar(i){
    nzsol[i]=zsol;no3volant0[i]=o3volant0;no3volant[i]=o3volant;
    no3wheel[i]=o3wheel;nvcar[i]=vcar;nvrun[i]=vrun;
    nvmx[i]=vmx;nvmy[i]=vmy;nvmz[i]=vmz;
-   nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;
+   nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;ntlogan[i]=tlogan;
 }
 var autoroad=[],nautoroad=20,iautoroad=0;
 var pautoroad=-1,pautoroad0=-1,o1pilot=0;
@@ -9087,6 +9241,7 @@ if(typecar>0){
    latx=nlatx[0]+nsin1[0]*dmax/scale;
    x=nx[0]+ncos1[0]*dmax;
    y=ny[0]+nsin1[0]*dmax;
+   tlogan=parseInt(Math.random()*1.9);
 pautoroad0=-1;
 o1=no1[0]+180+(Math.random()-0.5)*90;
 if(Math.random()<0.1){
@@ -12654,6 +12809,8 @@ var rocVertexPositionBuffer = null;
 var rocVertexTextureCoordBuffer = null;
 var stationVertexPositionBuffer = null;
 var stationVertexTextureCoordBuffer = null;
+var loganVertexPositionBuffer = null;
+var loganVertexTextureCoordBuffer = null;
 
 
 function loadmodels() {
@@ -12708,6 +12865,19 @@ function loadmodels() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
     stationVertexTextureCoordBuffer.itemSize = 2;
     stationVertexTextureCoordBuffer.numItems = vertexCount;//alert(vertexCount);
+    
+    handleLoadedWorld(loganobjtxt);
+    loganVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexPositionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
+    loganVertexPositionBuffer.itemSize = 3;
+    loganVertexPositionBuffer.numItems = vertexCount;
+
+    loganVertexTextureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexTextureCoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
+    loganVertexTextureCoordBuffer.itemSize = 2;
+    loganVertexTextureCoordBuffer.numItems = vertexCount;//alert(vertexCount);
     
 }
 var vertexCount = 0;
