@@ -3987,7 +3987,7 @@ function drawcarobj(){
     gl.vertexAttribPointer(shaderaProgram.textureCoordAttribute, carVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
