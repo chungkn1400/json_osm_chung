@@ -1298,6 +1298,7 @@ function subgirl(){
  else if(tgirl==1){tgirl=2;carTexture.image.src = "volvo.png";msg="Volvo";}
  else if(tgirl==2){tgirl=3;carTexture.image.src = "cadillac.png";msg="Cadillac";}
  else if(tgirl==3){tgirl=4;carTexture.image.src = "mercedes.png";msg="Mercedes";}
+ else if(tgirl==4){tgirl=5;carTexture.image.src = "ford.png";msg="Ford";}
  else{tgirl=0;carTexture.image.src = "chevy2.png";msg="Chevy";}
  resetkeys();
  context.clearRect (0,0,canvas.width,canvas.height);
@@ -1896,7 +1897,8 @@ y=(latx-lat0)*scale;
 var tvolume=0,tspeed=0;
 function setvolume(){
     var dpitch=0;
-        if(tgirl>=4){dpitch=0.12;}//carTexture.image.src = "mercedes.png";}
+        if(tgirl>=5){dpitch=0.11;}//carTexture.image.src = "ford.png";}
+        else if(tgirl>=4){dpitch=0.12;}//carTexture.image.src = "mercedes.png";}
         else if(tgirl>=3){dpitch=0.1;}//carTexture.image.src = "cadillac.png";}
         else if(tgirl>=2){dpitch=0.02;}//carTexture.image.src = "volvo.png";}
         else if(tgirl>=1){dpitch=0.03;}//carTexture.image.src = "toyota.png";}
@@ -2632,7 +2634,8 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         //if(tgirl>=1){carTexture.image.src = "chevy2girl.png";}//"chevy.jpg";
         //else{carTexture.image.src = "chevy2.png";}//"chevy.jpg";
-        if(tgirl>=4){carTexture.image.src = "mercedes.png";}//"chevy.jpg";
+        if(tgirl>=5){carTexture.image.src = "ford.png";}
+        else if(tgirl>=4){carTexture.image.src = "mercedes.png";}//"chevy.jpg";
         else if(tgirl>=3){carTexture.image.src = "cadillac.png";}//"chevy.jpg";
         else if(tgirl>=2){carTexture.image.src = "volvo.png";}//"chevy.jpg";
         else if(tgirl>=1){carTexture.image.src = "toyota.png";}//"chevy.jpg";
@@ -4161,6 +4164,7 @@ if(tgirl==1){drawcarcockpit2();return;}
 if(tgirl==2){drawcarcockpit3();return;}
 if(tgirl==3){drawcarcockpit4();return;}
 if(tgirl==4){drawcarcockpit5();return;}
+if(tgirl==5){drawcarcockpit6();return;}
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.DEPTH_TEST);
         mvPushMatrix();
@@ -4452,6 +4456,58 @@ function drawcarcockpit5(){
     mat4.scale(mvMatrix,[0.245,0.422,1]);
 	mat4.rotate(mvMatrix, degtorad(o3volant), [0, 0, 1]);
     drawvolant2();
+	mvPopMatrix();
+	
+	mvPopMatrix();
+    gl.enable(gl.DEPTH_TEST);
+}
+function drawcarcockpit6(){
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+        mvPushMatrix();
+		mat4.identity(mvMatrix);
+		//windx=canvas.width;
+		//windy=canvas.height;
+		//mat4.translate(mvMatrix, [230*windx/windy,-220,-600]);//boussx
+		mat4.translate(mvMatrix, [10.8,-14,-60]);
+		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
+		//mat4.rotate(mvMatrix, degtorad(planedo2), [1, 0, 0]);
+		mat4.rotate(mvMatrix, degtorad(-planedo3*2.05), [0, 0, 1]);
+		mat4.translate(mvMatrix, [0,Math.min(20,Math.max(-20,planedo2*0.7+cockpith-tfly*7.5)),0]);
+		if(tmouse3move==1){mat4.translate(mvMatrix, [-mouse3dx*20,-mouse2dy*20,0]);}
+		///else{mat4.translate(mvMatrix, [-mouse2dx*20,-mouse2dy*20,0]);}
+	    //mat4.identity(rotMatrix);
+        //mat4.translate(rotMatrix, [x,y,z]);
+        //mat4.rotate(rotMatrix, degtorad(o1), [0, 0, 1]);
+	gl.useProgram(shaderaProgram);
+	gl.activeTexture(gl.TEXTURE5);
+	//if(tgirl==1){if(Math.random()<dtime*0.0001){tgirl=2;}}
+	//if(tgirl==2){if(Math.random()<dtime*0.0002){tgirl=1;}}
+    //if(tgirl<2){gl.bindTexture(gl.TEXTURE_2D,  carTexture);}
+    gl.bindTexture(gl.TEXTURE_2D,  carTexture);
+	//else{gl.bindTexture(gl.TEXTURE_2D,  carTexture2);}
+    gl.uniform1i(shaderaProgram.samplerUniform, 5);
+    
+    mat4.scale(mvMatrix,[1.74,0.97,1]);
+    colorr=1;colorg=1;colorb=1;colora=0;//1+20;
+    //drawcarresh0();
+	drawcarrecockpit();
+    colorr=1;colorg=1;colorb=1;colora=1;
+	gl.useProgram(shaderProgram);
+
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-20,-9.3,0.005]);
+    mat4.scale(mvMatrix,[0.06,0.1,1]);
+	colora=1;
+	drawrpm();
+	colora=1;
+	mvPopMatrix();
+
+    mvPushMatrix();
+	mat4.translate(mvMatrix, [-20.5,-19.7,0.01]);
+    mat4.scale(mvMatrix,[0.22,0.422,1]);
+	mat4.rotate(mvMatrix, degtorad(o3volant), [0, 0, 1]);
+    drawvolant();
 	mvPopMatrix();
 	
 	mvPopMatrix();
