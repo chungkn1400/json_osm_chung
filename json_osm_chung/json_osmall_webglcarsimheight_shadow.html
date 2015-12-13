@@ -4609,7 +4609,8 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		   drawsun();}
 		fog=fogsave;
 
-        gl.useProgram(shaderProgram);
+        fogsave=fog;if(tmap>0){fog=0;}
+		gl.useProgram(shaderProgram);
 	gl.activeTexture(gl.TEXTURE15);
     gl.bindTexture(gl.TEXTURE_2D,  rttTexture);
     gl.uniform1i(shaderProgram.samplerUniform2, 15);
@@ -4666,6 +4667,8 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
     gl.bindTexture(gl.TEXTURE_2D,  rtt3Texture);
     gl.uniform1i(solProgram.samplerUniform6, 14);
 		drawsol();
+		
+		fog=fogsave;
 	    
 		gl.useProgram(program2d);
 		drawrain();
