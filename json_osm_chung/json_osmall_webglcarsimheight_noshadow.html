@@ -1971,9 +1971,10 @@ if(twebaudio==1 && tradio==0){
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
-		           loading=22;dtloading=tframe;tinitgmap=0;
+		           loading=22;dtloading=tframe;tinitgmap=-1;
 		           latsol0=latsol;lngsol0=lngsol;initgmap();
-		           loading=1;tdraw=2;tskip2=timer()+dtime+400;trygetways=1;
+		           loading=1;tdraw=2;tskip2=timer()+dtime+400;
+				   trygetways=1;tinitgmap=0;
 				   }
 		if(tdraw==1){tdraw=0;setinode2();}
 		if(tdraw==2){tdraw=0;drawglroad(0);drawgl(0);}
@@ -2117,7 +2118,7 @@ lat=Math.max(-87,Math.min(87,lat));
 lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
-x00=999999;
+x00=999999;trygetways=1;
 return;
    }
 lat=Math.max(-87,Math.min(87,lat));
@@ -2125,7 +2126,7 @@ lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
 z=-1;tloadingreverse=tframe+1100;locx=999;
-x00=999999;//getways();
+x00=999999;trygetways=1;
 }
 var xmlhttp;
 function httpGet(url,callback) 
@@ -2560,7 +2561,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 	solTexture2.data=gettexturedata(solTexture2);
     solTexture2.datasize=parseInt(Math.sqrt(solTexture2.data.length/4));
     //auxvar=solTexture2.datasize;
-	tinitgmap=2;loading==33;
+	if(tinitgmap>=0){tinitgmap=2;loading==33;}
 	canvas2.setAttribute('width', 10);
     canvas2.setAttribute('height', 10);
 	setTimeout("solTexture2.image.src=null;",5000);
@@ -8559,7 +8560,7 @@ if (geolocation.length>0){
       latx0=lat;lngx0=lng;lngsol0=999;
       latx=lat;lngx=lng;tmap=0;z=-1;
 	  tloadingreverse=tframe+1100;locx=999;
-      x00=9999;getways();
+      x00=9999;trygetways=1;
     } else {
       alert('Geolocation not found ! ' + status);
     }
@@ -9060,7 +9061,7 @@ srtmymax[ii]=-srtmymax[ii];
 */
 srtmlng[ii]-=1000;
 //updatesrtm();
-tinitgmap=2;loading=50;
+if(tinitgmap>=0){tinitgmap=2;loading=50;}
 ttestloadsrtm=0;
 }
 function updatesrtm(){
