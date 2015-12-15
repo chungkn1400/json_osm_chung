@@ -7482,7 +7482,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.6 || Math.abs(ysol-y)>scy*0.6)){//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
-	      tloadsol=tframe+30000;
+	      tloadsol=tframe+50000;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
 	mvPushMatrix();

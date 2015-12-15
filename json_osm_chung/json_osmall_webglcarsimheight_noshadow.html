@@ -5251,7 +5251,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	mat4.translate(mvMatrix, [xsol,ysol,zsol0]);
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.75 || Math.abs(ysol-y)>scy*0.75)){
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
-	      tloadsol=tframe+40000;
+	      tloadsol=tframe+50000;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();}}
 	mat4.scale(mvMatrix,[scx,scy,sc]);
