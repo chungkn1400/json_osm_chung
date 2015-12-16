@@ -939,7 +939,10 @@ if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //http="http:";
 var overpass="//overpass.osm.rambler.ru/cgi/";
-if(http=="https:" || 1){overpass="//overpass-api.de/api/";}
+if(http=="https:"){overpass="//overpass-api.de/api/";}
+var overpass1=overpass;
+var overpass2="//overpass-api.de/api/";
+var toverpass=0;
 var url=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%2850.746%2C7.154%2C50.78%2C7.27%29%3Bout%20skel%203%3B";
 //url=http+"//overpass-api.de/api/xapi?map?bbox=7.012854,51.450317,7.016477,51.452105";
 //url=http+"//overpass-api.de/api/interpreter?data=node[name=\"Gielgen\"];out;";
@@ -1107,7 +1110,6 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  auxvar3=nmarket;auxvar2=0;
   if(inode3>0){setTimeout('getnodes3();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
@@ -1223,6 +1225,7 @@ if(loading>=1){return;}
 if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 trygetways=0;
 loading=1;
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 dxmax=25;
 if(avgfps<8 || dtweb>4500){dxmax2=Math.max(13,dxmax2-2);}
 else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
@@ -1312,6 +1315,7 @@ httpGet(wayurl2,waycallback2);
 var resetnode=0,tgetnode=1;
 function getnodes(){
 msgload("getnodes");
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 lat1=lat-dlat/2;lon1=lng-dlon/2;
 lat2=lat+dlat/2;lon2=lng+dlon/2;
 //nodeurl=http+overpass+"interpreter?data=[out:json];"+nodekey+"%3Bout%20skel%209999%3B";
@@ -1328,6 +1332,7 @@ httpGet(nodeurl,nodecallback);
 }
 function getnodes2(){
 msgload("getnodes2");
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 lat1=lat-dlat/2;lon1=lng-dlon/2;
 lat2=lat+dlat/2;lon2=lng+dlon/2;
 var dx=0.001;
@@ -1349,6 +1354,7 @@ httpGet(nodeurl2,nodecallback2);
 }
 function getnodes3(){
 msgload("getnodes3");
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 var nodeurl3=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode3;i++){
     nodeurl3+="node%28"+nodeid3[i]+"%29";
@@ -1361,6 +1367,7 @@ httpGet(nodeurl3,nodecallback3);
 }
 function getnodes31(){
 msgload("getnodes31");
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 var nodeurl31=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode31;i++){
     nodeurl31+="node%28"+nodeid31[i]+"%29";
@@ -1440,6 +1447,7 @@ getnodes4();
 function getnodes4(){
 if(loading!=0){return;}
 msgload("getnodes4");
+if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
 loading=1.4;
 dtloading=tframe;
 var dx=2.0;
@@ -2571,7 +2579,7 @@ y=(latx-lat0)*scale;
 testx=0;
 if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
 if(tframe>dtloading+20000){dtloading=tframe;resetkeys();
-	      tloadsol=tframe+30000;
+	      tloadsol=tframe+50000;
 		  tupdatesoltexture=2;loading=77;tdraw=0;tdraw2=0;
 		  updatesoltexture();return;}
 if(loading==0){
@@ -2784,8 +2792,10 @@ if(twebaudio==1 && tradio==0){
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
-		     loading=22;dtloading=tframe;tinitgmap=-1;
-			 latsol0=latsol;lngsol0=lngsol;initgmap();
+		     loading=22;dtloading=tframe;tinitgmap=0;
+			 latsol0=latsol;lngsol0=lngsol;
+			 if(tupdatesoltexture==99){tupdatesoltexture=0;tloadsol=tframe+9999000;}
+			 initgmap();
 		     loading=1;tskip2=timer()+dtime+400;
 			 dtinitmap=tframe;tdraw2=2;trygetways=1;tinitgmap=0;
 			 }
@@ -2854,10 +2864,9 @@ if(twebaudio==1 && tradio==0){
 		if(tstreetview==1){scrollTo(0,7000);}
 		if(tupdatesoltexture==1){
 		 //if(tupdatebuffersol==1){
-		    tupdatesoltexture=0;
+		    tupdatesoltexture=99;
 			handleLoadedTexture(solTexture);
             trygetweather=1;
-	        tloadsol=tframe+9999000;
             //updatebuffersolheight();
 		    //tupdatebuffersol=0;
 			//updatebuffersol();
@@ -11442,7 +11451,7 @@ function addtower(way){
 	   for(var i=0;i<nmarket;i++){
 	       if(marketlat[i]>latmin && marketlat[i]<latmax){
 	        if(marketlon[i]>lonmin && marketlon[i]<lonmax){
-			   tmarket=1;auxvar2+=1;break;
+			   tmarket=1;break;
 	   }}}}
 	   //ztree=(latnodes[i0]+lonnodes[i0])*1000000;
 	   //ztree=(ztree-100*parseInt(ztree/100))/2000;
@@ -12589,7 +12598,6 @@ function jscallback22(ii){
  canvas3.setAttribute('height', 600);
  canvassrtm.drawImage(srtmimg,0,0,srtmimg.width,srtmimg.height, 0,0,600,600);
  var rgb=canvassrtm.getImageData(0,0,600,600).data;
- auxvar=0;
  //var srtmtext=eval(srtmvars[ii]);
  //alert("srtmtextlen="+rgb.length);
  var j=0,k=0,l=0,kl=0,n=0,p=0,x=0,ix=0,ixmax=601*600,jx=0;
@@ -12601,12 +12609,11 @@ function jscallback22(ii){
 	if(x<-11000){x=0;}
 	x=-x;
     x*=0.0081;
-	if(x>auxvar){auxvar=x;}
 	//elevation = elevation < 32767 ? elevation : elevation - 16777216;
 	//elevation  = elevation < -11000 ? 0 : elevation ;
     srtmdata[ii][ix]=x;ix++;j+=4;
  }
- alert("ix="+ix+"/"+(600*600)+"/isrtm="+ii+"/aux="+auxvar);
+ alert("ix="+ix+"/"+(600*600)+"/isrtm="+ii);
  srtmtext=[];
  //srtmimg.src=null;
  //alert(srtmdata[i][0]); 
