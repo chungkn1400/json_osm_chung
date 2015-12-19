@@ -9402,6 +9402,7 @@ for(var i=iway;i<ways.length;i++){
    var di=1,xx0=0,yy0=0,zz0=0,xxx0=0,yyy0=0,zzz0=0;
    var dr0=1;
    var waytype="none";
+   if(way.nodes){
    if(way.tags){
      if(way.tags.highway){
       test=1;waytype=way.tags.highway;
@@ -9521,7 +9522,7 @@ for(var i=iway;i<ways.length;i++){
 	 }  
    }
    //context.stroke();
-   }}
+   }}}
    //ibuff=ibuff1;
    //updatebuffers();
 }
