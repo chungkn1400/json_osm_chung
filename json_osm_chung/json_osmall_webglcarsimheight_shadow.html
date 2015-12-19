@@ -5611,10 +5611,10 @@ savecar(0);
 setsoundcar2vol();
 for(var i=1;i<=ncar;i++){
    loadcar(i);
+   typecar=i;
    //vrun=0;vmx=0;vmy=0;vmz=0;vcar=0;
    movecar();
    testcollidecar(i);
-   typecar=i;
    testresetcar(typecar);
    if(Math.abs(x-nx[i])<10 && Math.abs(y-ny[i])<10){drawcarobj();}
    else{z=0;}
@@ -9086,7 +9086,7 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
 	   pautoroad0=pautoroad;pautoroad=-1;
 	}
 	}
-if(vcar<0.08){vrun=(0.74-vrun)*Math.min(1,dtime*0.001);}
+if(vcar<0.08){vrun+=(0.74-vrun)*Math.min(1,dtime*0.001);}
 else{vrun+=(0.48-vrun)*Math.min(1,dtime*0.001);}
 if(vcar<0.04){vrun=1.80;vcar=Math.max(0.015,vcar);}
 if(pautoroad>=0){
