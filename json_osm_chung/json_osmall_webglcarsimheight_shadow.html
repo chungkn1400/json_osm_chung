@@ -715,7 +715,8 @@ float decodefloatrgb( vec3 rgb ) {
 	   //gl_FragColor.rgb+=color*(gl_FragColor.rgb*(0.35+1.65*fcolor2.rgb)+0.1*fcolor2.rgb-gl_FragColor.rgb);	 
 	   gl_FragColor.rgb+=color2*(gl_FragColor.rgb*(0.30+1.65*fcolor2.rgb)+0.1*fcolor2.rgb-gl_FragColor.rgb);	 
 		 //gl_FragColor.rgb=fcolor2.rgb;   
-      }else{
+      }else if(color3>0.2){
+      //}else{
 	   vec4 fcolor3=texture2D(uSampler3, 1.3*(vTextureCoord2*30.0/130.0+ksea*(vec2(0.5,0.5))));
 	   gl_FragColor.rgb+=color3*(1.0-gl_FragColor.r)*(gl_FragColor.rgb*(0.30+1.65*fcolor3.rgb)+0.1*fcolor3.rgb-gl_FragColor.rgb);
       }	  
@@ -774,6 +775,8 @@ float decodefloatrgb( vec3 rgb ) {
 		else{color=1.0;}
 	    if(aVertexPosition.z<-0.39 || vTextureCoord.y<-1.0){
 		     color3=0.3;}
+	    else if(aVertexPosition.z<0.039){
+		     color3=0.15;}
 		else{color3=0.0;}
 		vTextureCoord2.x=aVertexPosition.x*130.0;//25.0 /2.5;
 		vTextureCoord2.y=aVertexPosition.y*130.0;//25.0 /2.5;
