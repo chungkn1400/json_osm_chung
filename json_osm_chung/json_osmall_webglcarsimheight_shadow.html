@@ -9086,12 +9086,12 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
 	   pautoroad0=pautoroad;pautoroad=-1;
 	}
 	}
-if(vcar<0.08){vrun+=(0.74-vrun)*Math.min(1,dtime*0.001);}
-else{vrun+=(0.48-vrun)*Math.min(1,dtime*0.001);}
+if(vcar<0.08){vrun+=(0.74-vrun)*Math.min(1,dtime*0.002);}
+else{vrun+=(0.48-vrun)*Math.min(1,dtime*0.002);}
 if(vcar<0.04){vrun=1.80;vcar=Math.max(0.015,vcar);}
 if(pautoroad>=0){
    j=pautoroad;
-   if(typecar==0 && vcar>road0r[j]*0.12){vrun+=(0.1-vrun)*Math.min(1,dtime*0.001);
+   if(typecar==0 && vcar>road0r[j]*0.12){vrun+=(0.1-vrun)*Math.min(1,dtime*0.002);
 				          vcar=Math.max(vcar-vcar*dtime*0.0003,0.03);}
    dxyroad0=dxyroad;
    dxyroad=dx*road0si1[j]-dy*road0co1[j];
