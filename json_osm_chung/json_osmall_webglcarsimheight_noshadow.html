@@ -478,7 +478,7 @@ if(document.location.href.indexOf("https")>=0){
 //var overpass="//overpass.osm.rambler.ru/cgi/";
 //var overpass="//overpass-api.de/api/";
 var overpass="//overpass.osm.rambler.ru/cgi/";
-if(http=="https:"){overpass="//overpass-api.de/api/";}
+if(http=="https:" || 1){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
 var overpass2="//overpass-api.de/api/";
 var toverpass=0;
@@ -8832,6 +8832,7 @@ function initparms(){
 			   //setTimeout("subcombo();",8000);
 			   }
   }
+var tfog=0;
 function evaln(n){if(isNaN(eval(n))){return 0;}else{return eval(n);};}
 function getparms(hash){
   if(hash!=""){parms=[];parms=hash.split("&");
@@ -8860,6 +8861,7 @@ function getparms(hash){
     mouse2dx=evaln(parms[i]);i+=1;if(i>=n){return;}
     mouse2dy=evaln(parms[i]);i+=1;if(i>=n){return;}
     kscalex=evaln(parms[i]);i+=1;if(i>=n){return;}
+    tfog=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 var noshadow=0;
@@ -8903,6 +8905,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(mouse2dx);
   addparm(mouse2dy);
   addparm(kscalex);
+  addparm(tfog);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
