@@ -1280,14 +1280,14 @@ var kx=2;
 lat1=lat-kx*dlat/2;lon1=lng-kx*dlon/2;
 lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 tilat=0;if(Math.abs(ilat-lat)<dlat/3 && Math.abs(ilng-lng)<dlon/3){tilat=1;}
-ilat=lat;ilng=lng;
+ilat=lat;ilng=lng;auxvar=tilat;
 if(tilat==1){
  ilat+=sin1*dlat/2.2;
  ilng+=cos1*dlon/2.2;
- lat1+=sin1*kx*dlat/2.2;
- lon1+=cos1*kx*dlon/2.2;
- lat2+=sin1*kx*dlat/2.2;
- lon2+=cos1*kx*dlon/2.2;
+ lat1+=sin1*dlat/2.2;
+ lon1+=cos1*dlon/2.2;
+ lat2+=sin1*dlat/2.2;
+ lon2+=cos1*dlon/2.2;
 }
 var latlon2="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 kx=0.040;
