@@ -4263,7 +4263,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform3f(shaderProgram.sunposUniform,0,0,0);
         if(tshadownight==1){gl.uniform1f(shaderProgram.lightUniform,1.5-tlight/2);}
 		else{gl.uniform1f(shaderProgram.lightUniform,0);}
-        dmaxuniform=dxmax2*5;
+        dmaxuniform=dxmax*5;//dxmax2*5;
 		gl.uniform1f(shaderProgram.dmaxUniform,dmaxuniform);
         gl.uniform1f(shaderProgram.fog,fog);
 	    var scx=(dlngsol/klon)*scale;
@@ -4284,7 +4284,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform3f(shaderProgram.sunposUniform,1,0,0);
         if(tshadownight==1){gl.uniform1f(shaderProgram.lightUniform,1.5-tlight/2);}
 		else{gl.uniform1f(shaderProgram.lightUniform,0);}
-        dmaxuniform=dxmax2*5;
+        dmaxuniform=dxmax*5;//dxmax2*5;
 		gl.uniform1f(shaderProgram.dmaxUniform,dmaxuniform);
         gl.uniform1f(shaderProgram.fog,fog);
 	    var scx=(dlngsol/klon)*scale;
@@ -4305,7 +4305,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform3f(shaderProgram.sunposUniform,sunx,suny,sunz);
         if(tshadownight==1){gl.uniform1f(shaderProgram.lightUniform,1.5-tlight/2);}
 		else{gl.uniform1f(shaderProgram.lightUniform,0);}
-        dmaxuniform=dxmax2*5*2;
+        dmaxuniform=dxmax*10;//dxmax2*5*2;
 		gl.uniform1f(shaderProgram.dmaxUniform,dmaxuniform);
         gl.uniform1f(shaderProgram.fog,fog);
 	    var scx=(dlngsol/klon)*scale;
@@ -11456,7 +11456,7 @@ function addtower(way){
    var xx=0,xxx=0,yy=0,yyy=0,r=1,dr=1;
    var dxx=0,dyy=0,zz=0,zzz=0;
    var s=0,t=0,tt=0;
-   var h=1,amenity="",building="",hmin=0,h00=0,tmarket=0;
+   var h=1,amenity="",building="",hmin=0,h00=0,tmarket=0,trailstation=0;
    if(way.tags){
     if(way.tags.height){h00=way.tags.height/6;
 	        }
@@ -11534,7 +11534,13 @@ function addtower(way){
 	       if(marketlat[i]>latmin && marketlat[i]<latmax){
 	        if(marketlon[i]>lonmin && marketlon[i]<lonmax){
 			   tmarket=1;break;
-	   }}}}
+	   }}}
+	   for(var i=0;i<nrailstation;i++){
+	       if(railstationlat[i]>latmin && railstationlat[i]<latmax){
+	        if(railstationlon[i]>lonmin && railstationlon[i]<lonmax){
+			   trailstation=1;break;
+	   }}}
+	   }
 	   //ztree=(latnodes[i0]+lonnodes[i0])*1000000;
 	   //ztree=(ztree-100*parseInt(ztree/100))/2000;
 	   //ztree+=zsol0-0.01;//-0.06+zsol0;
@@ -11554,6 +11560,7 @@ var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
 if(tmarket==1){var r=3,g=15,b=3;icolor=parseInt(20000+(r*256+g*16+b)*256);}
+if(trailstation==1){var r=3,g=3,b=15;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 var dty=0;if(icolor>19999){dty=icolor;}
 if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
                trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
