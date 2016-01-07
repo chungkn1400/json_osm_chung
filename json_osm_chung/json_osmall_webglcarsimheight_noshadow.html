@@ -3077,7 +3077,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(shaderProgram.dmaxUniform,dmaxuniform);
     }
     function setMatrixUniforms1() {
-	    dxmaxuniform=dxmax2*5;
+	    dxmaxuniform=dxmax*5;//dxmax2*5;
         //gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
         //gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 	    mat4.multiply(pMatrix,mvMatrix,pvMatrix);
@@ -3086,7 +3086,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(shaderProgram.dmaxUniform,dmaxuniform);
     }
     function setMatrixUniforms() {
-	    dxmaxuniform=dxmax2*5;
+	    dxmaxuniform=dxmax*5;//dxmax2*5;
         //gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
         //gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 	    mat4.multiply(pMatrix,mvMatrix,pvMatrix);
