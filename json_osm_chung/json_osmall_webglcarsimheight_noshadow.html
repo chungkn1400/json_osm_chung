@@ -698,7 +698,7 @@ keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";wa
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
-wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%20qt%208999%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%208999%3B";
 try{		
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
@@ -712,8 +712,8 @@ lat2=lat+dlat/2;lon2=lng+dlon/2;
 var dx=0.001;
 var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
-nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%20qt%2049999%3B";
-//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20qt%2019999%3B";
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2049999%3B";
+//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%2019999%3B";
 resetnode=1;tgetnode=1;
 try{		
 httpGet(nodeurl,nodecallback);
@@ -1980,7 +1980,7 @@ if(twebaudio==1 && tradio==0){
 		//if(y>ymax){y-=ymax-ymin;tskip=1;};
 		if(tgamesave>=1){tskip=1;}
 		if(tstreetview==1){tskip=1;}
-		if(tskip==0 && tframe>tsrtm && testsrtm>=0.1 && loading==0){tsrtm=tframe+3000;testloadsrtm();}
+		if(tskip==0 && tframe>tsrtm && testsrtm>=0.01 && loading==0){tsrtm=tframe+3000;testloadsrtm();}
 		if(tframe<tskip2+100){tskip=1;}
         gl.clearColor(1,1,1, 1.0);//auxvar2=loading;
 		//if(tskip==0 && (tmovertt==1 || itime%2==0)){tmovertt=0;drawrttshadow();};
@@ -1993,6 +1993,7 @@ if(twebaudio==1 && tradio==0){
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
+		           if(testsrtm>0.01){tdrawsol=0;}
 		           loading=22;dtloading=tframe;tinitgmap=0;
 		           latsol0=latsol;lngsol0=lngsol;
 			       if(tupdatesoltexture==99){tupdatesoltexture=0;tloadsol=tframe+9999000;}
@@ -2044,6 +2045,7 @@ if(twebaudio==1 && tradio==0){
 		   if(tinit==0){tinit=1;}
 		   setsnow();
 		   trottoirx=999999;settrottoir();
+		   tdrawsol=1;
 		   }
 		if(itime%30==1){
 		 if(tmap==4){//scrollTo(0,4000);
@@ -2142,7 +2144,7 @@ lat=Math.max(-87,Math.min(87,lat));
 lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
-x00=999999;trygetways=1;
+x00=999999;trygetways=1;tinit=0;
 return;
    }
 lat=Math.max(-87,Math.min(87,lat));
@@ -2150,7 +2152,7 @@ lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
 z=-1;tloadingreverse=tframe+1100;locx=999;
-x00=999999;trygetways=1;
+x00=999999;trygetways=1;tinit=0;
 }
 var xmlhttp;
 function httpGet(url,callback) 
@@ -5260,8 +5262,9 @@ if(dx<=(1.0-dy)){
 	}
 }
 var xsol=0,ysol=0,zsol0=-0.02;
-var scalez=1,tloadsol=0,tsea0=0;
+var scalez=1,tloadsol=0,tsea0=0,tdrawsol=0;
 function drawsol(){
+if(tdrawsol==0){return;}
 //xsol=parseInt(x/100)*100;
 //ysol=parseInt(y/100)*100;
     var sc=1;//scalez;
@@ -5481,7 +5484,7 @@ function initgmap(){
 
 		var zsolmin2=9990,zsolmax2=1;
 		var ij=0,h=0;
-	if(testsrtm>=0.1){	
+	if(testsrtm>=0.01){	
 		updatesrtm();
 		var n22=n;
         for(var ij2=0;ij2<n22*n22;ij2++){
@@ -8624,7 +8627,7 @@ if (geolocation.length>0){
       latx0=lat;lngx0=lng;lngsol0=999;
       latx=lat;lngx=lng;tmap=0;z=-1;
 	  tloadingreverse=tframe+1100;locx=999;
-      x00=9999;trygetways=1;
+      x00=9999;trygetways=1;tinit=0;
     } else {
       alert('Geolocation not found ! ' + status);
     }

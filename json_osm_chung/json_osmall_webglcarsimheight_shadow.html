@@ -6,8 +6,8 @@ openstreetmap roads to html5 array -->
 <title>json webglcarsimheight</title>
 <meta charset="utf-8">
 </head>
-<body bgcolor="#FFFFFF" onunload="quit=1;close();" onKeyUp="keyup(event);" onKeyDown="keydown(event);"  OnTouchDown="submousedown(event);"  OnTouchUp="submouseup(event);">
-<div id="alldiv"  BGCOLOR="#FFFFFF">
+<body bgcolor="#FFFFFF" onunload="quit=1;close();" >
+<div id="alldiv"  BGCOLOR="#FFFFFF" onKeyUp="keyup(event);" onKeyDown="keydown(event);" OnTouchDown="submousedown(event);"  OnTouchUp="submouseup(event);" >
 	<div id="mydiv" style="position:absolute;top:0px;left:0px;z-index:200;" >
 	<canvas id="canvasgl" style="border:none;top:0px;left:0px;" width="600" height="400"></canvas>
     </div>
@@ -1332,7 +1332,7 @@ keyway="%28"+keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wo
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
-wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%20qt%208999%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%208999%3B";
 try{		
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
@@ -1356,7 +1356,7 @@ var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 //keyway="(way['building:height']"+latlon+";way['building:levels']"+latlon+")";
 var keyway="(way['building:height']"+latlon+";way['building']['height']"+latlon+";way['building']['levels']"+latlon+";way['building:levels']"+latlon+")";
 keyway="(way['building']"+latlon+")";
-var wayurl2=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%20qt%204999%3B";
+var wayurl2=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3B";
 try{		
 httpGet(wayurl2,waycallback2);
 }catch (e){alert("error getways2");loading=0;}
@@ -1379,9 +1379,9 @@ if(tilat==1){
 var dx=0.001;
 var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
-nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%20qt%2049999%3B";
-//nodeurl=http+overpass+"interpreter?data=[out:json];node[layer]%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%20qt%2019999%3B";
-//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20qt%2019999%3B";
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2049999%3B";
+//nodeurl=http+overpass+"interpreter?data=[out:json];node[layer]%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2019999%3B";
+//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%2019999%3B";
 resetnode=1;tgetnode=1;
 try{		
 httpGet(nodeurl,nodecallback);
@@ -2837,7 +2837,7 @@ if(twebaudio==1 && tradio==0){
 		//if(y>ymax){y-=ymax-ymin;tskip=1;};
 		if(tgamesave>=1){tskip=1;}
 		if(tstreetview==1){tskip=1;}
-		if(tskip==0 && tframe>tsrtm && testsrtm>=0.1 && loading==0){
+		if(tskip==0 && tframe>tsrtm && testsrtm>=0.01 && loading==0){
 		   tsrtm=tframe+3000;testloadsrtm();
 		   }
 		if(tframe<tskip2+100){tskip=1;}
@@ -2859,6 +2859,7 @@ if(twebaudio==1 && tradio==0){
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>5)){
+		     if(testsrtm>0.01){tdrawsol=0;}
 		     loading=22;dtloading=tframe;tinitgmap=0;
 			 latsol0=latsol;lngsol0=lngsol;
 			 if(tupdatesoltexture==99){tupdatesoltexture=0;tloadsol=tframe+9999000;}
@@ -2920,7 +2921,7 @@ if(twebaudio==1 && tradio==0){
 		   dtinitmap=Math.min(dtinitmap,tframe-3000);
 		   setsnow();
 		   trottoirx=999999;settrottoir();
-		   tdraw=0;
+		   tdraw=0;tdrawsol=1;
 		   }
 		if(itime%30==1){
 		 if(tmap==4){scrollTo(0,4000);}else{scrollTo(0,0);}
@@ -3021,7 +3022,7 @@ lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
 x00=999999;
-tinittree22=1;tloadingreverse=timer()+1100;locx=99999;trygetways=1;
+tinittree22=1;tloadingreverse=timer()+1100;locx=99999;trygetways=1;tinit=0;
 return;
    }
 lat=Math.max(-87,Math.min(87,lat));
@@ -3029,7 +3030,7 @@ lng=Math.max(-177,Math.min(177,lng));
 latx0=lat;lngx0=lng;lngsol0=999;
 latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinittree22=1;
 z=-1;tloadingreverse=timer()+1100;locx=99999;
-tinitgmap=2;x00=999999;trygetways=1;
+tinitgmap=2;x00=999999;trygetways=1;tinit=0;
 }
 var xmlhttp;
 function httpGet(url,callback) 
@@ -7546,8 +7547,9 @@ for(var i=Math.max(1,i0-di);i<Math.min(nsol-1,i0+di);i++){
 }
 }
 var xsol=0,ysol=0,zsol0=-0.02;
-var scalez=1,tloadsol=0,tsea0=0;
+var scalez=1,tloadsol=0,tsea0=0,tdrawsol=0;
 function drawsol(){
+if(tdrawsol==0){return;}
 //xsol=parseInt(x/100)*100;
 //ysol=parseInt(y/100)*100;
     var sc=1;//scalez;
@@ -7791,7 +7793,7 @@ function initgmap(){
 
 		var zsolmin2=9990,zsolmax2=0.1;
 		var ij=0,h=0;
-	if(testsrtm>=0.1){	
+	if(testsrtm>=0.01){	
 		updatesrtm();
         for(var ij2=0;ij2<n22*n22;ij2++){
 		      if(zsolmin2>height1[ij2]){zsolmin2+=0.005*(height1[ij2]-zsolmin2);}
@@ -12171,7 +12173,7 @@ if (geolocation.length>0){
       latx0=lat;lngx0=lng;lngsol0=999;
       latx=lat;lngx=lng;tmap=0;z=-1;
 	  tloadingreverse=timer()+1100;locx=99999;
-      x00=999999;trygetways=1;//getways();
+      x00=999999;trygetways=1;tinit=0;//getways();
     } else {
       alert('Geolocation not found ! ' + status);
     }
