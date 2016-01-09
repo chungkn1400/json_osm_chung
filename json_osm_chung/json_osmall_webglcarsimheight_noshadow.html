@@ -1526,10 +1526,10 @@ if(tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
       if(Math.abs(o3volant)<40 || tfly==0){
-	   if(o3volant>0.1){o3volant=Math.max(0,o3volant-dt*0.05/(1+tfly));}
-	   if(o3volant<-0.1){o3volant=Math.min(0,o3volant+dt*0.05/(1+tfly));}
+	   if(o3volant>0.1){o3volant=Math.max(0.0,o3volant-dt*0.05/(1+tfly));}
+	   if(o3volant<-0.1){o3volant=Math.min(0.0,o3volant+dt*0.05/(1+tfly));}
 	  }
-	  var ko3v=60/(60+Math.abs(o3volant));
+	  var ko3v=60.0/(60+Math.abs(o3volant));
 	if(tmouse3move==1){
 	  if (keys[vk_left] || mouseleft || keys[vk_a] || button[5] || keys[58]) {mouse3dx-=dtime*0.01;if(mouse3dx<-10){mouse3dx=-10;}}
       else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {mouse3dx+=dtime*0.01;if(mouse3dx>10){mouse3dx=10;}}
