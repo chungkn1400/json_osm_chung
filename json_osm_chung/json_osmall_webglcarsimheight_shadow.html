@@ -1332,7 +1332,7 @@ keyway="%28"+keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wo
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
-wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%208999%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%20qt%208999%3B";
 try{		
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
@@ -1356,7 +1356,7 @@ var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 //keyway="(way['building:height']"+latlon+";way['building:levels']"+latlon+")";
 var keyway="(way['building:height']"+latlon+";way['building']['height']"+latlon+";way['building']['levels']"+latlon+";way['building:levels']"+latlon+")";
 keyway="(way['building']"+latlon+")";
-var wayurl2=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3B";
+var wayurl2=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%20qt%204999%3B";
 try{		
 httpGet(wayurl2,waycallback2);
 }catch (e){alert("error getways2");loading=0;}
@@ -1379,9 +1379,9 @@ if(tilat==1){
 var dx=0.001;
 var lat11=lat1-dx,lon11=lon1-dx*klon;
 var lat21=lat2+dx,lon21=lon2+dx*klon;
-nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2049999%3B";
-//nodeurl=http+overpass+"interpreter?data=[out:json];node[layer]%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%2019999%3B";
-//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%2019999%3B";
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%20qt%2049999%3B";
+//nodeurl=http+overpass+"interpreter?data=[out:json];node[layer]%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20skel%20qt%2019999%3B";
+//nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29%3Bout%20qt%2019999%3B";
 resetnode=1;tgetnode=1;
 try{		
 httpGet(nodeurl,nodecallback);
