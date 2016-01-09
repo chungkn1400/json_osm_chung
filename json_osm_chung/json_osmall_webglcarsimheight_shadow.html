@@ -1279,7 +1279,7 @@ var kx=2;
 //lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 lat1=lat-kx*dlat/2;lon1=lng-kx*dlon/2;
 lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
-tilat=0;if(Math.abs(ilat-lat)<dlat/3 && Math.abs(ilng-lng)<dlon/3){tilat=1;}
+tilat=0;if(Math.abs(ilat-lat)<dlat/2.2 && Math.abs(ilng-lng)<dlon/2.2){tilat=1;}
 ilat=lat;ilng=lng;auxvar=tilat;
 if(tilat==1){
  ilat+=sin1*dlat/2.2;
@@ -2157,12 +2157,13 @@ function teststopcar(){
 		   var test=road0cross[pautoroad];
 	       if(test || Math.abs(cos1*road0co1[pautoroad]+sin1*road0si1[pautoroad])<0.55){
 		           dtautopilot=0;
-				   var dxx=Math.max(Math.abs(x-road0x[pautoroad]),Math.abs(y-road0y[pautoroad]));
-				   var dyy=Math.max(Math.abs(x-road0x[pautoroad]-road0l[pautoroad]*road0co1[pautoroad]),Math.abs(y-road0y[pautoroad]-road0l[pautoroad]*road0si1[pautoroad]));
-	               var dvv=0.08;
-				   if(!test && Math.min(dxx,dyy)>1.5){dvv=Math.min(vcar,0.16);}
-				   vrun=Math.min(0.3,vrun);vcar=Math.max(dvv,vcar-0.0065*dtime*(vcar+0.05));}}
+				   var dxx=cos1*(x-road0x[pautoroad])+sin1*Math.abs(y-road0y[pautoroad]);
+				   var dyy=cos1*(x-road0x[pautoroad]-road0l[pautoroad]*road0co1[pautoroad])+sin1*(y-road0y[pautoroad]-road0l[pautoroad]*road0si1[pautoroad]);
+	               var dvv=0.08;dxx=Math.max(-dxx,-dyy);
+				   if((dxx>1.0 || dxx<0.1)){dvv=Math.min(vcar,0.2);}
+				   vrun=Math.min(0.4,vrun);vcar=Math.max(dvv,vcar-0.0065*dtime*(vcar+0.05));}}
 }
+function reseto3volant(){dtautopilot=0;o3volant=0;}
 var x=0,y=0,z=0,o1=0,o2=-10,o3=0,vrun=0,vrunmax=1.5;
 var cos1=0,sin1=0,cos2=0,sin2=0,cos3=0,sin3=0,do1=0,do2=0,do3=0; 
 var xmin=-30000,xmax=30000,ymin=-30000,ymax=30000;
@@ -2228,7 +2229,7 @@ tmove=0;trot=0;
 //var vcar0=vcar;
 var oo10=o1;
 var testx=0,v=0.00000015*dtime,vv=0.00000015*200;
-if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1){tfoot=0;};resetkeys();}
+if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1){tfoot=0;};resetkeys();reseto3volant();}
 if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();resetkeys();}
 	tgaz=0;
 	//timer0=timer1;
@@ -2339,16 +2340,7 @@ if(tfly==1){
 	   latx-=sin1*vv*kvv/4;lngx-=cos1*klon*vv*kvv/4;testx=1;tcollide=0;}
 	 tcollide=0;
 	 var piloto1=0;
-	 if(tautopilot>=1 && tframe>dtautopilot-2000){
-	     if(vcar>0.08 && pautoroad>=0){
-		   var test=road0cross[pautoroad];
-	       if(test || Math.abs(cos1*road0co1[pautoroad]+sin1*road0si1[pautoroad])<0.55){
-		           dtautopilot=0;
-				   var dxx=Math.max(Math.abs(x-road0x[pautoroad]),Math.abs(y-road0y[pautoroad]));
-				   var dyy=Math.max(Math.abs(x-road0x[pautoroad]-road0l[pautoroad]*road0co1[pautoroad]),Math.abs(y-road0y[pautoroad]-road0l[pautoroad]*road0si1[pautoroad]));
-	               var dvv=0.08;
-				   if(!test && Math.min(dxx,dyy)>1.5){dvv=Math.min(vcar,0.16);}
-				   vrun=Math.min(0.3,vrun);vcar=Math.max(dvv,vcar-0.0065*dt*(vcar+0.05));}}}
+	 if(tautopilot>=1 && tframe>dtautopilot-2000){teststopcar();}
 	 if(tautopilot>=1 && tframe>dtautopilot){
 	     vrunauto0=Math.max(0.3,Math.min(1.0,vrunauto0));
 	     vrun+=(vrunauto0-vrun)*dtime*0.0005;
@@ -2554,7 +2546,7 @@ if(keys[61]){subgirlimage3();sleep(200);resetkeys();}//'='
 if(keys[vk_f]){subfog();resetkeys();}
 if(keys[vk_e] && keys[vk_shift]){subgirl();resetkeys();}
 if(keys[vk_h]){if(keys[vk_shift]==0){subhelp();}else{subshadow();};resetkeys();}
-if(keys[vk_v]){keys[vk_v]=0;iview+=1;if(iview>2){iview=0;};}
+if(keys[vk_v]){keys[vk_v]=0;iview+=1;if(iview>2){iview=0;};reseto3volant();}
 if(keys[vk_g]){keys[vk_g]=0;
    if(keys[vk_shift]){geolocate();}
    else if(tfoot==1){tminimap2+=1;if(tminimap2>1){tminimap2=0;}}
@@ -9102,6 +9094,7 @@ function resetfindroad(){
      npautoroad[i]=-1;npautoroad0[i]=-1;
   }
 }
+var pautoroad00=0,tpautoroad00=0;
 function findroad(auto){
 var xx=((lngx-lng0)/klon)*scale+3*cos1;
 var yy=(latx-lat0)*scale+3*sin1;
@@ -9110,6 +9103,10 @@ var r=1;
 var l,dx,dy,dxy;
 var px=(xx+(roadlng0-lng0)*scale/klon)*2;
 var py=(yy+(roadlat0-lat0)*scale)*2;
+if(typecar==0){
+   if(pautoroad<0 && tframe>tpautoroad00+1000){pautoroad=pautoroad00;}
+   else if(pautoroad>=0){pautoroad00=pautoroad;tpautoroad00=tframe;}
+}
 var j=pautoroad;
 r=1.5+vcar;
 if(pautoroad>=0 && (auto==0 || pautoroad0<0)){
@@ -9164,6 +9161,7 @@ if(pautoroad>=0 && auto==1 && pautoroad0>=0){
 if(vcar<0.08){vrun=0.74;}
 else{vrun=0.48;}
 if(vcar<0.04){vrun=1.80;vcar=Math.max(0.015,vcar);}
+
 if(pautoroad>=0){
    j=pautoroad;
    //if(typecar==0 && vcar>road0r[j]*0.12){vrun+=(0.1-vrun)*Math.min(1,dtime*0.002);
@@ -9196,6 +9194,7 @@ if(pautoroad>=0){
 	}
    return;}
 //o1pilot=o1;
+if(pautoroad00>=0 && tframe<tpautoroad00+1){return;}
 dxyroad=0;
 var cos10=0,sin10=0;
 if(pautoroad0>=0){
