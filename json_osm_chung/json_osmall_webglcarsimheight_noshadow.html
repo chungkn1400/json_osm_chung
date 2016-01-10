@@ -631,6 +631,7 @@ function weathercallback(r){//alert(r);
   var temp=weatherjson.main.temp-273;//alert(temp);
   fogweather=Math.min(1,Math.max(0,(humidity-50)*0.15/Math.max(3,temp)));
   if(Math.abs(loading-1.44)<0.001){loading=0;msgload("");}
+  if(temp>=7){tsnow=0;}
 }
 function msgload(text){
 context.clearRect (0,20,100,100);

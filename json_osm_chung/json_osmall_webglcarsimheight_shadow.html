@@ -1226,6 +1226,7 @@ function weathercallback(r){//alert(r);
   fogweather*=fogweather;
   if(Math.abs(loading-1.44)<0.001){loading=0;msgload("");}
   setskydometexture();
+  if(temp>=7){tsnow=0;}
 }
 function msgload(text){
 context.clearRect (0,20,100,100);
@@ -2105,7 +2106,8 @@ function subautopilot(){
  else{if(confirm("set autopilot off ?")){tautopilot=0;}}
 }
 function subshadow(){
- if(noshadow==0){if(confirm("set shadow off ?")){noshadow=1;}}
+ if(noshadow==1){if(confirm("set shadow off ?")){noshadow=2;}}
+ else if(noshadow==0){if(confirm("set double distshadow ?")){noshadow=1;}}
  else{if(confirm("set shadow on ?")){noshadow=0;}}
 }
 var tcockpitok=0;
@@ -2450,10 +2452,12 @@ if(tfly==1){
 				         if(vcar<0.005 && vrun<0.001 && button[2]){latx-=v*sin1;lngx-=v*cos1*klon;vcar=-0.05;};}
      if (keys[vk_shift] || button[6] || keys[vk_end]) {//vrun-=dt*0.0009;if(vrun<0){vrun=0;};
 	                 //vcar-=0.0022*dt*(vcar+0.05);
+					 tbrakes=tframe;
 	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
 		             if(vcar<0.001){vcar=0.001;};}
      if (keys[vk_down] && Math.abs(vrun)<0.01) {//vrun-=dt*0.0009;if(vrun<0){vrun=0;};
 	                 //vcar-=0.0022*dt*(vcar+0.05);
+					 tbrakes=tframe;
 	                 vcar-=0.0022*dt*(Math.min(vcar,0.3)+0.05);
 		             if(vcar<0.001){vcar=0.001;};}
 	 if(tgaz==0){if(vrun>vrunmax){vrun=vrunmax;};
@@ -2669,6 +2673,7 @@ if(testx==1 && loading==0){testx=0;//loading=-2;
 }
 function movecar(){
 if(tmap==0){
+	var vcar00=vcar;
 	var dt=dtime,lastz=zsol;
 	if(dt>300){dt=300;}
 	zsol=getterrainheight(lngx,latx);
@@ -2702,18 +2707,20 @@ if(tmap==0){
 		 while(do1pilot<-180){do1pilot+=360;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-	  var dxx=x+1.5*cos1+0.64*sin1-nx[0],testxx=0;
+	 for(var i=0;i<ncar;i++){
+      if(i!=typecar){	 
+	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
 	  if(Math.abs(dxx)<1){
-	    var dyy=y+1.5*sin1-0.64*cos1-ny[0];
+	    var dyy=y+1.5*sin1-0.64*cos1-ny[i];
 	    if(Math.abs(dyy)<1){
-		      piloto1=0.7;testxx=1;}}
+		      piloto1=0.7;testxx=1;vcar-=vcar*dtime*0.005;break;}}
 	  if(testxx==0){
-	    dxx=x+1.5*cos1-0.64*sin1-nx[0];
+	    dxx=x+1.5*cos1-0.64*sin1-nx[i];
 	    if(Math.abs(dxx)<1){
-	      var dyy=y+1.5*sin1+0.64*cos1-ny[0];
+	      var dyy=y+1.5*sin1+0.64*cos1-ny[i];
 	      if(Math.abs(dyy)<1){
-		      piloto1=-0.5;}}
-	  }
+		      piloto1=-0.5;vcar-=vcar*dtime*0.005;break;}}
+	  }}}
 	  var ko3v=60/(60+Math.abs(o3volant));
 	  if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant>64){o3volant=64;};}
       if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18;if(o3volant<-64){o3volant=-64;};}
@@ -2767,6 +2774,7 @@ y=(latx-lat0)*scale;
      vv=vmx*cos1*cos2+vmy*sin1*cos2+vmz*sin2;
 	 vcar=vv/0.013;
 }
+if(vcar<vcar00*(1.0-dtime*0.0001)){tbrakes=tframe;}
 }
 var tvolume=0,tspeed=0;
 function setvolume(){
@@ -3555,6 +3563,7 @@ function initGL(canvasgl){
 	var cloudTexture,roadbandTexture,crossTexture;
 	var cloudTexture,roadbandTexture,crossTexture;
 	var carobjTexture,woman1Texture,woman2Texture,loganobjTexture;
+	var carobjlightTexture,loganobjlightTexture;
 	var woman3Texture,smokeTexture,citypanelTexture;
 	var carTexture2,rocTexture,roadarrowTexture;
 	var eiffeltowerTexture,libertystatueTexture;
@@ -3578,11 +3587,11 @@ function initGL(canvasgl){
 		}
     }
 function initrtttexture(){
-        var s1024=1024;
+        var s1024=1024,h1024=1024;
         rttFramebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
         rttFramebuffer.width = s1024;
-        rttFramebuffer.height = s1024;
+        rttFramebuffer.height = h1024;
         rttTexture = gl.createTexture();
         rttTexture.width=rttFramebuffer.width;
         rttTexture.height=rttFramebuffer.height;
@@ -3603,7 +3612,7 @@ function initrtttexture(){
         rtt2Framebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rtt2Framebuffer);
         rtt2Framebuffer.width = s1024;
-        rtt2Framebuffer.height = s1024;
+        rtt2Framebuffer.height = h1024;
         rtt2Texture = gl.createTexture();
         rtt2Texture.width=rtt2Framebuffer.width;
         rtt2Texture.height=rtt2Framebuffer.height;
@@ -3624,7 +3633,7 @@ function initrtttexture(){
         rtt3Framebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rtt3Framebuffer);
         rtt3Framebuffer.width = s1024;
-        rtt3Framebuffer.height = s1024;
+        rtt3Framebuffer.height = h1024;
         rtt3Texture = gl.createTexture();
         rtt3Texture.width=rtt3Framebuffer.width;
         rtt3Texture.height=rtt3Framebuffer.height;
@@ -3763,12 +3772,26 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         carobjTexture.image.src = "car.png";
 
+        carobjlightTexture = gl.createTexture();
+        carobjlightTexture.image = new Image();
+        carobjlightTexture.image.onload = function () {
+            handleLoadedTexture(carobjlightTexture);
+        }
+        carobjlightTexture.image.src = "carlight.png";
+
         loganobjTexture = gl.createTexture();
         loganobjTexture.image = new Image();
         loganobjTexture.image.onload = function () {
             handleLoadedTexture(loganobjTexture);
         }
         loganobjTexture.image.src = "logan.jpg";
+
+        loganobjlightTexture = gl.createTexture();
+        loganobjlightTexture.image = new Image();
+        loganobjlightTexture.image.onload = function () {
+            handleLoadedTexture(loganobjlightTexture);
+        }
+        loganobjlightTexture.image.src = "loganlight.jpg";
 
         carTexture = gl.createTexture();
         carTexture.image = new Image();
@@ -4380,7 +4403,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(solProgram.sunco1,sunco1);
         gl.uniform1f(solProgram.sunsi1,sunsi1);
         gl.uniform1f(solProgram.cloudx,cloudx0*400.0/(300.0*distcloud));
-        if(noshadow==1){gl.uniform1i(solProgram.tshadow,0);}
+        if(noshadow>=2){gl.uniform1i(solProgram.tshadow,0);}
 		else{gl.uniform1i(solProgram.tshadow,1);}
     }
    var texscalex=1,texscaley=1,textdx=0,textdy=0,scalex2d=1;scaley2d=1,dx2d=0,dy2d=0;   
@@ -4413,7 +4436,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 
     var noshadow=0;
 	function drawrttshadow() {//return;
-	  if(noshadow>=12){return;}
+	  if(noshadow>=22){return;}
       //gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
       gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
       //gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
@@ -4422,14 +4445,14 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
       //gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
 	function drawrtt2shadow() {//return;
-	  if(noshadow>=12){return;}
+	  if(noshadow>=22){return;}
       gl.bindFramebuffer(gl.FRAMEBUFFER, rtt2Framebuffer);
 	  drawshadow(1);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       //gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
 	function drawrtt3shadow() {//return;
-	  if(noshadow>=12){return;}
+	  if(noshadow>=22){return;}
       gl.bindFramebuffer(gl.FRAMEBUFFER, rtt3Framebuffer);
 	  drawshadow3();
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -4448,6 +4471,7 @@ var tshadownight=0;
 		else{gl.clearColor(0,0,0, 1.0);}
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		distshadow=30.0;
+		if(noshadow==1){distshadow=60.0;}
 		var wx=distshadow,wy=distshadow;
 		var sunxx=sunx-x,sunyy=suny-y,sunzz=sunz-z;
 		var dz=Math.max(0.01,Math.sqrt(sunxx*sunxx+sunyy*sunyy+sunzz*sunzz));
@@ -4474,7 +4498,7 @@ var tshadownight=0;
 		gl.useProgram(shader22Program);
 	if(irtt==0){
 		setmatrix2();
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(tlight==0){tshadow=0;return;}
 		drawsol2();
 		drawtowers2();
@@ -4485,7 +4509,7 @@ var tshadownight=0;
 		drawroc2();
 		drawroads2();
 	}else{
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(tlight==0){tshadow=0;return;}
 		//if(iview==1 && tfoot==0){drawcarobj2();}
 		//else if(tfoot==0){drawcarobj2();}//drawcar2();}
@@ -4517,6 +4541,7 @@ var tshadownight=0;
         gl.clearColor(1,1,0, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		distshadow=30.0;
+		if(noshadow==1){distshadow=60.0;}
 		var wx=distshadow,wy=distshadow;
 		var dz=Math.max(0.01,Math.sqrt(sunx*sunx+suny*suny+sunz*sunz));
 		var dx=Math.max(0.01,Math.sqrt(sunx*sunx+suny*suny));
@@ -4540,7 +4565,7 @@ var tshadownight=0;
 		gl.useProgram(shader22Program);
 	if(irtt==0){
 		setmatrix2();
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
 		drawsol2();
 		drawtowers2();
@@ -4551,7 +4576,7 @@ var tshadownight=0;
 		drawroc2();
 		drawroads2();
 	}else{
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
    		gl.useProgram(shader2Program);
 		if(iview==1 && tfoot==0){drawcarobj2();}
@@ -4592,7 +4617,7 @@ var tshadownight=0;
    		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
 		//mat4.rotate(mvMatrix, degtorad(diro1(sunx,suny)+90), [0, 0, 1]);
 		//setmatrix2();
-		if(noshadow>=1){noshadow+=1;tshadow=0;return;}
+		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
 		if(tcloud>=1){
 				   fogsave=fog;fog=0;
@@ -4614,7 +4639,8 @@ var tshadownight=0;
     	mat4.perspective(47, (cssscale/cssscaley)*gl.viewportWidth / gl.viewportHeight, 0.2, 3000.0, pMatrix);//3000
 
 var ksuspension=20,kfps=Math.min(3,dtime*0.03);
-if(tfoot==0){//suspensions 
+if(tfoot==0){//suspensions
+ if(iview==1){ksuspension=5;}else{ksuspension=20;} 
  vm20=vm2;
  vm2=(vmx2*cos1+vmy2*sin1)*100;
  if(vm2<0.01){vm2=0;}
@@ -5382,12 +5408,12 @@ for(i=0;i<iwall0;i++){
 		  var dxx=dx*wallco10[i]+dy*wallsi10[i];
 		  if(dxx>0 && dxx<walll0[i] && z<wallh0[i]+0.26){wallheight=wallh0[i];return 1;}
 		  }}}}
-r=0.08+Math.abs(vcar*0.5);
+/*r=0.08+Math.abs(vcar*0.5);
 for(i=0;i<iwalltree0;i++){
     if(Math.abs(walltreex0[i]-x)<r){
 	  if(Math.abs(walltreey0[i]-y)<r){
-	    if(z<walltreeh0[i]){return 1;}
-	}}}
+	    if(z<walltreeh0[i]){soundcrash();return 0;}
+	}}} */
 return 0;
 }
 function drawcarre(){
@@ -5689,7 +5715,7 @@ for(var i=1;i<=ncar;i++){
 loadcar(0);
 typecar=0;
 }
-var o3volant0=0,o3wheel=0,typecar=0,tlogan=0;
+var o3volant0=0,o3wheel=0,typecar=0,tlogan=0,tbrakes=0;
 function drawcarobj(){
 if(tlogan==1){drawloganobj();return;}
         mvPushMatrix();
@@ -5701,13 +5727,15 @@ if(tlogan==1){drawloganobj();return;}
 		var o22=o2,o33=o3;
 		if(typecar==0){o22=Math.max(-50,Math.min(50,o2-planedo2*0.24-2.7));
                        o33=o3+planedo3*1.2;}
-        mat4.rotate(mvMatrix, degtorad(o1+o3volant0/4), [0, 0, 1]);
+        if(typecar==0){mat4.rotate(mvMatrix, degtorad(o1+o3volant0/4), [0, 0, 1]);}
+		else{mat4.rotate(mvMatrix, degtorad(o1+o3volant0*0.04), [0, 0, 1]);}
         mat4.rotate(mvMatrix, degtorad(-o22), [0, 1, 0]);
         mat4.rotate(mvMatrix, degtorad(-o33), [1, 0, 0]);
 		//planedo3=sin3*24;
 	var sc=0.0030;mat4.scale(mvMatrix,[sc,sc,sc]);
 	gl.activeTexture(gl.TEXTURE11);
-    gl.bindTexture(gl.TEXTURE_2D, carobjTexture);
+    if(tbrakes<tframe-300){gl.bindTexture(gl.TEXTURE_2D, carobjTexture);}
+	else{gl.bindTexture(gl.TEXTURE_2D, carobjlightTexture);}
     gl.uniform1i(shaderaProgram.samplerUniform, 11);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexTextureCoordBuffer);
@@ -5719,10 +5747,10 @@ if(tlogan==1){drawloganobj();return;}
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
     if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
-    if(typcar==2){colorr=0;colorg=0;colorb=1;colora=0;}
+    if(typcar==2){colorr=0.2;colorg=0.1;colorb=1;colora=0;}
     if(typcar==3){colorr=1;colorg=1;colorb=0;colora=0;}
-    if(typcar==4){colorr=0;colorg=1;colorb=1;colora=0;}
-    if(typcar==5){colorr=1;colorg=0;colorb=1;colora=0;}
+    if(typcar==4){colorr=0.2;colorg=1;colorb=1;colora=0;}
+    if(typcar==5){colorr=1;colorg=0.1;colorb=1;colora=0;}
 	setMatrixUniformsa();
 	colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, carVertexPositionBuffer.numItems);
@@ -5803,7 +5831,8 @@ function drawloganobj(){
 		//planedo3=sin3*24;
 	var sc=0.0027;mat4.scale(mvMatrix,[sc,0.0032,sc]);
 	gl.activeTexture(gl.TEXTURE11);
-    gl.bindTexture(gl.TEXTURE_2D, loganobjTexture);
+    if(tbrakes<tframe-300){gl.bindTexture(gl.TEXTURE_2D, loganobjTexture);}
+	else{gl.bindTexture(gl.TEXTURE_2D, loganobjlightTexture);}
     gl.uniform1i(shaderaProgram.samplerUniform, 11);
     
     gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexTextureCoordBuffer);
@@ -5815,10 +5844,10 @@ function drawloganobj(){
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
     if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
-    if(typcar==2){colorr=0;colorg=0;colorb=1;colora=0;}
+    if(typcar==2){colorr=0.2;colorg=0.1;colorb=1;colora=0;}
     if(typcar==3){colorr=1;colorg=1;colorb=0;colora=0;}
-    if(typcar==4){colorr=0;colorg=1;colorb=1;colora=0;}
-    if(typcar==5){colorr=1;colorg=0;colorb=1;colora=0;}
+    if(typcar==4){colorr=0.2;colorg=1;colorb=1;colora=0;}
+    if(typcar==5){colorr=1;colorg=0.1;colorb=1;colora=0;}
 	mvPushMatrix();
     mat4.rotate(mvMatrix, degtorad(-90), [0, 0, 1]);
 	setMatrixUniformsa();
@@ -7049,6 +7078,7 @@ while(boeing2o1>180){boeing2o1-=360;}
 while(boeing2o1<-180){boeing2o1+=360;}
 }
 function drawboeing2(){
+    if(distairportxx>200){return;}
     var d720=Math.max(390,Math.min(720,720*distairportxx/200));
     var xx=(boeing2x-lng0)*scale/klon;
     if(Math.abs(xx-x)>d720){resetboeing2();return;}
@@ -9053,6 +9083,7 @@ var ncos2=[],nsin2=[],ncos3=[],nsin3=[],nvrun=[];
 var no2=[],no3=[],nx=[],ny=[],nz=[],nvcar=[];
 var nvmx=[],nvmy=[],nvmz=[],nvmx2=[],nvmy2=[],nvmz2=[];
 var nzsol=[],no3volant0=[],no3volant=[],no3wheel=[],ntlogan=[];
+var ntbrakes=[];
 function initncar(){
 for(var i=0;i<=ncar;i++){
    npautoroad[i]=-1;npautoroad0[i]=-1;no1pilot[i]=0;
@@ -9064,6 +9095,7 @@ for(var i=0;i<=ncar;i++){
    no3wheel[i]=0;nvcar[i]=0;nvrun[i]=vrun;
    nvmx[i]=vmx;nvmy[i]=vmy;nvmz[i]=vmz;
    nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;ntlogan[i]=parseInt(Math.random()*1.9);
+   ntbrakes[i]=0;
 }}
 function loadcar(i){
    pautoroad=npautoroad[i];pautoroad0=npautoroad0[i];o1pilot=no1pilot[i];
@@ -9075,6 +9107,7 @@ function loadcar(i){
    o3wheel=no3wheel[i];vcar=nvcar[i];vrun=nvrun[i];
    vmx=nvmx[i];vmy=nvmy[i];vmz=nvmz[i];
    vmz2=nvmx2[i];vmy2=nvmy2[i];vmz2=nvmz2[i];tlogan=ntlogan[i];
+   tbrakes=ntbrakes[i];
 }
 function savecar(i){
    npautoroad[i]=pautoroad;npautoroad0[i]=pautoroad0;no1pilot[i]=o1pilot;
@@ -9086,6 +9119,7 @@ function savecar(i){
    no3wheel[i]=o3wheel;nvcar[i]=vcar;nvrun[i]=vrun;
    nvmx[i]=vmx;nvmy[i]=vmy;nvmz[i]=vmz;
    nvmx2[i]=vmx2;nvmy2[i]=vmy2;nvmz2[i]=vmz2;ntlogan[i]=tlogan;
+   ntbrakes[i]=tbrakes;
 }
 var autoroad=[],nautoroad=20,iautoroad=0;
 var pautoroad=-1,pautoroad0=-1,o1pilot=0;
@@ -9196,7 +9230,7 @@ if(pautoroad>=0){
 	}
    return;}
 //o1pilot=o1;
-if(pautoroad00>=0 && tframe<tpautoroad00+1){return;}
+if(pautoroad00>=0 && tframe<tpautoroad00+1 && typecar==0){return;}
 dxyroad=0;
 var cos10=0,sin10=0;
 if(pautoroad0>=0){
@@ -12420,7 +12454,7 @@ function initparms(){
   lnginit/=100;
   latx=latinit;lngx=lnginit;
   if(kscalex>=0.25 && kscalex<=2.0){scale=scale0*kscalex;}
-  if(noshadow>=1){noshadow=1;}
+  if(noshadow>=2){noshadow=2;}
   if(flytoname){
     document.getElementById('combo')[1].text=flytoname;}
   if(icombo>0){document.getElementById('combo').selectedIndex=icombo;
