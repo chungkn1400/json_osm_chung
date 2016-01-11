@@ -1989,6 +1989,7 @@ msg+="7 => change season"+crlf;
 msg+="shift+X => scalex"+crlf;
 msg+="space+arrows => turn head"+crlf;
 msg+="shift+E => change cockpit"+crlf;
+msg+="shift+N => number of cars"+crlf;
 msg+="button 1 => accelerate"+crlf;
 msg+="button 2 => decelerate"+crlf;
 msg+="button 4 => car / foot"+crlf;
@@ -2139,6 +2140,10 @@ function subtower(){
  if(ttower==0){if(confirm("set towers only on ?")){ttower=1;x00=999999;}}
  else{if(confirm("set towers only off ?")){ttower=0;x00=999999;}}
 }
+function subncar(){
+var k=prompt("number of cars : enter a number 1.."+ncar+" last="+ncar2)
+if(k){k=Math.max(1,Math.min(ncar,k));if(k>0){ncar2=k;}}
+}
 function quitmsgmap(){
 document.getElementById('mapdiv').blur();
 scrollTo(0,0);tmap=0;//alert('ok');
@@ -2155,10 +2160,20 @@ if(troad>0){return zroad;}
 return getterrainheight(lngx,latx);
 }
 function teststopcar(){
+	     if(vcar>0.04 && nstop0>=1){
+		   for(var i=1;i<=nstop0;i++){
+		       var dxx=x-stopx0[i];
+			   if(Math.abs(dxx)<2.5+vcar){
+			      var dyy=y-stopy0[i];
+				  if(Math.abs(dyy)<2.5+vcar){
+				     var dxy=-dxx*stopco10[i]-dyy*stopsi10[i];
+					 if(dxy>0.03){
+					   if(cos1*stopco10[i]+sin1*stopsi10[i]>0.3){
+				         vrun=Math.min(0.4,vrun);vcar=Math.max(0.04,vcar-0.0065*dtime*(vcar+0.05));return;}}
+					 }}}}
 	     if(vcar>0.08 && pautoroad>=0){
 		   var test=road0cross[pautoroad];
 	       if(test || Math.abs(cos1*road0co1[pautoroad]+sin1*road0si1[pautoroad])<0.55){
-		           dtautopilot=0;
 				   var dxx=cos1*(x-road0x[pautoroad])+sin1*Math.abs(y-road0y[pautoroad]);
 				   var dyy=cos1*(x-road0x[pautoroad]-road0l[pautoroad]*road0co1[pautoroad])+sin1*(y-road0y[pautoroad]-road0l[pautoroad]*road0si1[pautoroad]);
 	               var dvv=0.08;dxx=Math.max(-dxx,-dyy);
@@ -2184,7 +2199,7 @@ var tcollide=0,zsol=0,troad=0,dtroad=0;
 var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
-var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0;
+var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0,piloto10=0,tpiloto10=0;
 function testkeys() {
 if(tframe>tloadingreverse && tmap==0){
    getreverselocation();
@@ -2355,12 +2370,18 @@ if(tfly==1){
 		 var do1pilot=o1pilot-o1;
 		 while(do1pilot>180){do1pilot-=360;}
 		 while(do1pilot<-180){do1pilot+=360;}
-		 if(do1pilot>110){do1pilot=0;}
-		 if(do1pilot<-110){do1pilot=0;}
+		 if(do1pilot>170){do1pilot=0;}
+		 if(do1pilot<-170){do1pilot=0;}
 		 if(Math.abs(do1pilot)>30 && vcar>0.08){vcar+=(0.08-vcar)*dtime*0.02;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-	 }
+		 var dpiloto10=o1-piloto10;
+		 while(dpiloto10>180){dpiloto10-=360;}
+		 while(dpiloto10<-180){dpiloto10+=360;}
+		 piloto10+=sign(dpiloto10)*(dtime*0.00001);
+         if(tframe<tpiloto10+3000){piloto1=0;piloto10=o1;}
+		 if(Math.abs(dpiloto10)>170){piloto10=o1;tpiloto10=tframe;}
+	 }else{piloto10=o1;}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
@@ -2518,6 +2539,7 @@ if(tfly==1){
 	vcarz=vcar*sin2;
   }
 
+if(keys[vk_n]){subncar();resetkeys();}
 if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  
@@ -2707,7 +2729,7 @@ if(tmap==0){
 		 while(do1pilot<-180){do1pilot+=360;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-	 for(var i=0;i<ncar;i++){
+	 for(var i=0;i<=ncar2;i++){
       if(i!=typecar){	 
 	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
 	  if(Math.abs(dxx)<1){
@@ -5660,7 +5682,7 @@ for(var i=0;i<ncloud;i++){
 }
 }
 function testcollidecar(i){
-  for(var j=0;j<=ncar;j++){
+  for(var j=0;j<=ncar2;j++){
     if(i!=j){
 	 var dx=nx[j]-nx[i];
 	 if(Math.abs(dx)<0.45){
@@ -5681,7 +5703,7 @@ var distncar=999;
 function setsoundcar2vol(){
   distncar=999;
   var i=0;
-  for(var j=1;j<=ncar;j++){
+  for(var j=1;j<=ncar2;j++){
 	 var dx=nx[j]-x;
 	 if(Math.abs(dx)<distncar){
 	   var dy=ny[j]-y;
@@ -5701,7 +5723,7 @@ if(tinitncar==1){tinitncar=0;initncar();
 testcollidecar(0);
 savecar(0);
 setsoundcar2vol();
-for(var i=1;i<=ncar;i++){
+for(var i=1;i<=ncar2;i++){
    loadcar(i);
    typecar=i;
    //vrun=0;vmx=0;vmy=0;vmz=0;vcar=0;
@@ -9077,7 +9099,7 @@ function addroadarrow(px,py,pz,co1,si1,tan2){
  roadarrowo1[i]=diro1(co1,si1);roadarrowo2[i]=diro1(1,tan2);
 }
 var npautoroad=[],npautoroad0=[],no1pilot=[];
-var ndxyroad0=[],ndxyroad=[],ncar=5;
+var ndxyroad0=[],ndxyroad=[],ncar=12,ncar2=5;
 var nlngx=[],nlatx=[],no1=[],ncos1=[],nsin1=[];
 var ncos2=[],nsin2=[],ncos3=[],nsin3=[],nvrun=[];
 var no2=[],no3=[],nx=[],ny=[],nz=[],nvcar=[];
@@ -10542,6 +10564,11 @@ function updateiroad(){
       stationo10[i]=stationo1[i];
    }
    nstation0=nstation;
+   
+   for(var i=1;i<=nstop;i++){stopx0[i]=stopx[i];stopy0[i]=stopy[i];
+                             stopco10[i]=stopco1[i];stopsi10[i]=stopsi1[i];
+   }
+   nstop0=nstop;
 }
 function updatebuffer1(){   
    var ibuff=ibuff1;
@@ -10975,9 +11002,12 @@ function addcross(xx,yy,zz,r,co1,si1){
 	 crossttestroad[icross]=ttestroadcross;
 	 icross+=1}
 }
+var nstop=0,stopx=[],stopy=[],stopco1=[],stopsi1=[];
+var nstop0=0,stopx0=[],stopy0=[],stopco10=[],stopsi10=[];
 function addcrosstest(){
 var h=0.3,h2=0.45,h21=0.765,xx,yy,zz,rr,co1,si1,r;
 var co11,si11;
+nstop=0;
 for(var i=0;i<icross;i++){
 xx=crossx[i];yy=crossy[i];
 if(crossttestroad[i]==0 || testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
@@ -10993,7 +11023,7 @@ if(crossttestroad[i]==0 || testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
    var face=1;
    var test=0;if(crossttestroad[i]==1){test=testroadcross(xx/2,yy/2,latx0,lngx0,rr);}
    roadcross[crossiroad[i]]=test;
-   if(test==1){
+   if(test==1){nstop+=1;stopx[nstop]=xx/2;stopy[nstop]=yy/2;stopco1[nstop]=crossco1[i];stopsi1[nstop]=crosssi1[i];
       r+=10;co1*=0.87;si1*=0.87;}//stop
    else if(rr>750){r+=750;co1*=1.4;si1*=1.4;h2=0.55;face=2;}//hospital
    else if(rr>700){r+=700;co1*=0.82;si1*=0.82;face=2;}//hospital
@@ -12455,6 +12485,7 @@ function initparms(){
   latx=latinit;lngx=lnginit;
   if(kscalex>=0.25 && kscalex<=2.0){scale=scale0*kscalex;}
   if(noshadow>=2){noshadow=2;}
+  ncar2=Math.max(1,Math.min(ncar,ncar2));
   if(flytoname){
     document.getElementById('combo')[1].text=flytoname;}
   if(icombo>0){document.getElementById('combo').selectedIndex=icombo;
@@ -12491,6 +12522,7 @@ function getparms(hash){
     mouse2dy=evaln(parms[i]);i+=1;if(i>=n){return;}
     kscalex=evaln(parms[i]);i+=1;if(i>=n){return;}
     tfog=evaln(parms[i]);i+=1;if(i>=n){return;}
+    ncar2=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 function setlink(){
@@ -12534,6 +12566,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(mouse2dy);
   addparm(kscalex);
   addparm(tfog);
+  addparm(ncar2);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
