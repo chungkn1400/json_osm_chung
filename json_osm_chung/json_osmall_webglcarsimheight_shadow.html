@@ -2381,6 +2381,20 @@ if(tfly==1){
 		 piloto10+=sign(dpiloto10)*(dtime*0.00001);
          if(tframe<tpiloto10+3000){piloto1=0;piloto10=o1;}
 		 if(Math.abs(dpiloto10)>170){piloto10=o1;tpiloto10=tframe;}
+	 for(var i=0;i<=ncar2;i++){
+      if(i!=typecar){	 
+	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
+	  if(Math.abs(dxx)<1){
+	    var dyy=y+1.5*sin1-0.64*cos1-ny[i];
+	    if(Math.abs(dyy)<1){
+		      piloto1=0.7;testxx=1;vcar-=vcar*dtime*0.0022;break;}}
+	  if(testxx==0){
+	    dxx=x+1.5*cos1-0.64*sin1-nx[i];
+	    if(Math.abs(dxx)<1){
+	      var dyy=y+1.5*sin1+0.64*cos1-ny[i];
+	      if(Math.abs(dyy)<1){
+		      piloto1=-0.5;vcar-=vcar*dtime*0.0022;break;}}
+	  }}}
 	 }else{piloto10=o1;}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
