@@ -655,13 +655,17 @@ loading=1;
 dxmax=25;
 if(avgfps<8 || dtweb>4500){dxmax2=Math.max(13,dxmax2-2);}
 else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
-var k=(300/(10+ways.length));
-k=Math.min(k,5000/(100+nodes.length+nodes2.length+nodes3.length));
-k=Math.max(0.75,Math.min(3,Math.sqrt(k)));
-if(tinit<2){k=1;};
-if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
-else if(k>kdxmax){kdxmax+=0.25;}
-kdxmax=Math.max(0.75,Math.min(2,kdxmax));
+var k=(700/(10+ways.length));
+k=Math.min(k,7000/(10+nodes.length+nodes2.length+nodes3.length));
+//k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
+if(tinit<1){k=1;kdxmax=1;};
+//if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
+//else if(k>kdxmax){kdxmax+=0.25;}
+if(k<1 || dtweb>5900){kdxmax-=0.25;}
+else if(k>1.1){kdxmax+=0.25;}
+if(k<0.5){kdxmax-=0.25;}
+else if(k>2.0){kdxmax+=0.25;}
+kdxmax=Math.max(0.75,Math.min(4,kdxmax));auxvar2=kdxmax;
 dxmax=Math.max(19,dxmax2*kdxmax);
 lat=latx+sin1*dxmax*0.74/scale;
 lng=lngx+cos1*dxmax*0.74*klon/scale;
@@ -1367,7 +1371,7 @@ var tcollide=0,zsol=0,troad=0,dtroad=0;
 var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
-var timer0=0,timer1=0;
+var timer0=0,timer1=0,piloto10=0,tpiloto10=0;
 function testkeys() {
 if(tframe>tloadingreverse && tmap==0){
    getreverselocation();
@@ -1513,7 +1517,7 @@ if(tfly==1){
 	 if(tautopilot>=1 && tframe>dtautopilot-2000){teststopcar();}
 	 if(tautopilot>=1 && tframe>dtautopilot){
 	     vrunauto0=Math.max(0.3,Math.min(1.0,vrunauto0));
-	     vrun+=(vrunauto0-vrun)*dtime*0.0005;
+	     vrun+=(vrunauto0-vrun)*dtime*0.0006;
 		 if(troad==0){vrun=Math.min(vrunmax*0.45,Math.max(0.1,vrun));}
 		 else{vrun=Math.min(vrunmax,Math.max(0.1,vrun));}
 	     if(tupdatebuffer==0){
@@ -1522,12 +1526,32 @@ if(tfly==1){
 		 var do1pilot=o1pilot-o1;
 		 while(do1pilot>180){do1pilot-=360;}
 		 while(do1pilot<-180){do1pilot+=360;}
-		 if(do1pilot>170){do1pilot=0;}
-		 if(do1pilot<-170){do1pilot=0;}
+		 //if(do1pilot>170){do1pilot=0;}
+		 //if(do1pilot<-170){do1pilot=0;}
 		 if(Math.abs(do1pilot)>30 && vcar>0.08){vcar+=(0.08-vcar)*dtime*0.02;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-	 }
+		 var dpiloto10=o1-piloto10;
+		 while(dpiloto10>180){dpiloto10-=360;}
+		 while(dpiloto10<-180){dpiloto10+=360;}
+		 piloto10+=sign(dpiloto10)*(dtime*0.00001);
+         if(tframe<tpiloto10+3000){piloto1=0;piloto10=o1;}
+		 if(Math.abs(dpiloto10)>170){piloto10=o1;tpiloto10=tframe;}
+	 for(var i=0;i<=ncar2;i++){
+      if(i!=typecar){	 
+	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
+	  if(Math.abs(dxx)<1){
+	    var dyy=y+1.5*sin1-0.64*cos1-ny[i];
+	    if(Math.abs(dyy)<1){
+		      piloto1=0.7;testxx=1;if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;};break;}}
+	  if(testxx==0){
+	    dxx=x+1.5*cos1-0.64*sin1-nx[i];
+	    if(Math.abs(dxx)<1){
+	      var dyy=y+1.5*sin1+0.64*cos1-ny[i];
+	      if(Math.abs(dyy)<1){
+		      piloto1=-0.5;if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;};break;}}
+	  }}}
+	 }else{piloto10=o1;}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
@@ -1579,9 +1603,9 @@ if(tfly==1){
       //if(vcar0<vcar){planedo2+=(diro1(240,(vcar0-vcar)*dt)-planedo2);
 	  //}else{planedo2+=(diro1(140,(vcar0-vcar)*dt)-planedo2);}
      if(tfly==0){
-	  if(vcar0<vcar){planedo2+=Math.min(1,0.01*dt)*(diro1(50,(vcar0-vcar)*dt)-planedo2);
-	  }else{planedo2+=Math.min(1,0.01*dt)*(diro1(30,(vcar0-vcar)*dt)-planedo2);}
-	  vcar0=vcar;
+	  //if(vcar0<vcar){planedo2+=Math.min(1,0.01*dt)*(diro1(50,(vcar0-vcar)*dt)-planedo2);
+	  //}else{planedo2+=Math.min(1,0.01*dt)*(diro1(30,(vcar0-vcar)*dt)-planedo2);}
+	  vcar0=vcar;planedo2=0;
       var vmxyz=Math.sqrt(vmx*vmx+vmy*vmy+vmz*vmz);
       if(Math.abs(vmxyz0-vmxyz)>(0.1+vmxyz0)*0.00001*dt){
          soundpneu();}
@@ -1631,7 +1655,7 @@ if(tfly==1){
 	}else{
 	   vrun2=vrun*((3-1.4*vcar/kair)/2)*3*air*air*((2+kair)/3)/(2+air*air*kair);
 	}
-	if(Math.abs(vrun-vrun10)>0.0001*dtime){vrunauto0=vrun;}
+	if(Math.abs(vrun-vrun10)>0.0005*dtime){vrunauto0=vrun;}
 	var kv=1;
     if(landing==0){kv=0;}
     vcar+=(kv*(vrun)*0.00082*dt-dt*(kv*0.003*vcar+(sin2+0.01)*0.0020));	
@@ -1999,7 +2023,7 @@ if(twebaudio==1 && tradio==0){
                             if(trygetweather==1){trygetweather=0;getweather();}
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
-		if(tinitgmap>=1 && (loading==0 || loading>5)){
+		if(tinitgmap>=1 && (loading==0 || loading>25)){
 		           if(testsrtm>0.01){tdrawsol=0;}
 		           loading=22;dtloading=tframe;tinitgmap=0;
 		           latsol0=latsol;lngsol0=lngsol;
@@ -2594,7 +2618,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 	solTexture2.data=gettexturedata(solTexture2);
     solTexture2.datasize=parseInt(Math.sqrt(solTexture2.data.length/4));
     //auxvar=solTexture2.datasize;
-	if(tinitgmap>=0){tinitgmap=2;loading==33;}
+	if(tinitgmap>=0){tinitgmap=2;}//loading==33;}
 	canvas2.setAttribute('width', 10);
     canvas2.setAttribute('height', 10);
 	setTimeout("solTexture2.image.src=null;",5000);
@@ -5287,7 +5311,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.75 || Math.abs(ysol-y)>scy*0.75)){
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
-		  tupdatesoltexture=2;loading=66;
+		  tupdatesoltexture=2;//loading=66;
 		  updatesoltexture();}}
 	mat4.scale(mvMatrix,[scx,scy,sc]);
 	gl.activeTexture(gl.TEXTURE7);
@@ -6671,7 +6695,7 @@ if(typecar>0){
    y=ny[0]+nsin1[0]*dmax;
 pautoroad0=-1;
 o1=no1[0]+180+(Math.random()-0.5)*90;
-if(Math.random()<0.1){
+if(Math.random()<0.15){
    o1-=180;
    if(vcar>nvcar[0]*1.3){
      lngx=nlngx[0]-ncos1[0]*dmax*klon/scale;
@@ -9086,7 +9110,7 @@ jsfile=jsfilelist[i];
 		};}
 }
 function loadsrtmfile(iisrtm){
-loading=55;
+//loading=55;
 //alert("load "+srtmfolder0+srtmfiles[isrtm]);
 var jsfilepath=srtmfiles[iisrtm];
 jslist[njsfile]=document.createElement("script");
@@ -9141,7 +9165,7 @@ srtmymax[ii]=-srtmymax[ii];
 */
 srtmlng[ii]-=1000;
 //updatesrtm();
-if(tinitgmap>=0){tinitgmap=2;loading=50;}
+if(tinitgmap>=0){tinitgmap=2;}//loading=50;}
 ttestloadsrtm=0;
 }
 function updatesrtm(){
