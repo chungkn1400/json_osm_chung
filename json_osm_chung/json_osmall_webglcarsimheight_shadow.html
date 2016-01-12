@@ -2203,7 +2203,9 @@ var tcollide=0,zsol=0,troad=0,dtroad=0;
 var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
-var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0,piloto10=0,tpiloto10=0;
+var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0;
+var piloto10=0,tpiloto10=0,oldx=[],oldy=[],ioldxy=0;
+for(var i=0;i<=10;i++){oldx[i]=9999999;oldy[i]=9999999;}
 function testkeys() {
 if(tframe>tloadingreverse && tmap==0){
    getreverselocation();
@@ -2224,7 +2226,7 @@ if(tmsg<(tframe-150)){tmsg=tframe;
  var msg="x="+xx+"  y="+yy+"  z="+zz+"  v="+vv+"  prop="+pp
  if(test==1){msg+="  o1="+oo1+" o2="+oo2+" o3="+oo3;};
  msg+=" fps="+ff;
- msg+=" tri="+ntri;
+ //msg+=" tri="+ntri;
  if(distairportxx<4000){msg+=" airport="+parseInt(distairportxx);}
  if(auxvar!=null){msg+=" aux="+auxvar;}
  if(auxvar2!=null){msg+=" aux2="+auxvar2;}
@@ -2374,32 +2376,40 @@ if(tfly==1){
 		 var do1pilot=o1pilot-o1;
 		 while(do1pilot>180){do1pilot-=360;}
 		 while(do1pilot<-180){do1pilot+=360;}
-		 //if(do1pilot>170){do1pilot=0;}
-		 //if(do1pilot<-170){do1pilot=0;}
+		 if(do1pilot>150){do1pilot=0;}
+		 if(do1pilot<-150){do1pilot=0;}
 		 if(Math.abs(do1pilot)>30 && vcar>0.08){vcar+=(0.08-vcar)*dtime*0.02;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
-		 var dpiloto10=o1-piloto10;
-		 while(dpiloto10>180){dpiloto10-=360;}
-		 while(dpiloto10<-180){dpiloto10+=360;}
-		 piloto10+=sign(dpiloto10)*(dtime*0.00001);
-         if(tframe<tpiloto10+3000){piloto1=0;piloto10=o1;}
-		 if(Math.abs(dpiloto10)>170){piloto10=o1;tpiloto10=tframe;}
+		 if(Math.abs(do1pilot)>2){
+		    if(oldxy>40){ioldxy+=1;if(ioldxy>10){ioldxy=0;}
+			                     oldx[ioldxy]=x;oldy[ioldxy]=y;
+								 for(var i=0;i<=10;i++){
+								  if(Math.abs(oldx[i]-x)+Math.abs(oldy[i]-y)<15 && i!=ioldxy){
+								     for(var j=0;j<=10;j++){oldx[j]=9999999;};
+									 tpiloto10=tframe+Math.random()*2000;break;}}
+			                     oldxy=0;}}
+         if(tframe<tpiloto10+2000){piloto1=0;}else{var vv=0.013*vcar;oldxy+=vv*dtime;}
 	 for(var i=0;i<=ncar2;i++){
       if(i!=typecar){	 
-	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
+	  var dxx=x+1.35*cos1+0.6*sin1-nx[i],testxx=0;
 	  if(Math.abs(dxx)<1){
-	    var dyy=y+1.5*sin1-0.64*cos1-ny[i];
+	    var dyy=y+1.35*sin1-0.6*cos1-ny[i];
 	    if(Math.abs(dyy)<1){
-		      piloto1=0.7;testxx=1;if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;};break;}}
+		      testxx=1;
+			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=0.7;}
+			  else{vcar+=vcar*dtime*0.002;piloto1=0.45;};
+			  break;}}
 	  if(testxx==0){
-	    dxx=x+1.5*cos1-0.64*sin1-nx[i];
+	    dxx=x+1.35*cos1-0.6*sin1-nx[i];
 	    if(Math.abs(dxx)<1){
-	      var dyy=y+1.5*sin1+0.64*cos1-ny[i];
+	      var dyy=y+1.35*sin1+0.6*cos1-ny[i];
 	      if(Math.abs(dyy)<1){
-		      piloto1=-0.5;if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;};break;}}
+			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=-0.5;}
+			  else{vcar+=vcar*dtime*0.002;piloto1=-0.45;}
+			  break;}}
 	  }}}
-	 }else{piloto10=o1;}
+	 }else{oldxy=0;}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
@@ -2961,6 +2971,7 @@ if(twebaudio==1 && tradio==0){
 		   testaddphotopanel();
 		   addcitypaneltest();
 		   resetfindroad();
+		   for(var i=0;i<=10;i++){oldx[i]+=nextdx;oldy[i]+=nextdy;}
 		   tmovertt=1;
            loading=0;dtloading=tframe;
 		   nextdx=0;nextdy=0;
@@ -3723,7 +3734,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 	solTexture2.data=gettexturedata(solTexture2);
     solTexture2.datasize=parseInt(Math.sqrt(solTexture2.data.length/4));
     //auxvar=solTexture2.datasize;
-	if(tinitgmap>=0){tinitgmap=2;}//loading=33;}
+	if(tinitgmap>=0){tinitgmap=2;loading=33;}
 	canvas2.setAttribute('width', 10);
     canvas2.setAttribute('height', 10);
 	setTimeout("solTexture2.image.src=null;",5000);
@@ -7633,7 +7644,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.6 || Math.abs(ysol-y)>scy*0.6)){//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
-		  tupdatesoltexture=2;//loading=66;
+		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
 	mvPushMatrix();
     //mat4.identity(mvMatrix);
@@ -9436,7 +9447,7 @@ o1pilot=o1;
 }
 function testresetcar(typecar){
 if(typecar>0){
- var dmax=dxmax*1.3;
+ var dmax=Math.min(44.0,dxmax*1.3);
  if(Math.abs(x-nx[0])>dmax+2 || Math.abs(y-ny[0])>dmax+2){
    lngx=nlngx[0]+ncos1[0]*dmax*klon/scale;
    latx=nlatx[0]+nsin1[0]*dmax/scale;
@@ -12746,7 +12757,7 @@ alert("load "+srtmfolder0+srtmfiles[iisrtm]);
 srtmimg.src=srtmfich;alert(srtmfich);
 }
 function loadsrtmfile(iisrtm){
-//loading=55;
+loading=55;
 //alert("load "+srtmfolder0+srtmfiles[isrtm]);
 var jsfilepath=srtmfiles[iisrtm];
 jslist[njsfile]=document.createElement("script");
@@ -12801,7 +12812,7 @@ srtmymax[ii]=-srtmymax[ii];
 */
 srtmlng[ii]-=1000;
 //updatesrtm();
-if(tinitgmap>=0){tinitgmap=2;}//loading=50;}
+if(tinitgmap>=0){tinitgmap=2;loading=50;}
 ttestloadsrtm=0;
 }
 function jscallback22(ii){
@@ -12836,7 +12847,7 @@ srtmymax[ii]=-srtmymax[ii];
 */
 srtmlng[ii]-=1000;
 //updatesrtm();
-if(tinitgmap>=0){tinitgmap=2;}//loading=50;}
+if(tinitgmap>=0){tinitgmap=2;loading=50;}
 ttestloadsrtm=0;
 }
 var kn18=18;
