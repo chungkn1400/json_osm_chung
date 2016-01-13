@@ -998,7 +998,7 @@ function waycallback(r){//alert(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  iiways+=1;if(iiways>1){iiways=0;}
+  iiways+=1;if(iiways>2){iiways=0;}
   if(wayjson.elements){iways[iiways]=wayjson.elements;}
   ways=iways[0];
   var j=ways.length;
@@ -1006,6 +1006,12 @@ function waycallback(r){//alert(r);
   for(var i=0;i<iways[1].length;i++){
      var test=0,id=iways[1][i].id;for(var k=0;k<j0;k++){if(ways[k].id==id){test=1;break;};}
 	 if(test==0){ways[j]=iways[1][i];j+=1;}
+  }
+  j=ways.length;
+  var j0=j;
+  for(var i=0;i<iways[2].length;i++){
+     var test=0,id=iways[2][i].id;for(var k=0;k<j0;k++){if(ways[k].id==id){test=1;break;};}
+	 if(test==0){ways[j]=iways[2][i];j+=1;}
   }
   msg+="len="+ways.length;
   if(ways.length>0){
@@ -1061,11 +1067,13 @@ function nodecallback(r){//alert(r);
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
-  iinodes+=1;if(iinodes>1){iinodes=0;}
+  iinodes+=1;if(iinodes>2){iinodes=0;}
   inodes[iinodes]=[];
   if(nodejson.elements){inodes[iinodes]=nodejson.elements;}
   nodes=inodes[0];
   var j=nodes.length;
+  for(var i=0;i<inodes[1].length;i++){nodes[j+i]=inodes[1][i];}
+  j=nodes.length;
   for(var i=0;i<inodes[1].length;i++){nodes[j+i]=inodes[1][i];}
   //msg+="len="+nodes.length;
   if(resetnode==1){latnodes=[];lonnodes=[];
@@ -1260,7 +1268,6 @@ if(tinit<1){k=1;kdxmax=1;};
 if(k<1 || dtweb>5900){kdxmax-=0.25;}
 else if(k>1.1){kdxmax+=0.25;}
 if(k<0.5){kdxmax-=0.25;}
-else if(k>2.0){kdxmax+=0.25;}
 kdxmax=Math.max(0.75,Math.min(4,kdxmax));auxvar2=kdxmax;
 //auxvar=kdxmax;auxvar2=nodes.length;
 dxmax=Math.max(19,dxmax2*kdxmax);
@@ -2376,8 +2383,8 @@ if(tfly==1){
 		 var do1pilot=o1pilot-o1;
 		 while(do1pilot>180){do1pilot-=360;}
 		 while(do1pilot<-180){do1pilot+=360;}
-		 if(do1pilot>150){do1pilot=0;}
-		 if(do1pilot<-150){do1pilot=0;}
+		 if(do1pilot>140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;auxvar3+=1;}
+		 if(do1pilot<-140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;auxvar3+=1;}
 		 if(Math.abs(do1pilot)>30 && vcar>0.08){vcar+=(0.08-vcar)*dtime*0.02;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
@@ -2395,20 +2402,40 @@ if(tfly==1){
 	  var dxx=x+1.35*cos1+0.6*sin1-nx[i],testxx=0;
 	  if(Math.abs(dxx)<1){
 	    var dyy=y+1.35*sin1-0.6*cos1-ny[i];
-	    if(Math.abs(dyy)<1){
+	    if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 		      testxx=1;
 			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=0.7;}
-			  else{vcar+=vcar*dtime*0.002;piloto1=0.45;};
+			  else{if(nvcar[i]>vcar-0.1){vcar+=vcar*dtime*0.002;vrun=1.2;};piloto1=0.45;};
+              if(o3volant<0){o3volant=0;}
 			  break;}}
 	  if(testxx==0){
 	    dxx=x+1.35*cos1-0.6*sin1-nx[i];
 	    if(Math.abs(dxx)<1){
 	      var dyy=y+1.35*sin1+0.6*cos1-ny[i];
-	      if(Math.abs(dyy)<1){
+	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=-0.5;}
-			  else{vcar+=vcar*dtime*0.002;piloto1=-0.45;}
-			  break;}}
-	  }}}
+			  else{if(nvcar[i]>vcar-0.1){vcar+=vcar*dtime*0.002;vrun=1.2;};piloto1=-0.45;}
+			  if(o3volant>0){o3volant=0;}
+              break;}}}
+	  if(testxx==0){
+	    dxx=x+1.3*cos1+1.4*sin1-nx[i];
+	    if(Math.abs(dxx)<1){
+	      var dyy=y+1.3*sin1-1.4*cos1-ny[i];
+	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
+			  if(cos1*ncos1[i]+sin1*nsin1[i]>0 && nvcar[i]>vcar-0.1){
+			   piloto1=-0.6;if(o3volant>0){o3volant=0;}
+			   vcar+=vcar*dtime*0.002;vrun=1.2;
+			   break;}}}}
+	  if(testxx==0){
+	    dxx=x+1.3*cos1-1.4*sin1-nx[i];
+	    if(Math.abs(dxx)<1){
+	      var dyy=y+1.3*sin1+1.4*cos1-ny[i];
+	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
+			  if(cos1*ncos1[i]+sin1*nsin1[i]>0 && nvcar[i]>vcar-0.1){
+			   piloto1=0.6;if(o3volant<0){o3volant=0;}
+			   vcar+=vcar*dtime*0.002;vrun=1.2;
+			   break;}}}}
+	  }}
 	 }else{oldxy=0;}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
@@ -2732,6 +2759,11 @@ if(tmap==0){
     var xx=((lngx-lng0)/klon)*scale;
     var yy=(latx-lat0)*scale;
     var troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);
+	if(troad==0 && (tframe>dttroad+5000 || tframe<dtinitmap+5000)){
+	            troad=testroad(xx,yy,lat0,lng0,0.5);
+	            if(troad==1){
+				o2road=Math.max(-50,Math.min(50,o2road));}
+				}
 	if(troad==0){
 	  h1=getterrainheight2(x+dx*cos1-dy*sin1,y+dx*sin1+dy*cos1);
 	  h2=getterrainheight2(x+dx*cos1+dy*sin1,y+dx*sin1-dy*cos1);
@@ -5717,6 +5749,8 @@ function testcollidecar(i){
 	 if(Math.abs(dx)<0.45){
 	   var dy=ny[j]-ny[i];
 	   if(Math.abs(dy)<0.45){
+	    var dz=nz[j]-nz[i];
+	    if(Math.abs(dz)<0.45){
 	      if(i==0 || j==0){soundpneu();soundcrash();}
 		  var dxx=dx*cos1+dy*sin1;
 		  vcar-=dxx*0.3*vcar;
@@ -5726,7 +5760,7 @@ function testcollidecar(i){
 		  o1+=(Math.random()-0.5)*18;
 		  no1[i]+=(Math.random()-0.5)*45;
 		  no1[j]+=(Math.random()-0.5)*45;
-		  }}}}
+		  }}}}}
 }
 var distncar=999;
 function setsoundcar2vol(){
@@ -9447,17 +9481,17 @@ o1pilot=o1;
 }
 function testresetcar(typecar){
 if(typecar>0){
- var dmax=Math.min(44.0,dxmax*1.3);
+ var dmax=Math.min(40.0,dxmax*1.3);
  if(Math.abs(x-nx[0])>dmax+2 || Math.abs(y-ny[0])>dmax+2){
    lngx=nlngx[0]+ncos1[0]*dmax*klon/scale;
    latx=nlatx[0]+nsin1[0]*dmax/scale;
    x=nx[0]+ncos1[0]*dmax;
    y=ny[0]+nsin1[0]*dmax;
    tlogan=parseInt(Math.random()*1.9);
-pautoroad0=-1;
+pautoroad0=-1;pautoroad=-1;
 o1=no1[0]+180+(Math.random()-0.5)*90;
-if(Math.random()<0.15){
-   o1-=180;
+if(Math.random()<0.3){
+   o1=no1[0]+(Math.random()-0.5)*40;
    if(vcar>nvcar[0]*1.3){
      lngx=nlngx[0]-ncos1[0]*dmax*klon/scale;
      latx=nlatx[0]-nsin1[0]*dmax/scale;
@@ -13215,3 +13249,4 @@ setTimeout('radiomsg("hello,how are you");',4000);
 </script>
 </body>
 </html>
+
