@@ -5771,9 +5771,11 @@ function setsoundcar2vol(){
 	 if(Math.abs(dx)<distncar){
 	   var dy=ny[j]-y;
 	   if(Math.abs(dy)<distncar){
-	     distncar=Math.max(Math.abs(dx),Math.abs(dy));
-		 i=j;
-	}}}
+	     var dz=nz[j]-z;
+	     if(Math.abs(dz)<0.5*distncar){
+	       distncar=Math.max(Math.abs(dz*2),Math.max(Math.abs(dx),Math.abs(dy)));
+		   i=j;
+	}}}}
   var vol2=Math.max(0.002,0.4/(0.8+distncar*distncar));
   setvol(myaudiocar2,vol2);
   var speed2=(0.14+(Math.max(0,nvcar[i])*0.79+nvrun[i]*0.1)*0.9)*5.9;
@@ -9317,7 +9319,7 @@ if(pautoroad>=0){
 //o1pilot=o1;
 if(pautoroad00>=0 && tframe<tpautoroad00+1 && typecar==0){return;}
 dxyroad=0;
-var cos10=0,sin10=0;
+var cos10=cos1,sin10=sin1;
 if(pautoroad0>=0){
   var j=pautoroad0;
   cos10=road0co1[j];
