@@ -2383,8 +2383,8 @@ if(tfly==1){
 		 var do1pilot=o1pilot-o1;
 		 while(do1pilot>180){do1pilot-=360;}
 		 while(do1pilot<-180){do1pilot+=360;}
-		 if(do1pilot>140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;auxvar3+=1;}
-		 if(do1pilot<-140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;auxvar3+=1;}
+		 if(do1pilot>140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;}
+		 if(do1pilot<-140 && troad==1){o1pilot=o1;do1pilot=0;pautoroad=-1;}
 		 if(Math.abs(do1pilot)>30 && vcar>0.08){vcar+=(0.08-vcar)*dtime*0.02;}
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
