@@ -1514,6 +1514,7 @@ if(tfly==1){
 	   var kvv=1+3*Math.max(0,vcar);
 	   latx-=sin1*vv*kvv/4;lngx-=cos1*klon*vv*kvv/4;testx=1;tcollide=0;}
 	 tcollide=0;  
+     if(isNaN(o3volant)){o3volant=0.0;}
 	 var piloto1=0;
 	 if(tautopilot>=1 && tframe>dtautopilot-2000){teststopcar();}
 	 if(tautopilot>=1 && tframe>dtautopilot){
@@ -1550,7 +1551,7 @@ if(tfly==1){
 		      testxx=1;
 			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=0.7;}
 			  else{if(nvcar[i]>vcar-0.1){vcar+=vcar*dtime*0.002;vrun=1.2;};piloto1=0.45;};
-              if(o3volant<0){o3volant=0;}
+              if(o3volant<0){o3volant=0.0;}
 			  break;}}
 	  if(testxx==0){
 	    dxx=x+1.35*cos1-0.6*sin1-nx[i];
@@ -1559,7 +1560,7 @@ if(tfly==1){
 	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 			  if(cos1*ncos1[i]+sin1*nsin1[i]<0){vcar-=vcar*dtime*0.0022;piloto1=-0.5;}
 			  else{if(nvcar[i]>vcar-0.1){vcar+=vcar*dtime*0.002;vrun=1.2;};piloto1=-0.45;}
-			  if(o3volant>0){o3volant=0;}
+			  if(o3volant>0){o3volant=0.0;}
               break;}}}
 	  if(testxx==0){
 	    dxx=x+1.3*cos1+1.4*sin1-nx[i];
@@ -1567,7 +1568,7 @@ if(tfly==1){
 	      var dyy=y+1.3*sin1-1.4*cos1-ny[i];
 	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 			  if(cos1*ncos1[i]+sin1*nsin1[i]>0 && nvcar[i]>vcar-0.1){
-			   piloto1=-0.6;if(o3volant>0){o3volant=0;}
+			   piloto1=-0.6;if(o3volant>0){o3volant=0.0;}
 			   vcar+=vcar*dtime*0.002;vrun=1.2;
 			   break;}}}}
 	  if(testxx==0){
@@ -1576,7 +1577,7 @@ if(tfly==1){
 	      var dyy=y+1.3*sin1+1.4*cos1-ny[i];
 	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 			  if(cos1*ncos1[i]+sin1*nsin1[i]>0 && nvcar[i]>vcar-0.1){
-			   piloto1=0.6;if(o3volant<0){o3volant=0;}
+			   piloto1=0.6;if(o3volant<0){o3volant=0.0;}
 			   vcar+=vcar*dtime*0.002;vrun=1.2;
 			   break;}}}}
 	  }}
@@ -6559,6 +6560,7 @@ if(pautoroad>=0){
 		}else{o1pilot=o1+3*sign(dxxx*dxyroad);//dyyy);
 		}
 	}
+   if(road0oneway[j]==1){if((cos1*road0co1[j]+sin1*road0si1[j])<-0.83){o1pilot=o1-3;}}	
    return;}
 //o1pilot=o1;
 if(pautoroad00>=0 && tframe<tpautoroad00+1){return;}
@@ -6576,7 +6578,7 @@ if(pautoroad0>=0){
 }
 r=5;
 iautoroad=-1;
-var dxyauto=0,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
+var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i];
 	if(Math.abs(dx)<r){
@@ -6591,7 +6593,7 @@ var dxyauto=0,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);//1.5
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);}//1.5
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
 		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
@@ -6610,7 +6612,7 @@ var dxyauto=0,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);}
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
 		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
@@ -6629,7 +6631,7 @@ var dxyauto=0,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-1.05)*kdxy0);}
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
 		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
