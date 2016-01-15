@@ -2275,11 +2275,9 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	o10=o1;o20=o2;o30=o3;
 	var zsolprev=zsol,troadprev=troad,ttunnelprev=ttunnel;
 	zsol=getterrainheightcar(lngx,latx);
-	ttunnel=0;if(troad==1){if(road0layer[ixyroad]<=-2){
-	            if(Math.abs(road0tan2[ixyroad])<0.1){ttunnel=1;}else{ttunnel=2;}}}
 	var testwater=twater;
 	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;}
-	if(troad==0 && troadprev==1 && lastz<zsol-0.5 && ttunnelprev==1){
+	if(troad==0 && troadprev==1 && ttunnelprev==1){
 	      //soundcrash();
 	      var co1=lastcos1road,si1=lastsin1road;
 		  var dxx=3;if((x-lastxroad/2)*lastsin1road-(y-lastyroad/2)*lastcos1road>0){dxx=-dxx;}
@@ -2289,6 +2287,8 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	      zsol=zsolprev;o1=diro1(co1,si1);cos1=co1;sin1=si1;
 	      zsol=getterrainheightcar(lngx,latx);
 	}
+	ttunnel=0;if(troad==1){if(road0layer[ixyroad]<=-2){
+	            if(Math.abs(road0tan2[ixyroad])<0.1){ttunnel=1;}else{ttunnel=2;}}}
     if (keys[vk_q]){
 	   if(tfly==0 || tfoot==1){tfly=1;z+=dt*0.002;}
        else{tfly=0;}
