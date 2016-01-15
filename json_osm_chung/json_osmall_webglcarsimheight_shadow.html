@@ -2166,7 +2166,9 @@ while(timer()<t){}
 function getterrainheightcar(lngx,latx){
 var xx=((lngx-lng0)/klon)*scale;
 var yy=(latx-lat0)*scale;
-troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);
+if(ttunnel==0){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}
+else if(ttunnel==2){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.1);}
+else{troad=testroadcar(xx,yy,lastz,lat0,lng0,0.65);}
 if(troad>0){return zroad;}
 return getterrainheight(lngx,latx);
 }
@@ -2213,7 +2215,8 @@ var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
 var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0;
-var piloto10=0,tpiloto10=0,oldx=[],oldy=[],ioldxy=0;
+var piloto10=0,tpiloto10=0,oldx=[],oldy=[],ioldxy=0,oldxy=0;
+var lastcos1road=1,lastsin1road=0,lastxroad=0,lastyroad=0,ttunnel=0;
 for(var i=0;i<=10;i++){oldx[i]=9999999;oldy[i]=9999999;}
 function testkeys() {
 if(tframe>tloadingreverse && tmap==0){
@@ -2267,11 +2270,25 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	//timer0=timer1;
 	//timer1=timer();
 	//var dt=timer1-timer;
-	var dt=dtime;lastz=zsol;//timer1-timer0;
+	var dt=dtime;lastz=zsol;lastz=z-0.69;if(tfoot==0){lastz=z-0.8;}//timer1-timer0;
 	if(dt>300){dt=300;}
 	o10=o1;o20=o2;o30=o3;
+	var zsolprev=zsol,troadprev=troad;
 	zsol=getterrainheightcar(lngx,latx);
+	ttunnel=0;if(troad==1){if(road0layer[ixyroad]<=-2){
+	            if(Math.abs(road0tan2[ixyroad])<0.1){ttunnel=1;}else{ttunnel=2;}}}
 	var testwater=twater;
+	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;}
+	if(troad==0 && troadprev==1 && lastz<zsol-0.5){
+	      //soundcrash();
+	      var co1=lastcos1road,si1=lastsin1road;
+		  var dxx=3;if((x-lastxroad/2)*lastsin1road-(y-lastyroad/2)*lastcos1road>0){dxx=-dxx;}
+	      lngx+=dxx*0.3*si1*klon/scale;
+	      latx-=dxx*0.3*co1/scale;
+	      x+=dxx*0.3*si1;y-=dxx*0.3*co1;pautoroad=-1;
+	      zsol=zsolprev;o1=diro1(co1,si1);cos1=co1;sin1=si1;
+	      zsol=getterrainheightcar(lngx,latx);
+	}
     if (keys[vk_q]){
 	   if(tfly==0 || tfoot==1){tfly=1;z+=dt*0.002;}
        else{tfly=0;}
@@ -2334,23 +2351,27 @@ if(tfly==1){
         var yy=(latx-lat0)*scale;
 	    //troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);//}
 	    if(keys[vk_z]==1){troad=testroad(xx,yy,lat0,lng0,0.5);
-	       if(troad==1){z=Math.max(zsol+2,zroad+2);o2road=0;}
+	       if(troad==1){z=Math.max(zsol+3,zroad+3);o2road=0;}
+		   resetkeys();
 		}
 	if(troad==0 && (tframe>dttroad+5000 || tframe<dtinitmap+5000)){
 	            troad=testroad(xx,yy,lat0,lng0,0.5);
-	            if(troad==1){
+	            if(troad==1 && zroad<zsol-0.5){troad=0;zroad=zsol;}
+				if(troad==1){
 				o2road=Math.max(-50,Math.min(50,o2road));}
 				}
 	if(troad==1){
 	        if(tfoot==1){zroad+=0.1;}
-			zsol=Math.max(zsol,zroad);dttroad=tframe;
+			zsol=Math.max(zsol,zroad);
+			dttroad=tframe;
 	        cos13=cos1road;sin13=sin1road;
 			o2sol=Math.max(-80,Math.min(80,o2road));
             o3sol=Math.max(-80,Math.min(80,o3road));
 			if(tfoot==0){o2=o2sol;o3=o3sol;};}
     else{cos13=cos1;sin13=sin1;}
-	if(z<zsol+0.2){z=zsol+0.2;}
-	if(tcar==1){
+	if(troad==0 || zroad>=zsol-0.1){if(z<zsol+0.2){z=zsol+0.2;}}
+	else if(z>zroad+0.69){z=zroad+0.68;zsol=zroad;}
+	if(tcar==1 && (troad==0 || zroad>zsol-0.01)){
 	   if(z>zsol+10){z=zsol+10;}
 	   vzz-=dt*0.0006;if(vzz<-1.0){vzz=-1.0;}
 	   if(z<zsol+0.70){if(vcar>0.003 && troad==0){
@@ -2775,7 +2796,7 @@ if(tmap==0){
 	  o2sol=Math.max(-80,Math.min(80,diro1(dx,(h1+h2)*0.5-h0)));
 	  o3sol=Math.max(-80,Math.min(80,diro1(dy+dy,h2-h1)));
 	}
-	if(troad==1){zsol=Math.max(zsol,zroad);
+	if(troad==1){zsol=zroad;//Math.max(zsol,zroad);
 			o2sol=Math.max(-80,Math.min(80,o2road));
             o3sol=Math.max(-80,Math.min(80,o3road));
     }
@@ -7669,7 +7690,7 @@ for(var i=Math.max(1,i0-di);i<Math.min(nsol-1,i0+di);i++){
 var xsol=0,ysol=0,zsol0=-0.02;
 var scalez=1,tloadsol=0,tsea0=0,tdrawsol=0;
 function drawsol(){
-if(tdrawsol==0){return;}
+if(tdrawsol==0 && ttunnel==0){return;}
 //xsol=parseInt(x/100)*100;
 //ysol=parseInt(y/100)*100;
     var sc=1;//scalez;
@@ -7685,6 +7706,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	      tloadsol=tframe+50000;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
+    if(ttunnel==2){return;}
 	mvPushMatrix();
     //mat4.identity(mvMatrix);
 	mat4.translate(mvMatrix, [xsol,ysol,zsol0]);
@@ -8888,11 +8910,11 @@ function updatebuffersol(){
 		}
 var nroad=maxvertice-1,iroad=0,iroad0=0;
 var roadlng0=0,roadlat0=0,roadlng=0,roadlat=0;
-var roadx=[],roady=[],roadz=[],roadtan2=[],roadcross=[];
-var o1road=0,o2road=0,o3road=0,zroad=0;
+var roadx=[],roady=[],roadz=[],roadtan2=[],roadcross=[],roadlayer=[];
+var o1road=0,o2road=0,o3road=0,zroad=0,xroad=0,yroad=0,ixyroad=0;
 var cos1road=1,sin1road=0;
 var roadr=[],roadl=[],roadco1=[],roadsi1=[],roadoneway=[];
-var road0x=[],road0y=[],road0z=[],road0tan2=[],road0cross=[];
+var road0x=[],road0y=[],road0z=[],road0tan2=[],road0cross=[],road0layer=[];
 var road0r=[],road0l=[],road0co1=[],road0si1=[],road0oneway=[];
 function testaddcitypanel(){
 var px=((lngrev2-roadlng0)*scale/klon)*2;
@@ -9008,11 +9030,12 @@ var py=(py0+(roadlat0-lat10)*scale)*2;
   }
 return test;
 }
+var ztunnel=1.8;
 function testroadcar(px0,py0,pz0,lat10,lng10,r){
 var l,dx,dy,dxy,dxx=0,dxx0=0,test=0;
 var px=(px0+(roadlng0-lng10)*scale/klon)*2;
 var py=(py0+(roadlat0-lat10)*scale)*2;
-  o2road=80;zroad=0.054;
+  o2road=80;zroad=0.054-ztunnel;
   for(var i=0;i<iroad0;i++){
     if(Math.abs(px-road0x[i])<road0l[i]+3){
 	 if(Math.abs(py-road0y[i])<road0l[i]+3){
@@ -9024,7 +9047,10 @@ var py=(py0+(roadlat0-lat10)*scale)*2;
 		if(dxy>-0.28 && dxy<road0l[i]+0.28){
 		  var zroad1=road0tan2[i]*dxy+road0z[i];
 		  dxx=0.37-Math.abs(zroad1-0.22-pz0);//cos1*road0co1[i]+sin1*road0si1[i];
-          //if(Math.abs(dxx)>Math.abs(dxx0)){		  
+          //if(Math.abs(dxx)>Math.abs(dxx0)){
+          if(zroad1<zsol+0.1){dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.12-pz0));
+		                       dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.42-pz0));		  
+		                       dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.84-pz0));}		  
           if(dxx>dxx0-0.15){		  
 		   test=1;
 		   dxx0=Math.max(dxx,dxx0);
@@ -9032,10 +9058,13 @@ var py=(py0+(roadlat0-lat10)*scale)*2;
 		   cos1road=road0co1[i];
 		   sin1road=road0si1[i];
 		   var dxxx=cos1*cos1road+sin1*sin1road;
-		   if(dxxx<0){cos1road=-cos1road;sin1road=-sin1road;}
+		   if(dxxx<0 && road0oneway[i]==0){cos1road=-cos1road;sin1road=-sin1road;}
 		   o2road=Math.min(o2road,diro1(1,dxxx*road0tan2[i]));
 	       dxy=-cos1*road0si1[i]+sin1*road0co1[i];
 		   o3road=diro1(1,dxy*road0tan2[i]);
+		   xroad=road0x[i];
+		   yroad=road0y[i];
+		   ixyroad=i;
 		  }//return 1;
 		 }
 	   }
@@ -9079,7 +9108,7 @@ var py=(py0)*2;
 	     dxy=dx*roadco1[i]+dy*roadsi1[i];
 		 if(dxy>-2 && dxy<roadl[i]+2){
 		   var zroad=roadz[i]+dxy*roadtan2[i];
-		   if(Math.abs(zroad-pz0)<0.5){return 1;}
+		   if(Math.abs(zroad-pz0-0.2)<0.7){return 1;}
 		 }
 	   }
 	 }
@@ -9387,7 +9416,7 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	 dy=py-road0y[i]-road0l[i]*road0si1[i]/2;
 	 if(Math.abs(dy)<r){
 	 if(Math.abs(dy-dxy*cos1)<r){
-       var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]-sin2/2)*road0l[i]-z);
+       var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]/2-sin2/2)*road0l[i]-z);
 	   if(dx*cos1+dy*sin1<0 && dxxh>0){
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
@@ -9985,6 +10014,7 @@ if(way.nodes){
    var drtree=999,drtree5=5;
    var latxx=0,lonxx=0,latxxx=0,lonxxx=0;
    var dzlayer=Math.max(0,layer*0.82);//0.015);
+   if(layer<=-2){dzlayer=-ztunnel;}
    var smallbridge=0;
    var xxx0=0,yyy0=0,zzz0=0,r0=0,co10=0,si10=0;
    if((layer>0 || bridge>0) &&(jmax<5)){smallbridge=1;dzlayer=Math.max(dzlayer,0.82);}
@@ -10012,6 +10042,7 @@ if(way.nodes){
 	   if(jstart==0){jstart=j+1;//context.moveTo(xx,yy);
 			if(layernode2[inode]){if(layernode2[inode]>1.9){dhr2=0.82;}
 			else if(layernode[inode]){dhr2=Math.max(0,Math.min(0.82,layernode[inode]*0.82));}}
+			if(layer<=-2){dhr2=-ztunnel;}
 	        zz+=dhr2;
 	   }else{//context.lineTo(xx,yy);
 	        dxx=xx-xxx;dyy=yy-yyy;
@@ -10033,7 +10064,8 @@ if(way.nodes){
 			if(j==jmax){dhr2=0;}
 			if(layernode2[inode]){if(layernode2[inode]>1.9){dhr2=0.82;}
 			else if(layernode[inode]){dhr2=Math.max(0,Math.min(0.82,layernode[inode]*0.82));}}
-			else if(j>1 && j<jmax-1){zz+=dzlayer;}
+			else if(j>1 && j<jmax-1 || layer<=-2){zz+=dzlayer;}
+			if(layer<=-2){dhr2=-ztunnel;}
 			dr0=dr;
 			var co1=dxx/dr,si1=dyy/dr;
 			var tan2=(zz-zzz)/(dr);
@@ -10170,12 +10202,16 @@ if(way.nodes){
 			              //zz1=zz;
 						  }
 			else if(layer>=1){zz=(getterrainheight(lonxx,latxx)+dhr);
-			           if(ii<di){zz+=dzlayer;}
+			           if(ii<di){zz+=dzlayer;}else{zz+=dhr2;}
+			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
+			else if(layer<=-2){zz=(getterrainheight(lonxx,latxx)+dhr);
+					   if(ii<di){zz+=dzlayer;}else if(j<jmax){zz+=dhr2;}
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
 			else{zz=getterrainheight(lonxx,latxx)+dhr;}
 			//zz=getterrainheight(lonxx+dlonxx,latxx+dlatxx);
 			//zz=Math.max(zz,getterrainheight(lonxx-dlonxx,latxx-dlatxx));
 			if(zz<0){zz=0;}
+			if(ii==1 && j==jstart){zzz-=dhr2;}
 			tan2=(zz-zzz)/dr;
 		    var testband=0;
 	    	if(r>0.68 && bridge==0 && layer==0){
@@ -10196,6 +10232,7 @@ if(way.nodes){
 			  roadz[iroad]=zzz;
 			  roadoneway[iroad]=oneway;
 			  roadcross[iroad]=0;
+			  roadlayer[iroad]=layer;
 			  iroadcross=iroad;
 			  iroad+=1;
 			}
@@ -10380,6 +10417,17 @@ if(way.nodes){
 					//if(oneway==0){
 			         addbar(xxx+dx0*1.1,yyy+dy0*1.1,zzz,dr*0.9,co1,si1,tan2,0.85,1,-1);
 					//}
+					}
+			else if(layer<=-2){
+			     var kr=1,kr1=1;if(r>1){kr=1.3;kr1=1.193;}
+				 var xxx0=xxx+(r*kr1)*si1,yyy0=yyy-(r*kr1)*co1;
+			     var xxx1=xxx-(r*kr1)*si1,yyy1=yyy+(r*kr1)*co1;
+				 var hi=12,icolor=5;if(j==jstart && ii<=2 || j==jmax && ii>=di-1){hi=17+5;}
+				 for(var p=0.8;p<3;p++){
+				    addbar(xxx0+co1*dr*p/3,yyy0+si1*dr*p/3,zzz,1,co1,si1,tan2,hi,icolor,1);
+				    //if(oneway==0){
+				    addbar(xxx1+co1*dr*p/3,yyy1+si1*dr*p/3,zzz,1,co1,si1,tan2,hi,icolor,-1);
+					}
 					}
 			else if(taddbar>0){addbar(xxx+(r*1.3)*si1,yyy-(r*1.3)*co1,zzz,dr,co1,si1,tan2,1,0,1);}
 			xxx=xx;yyy=yy;zzz=zz;
@@ -10597,6 +10645,7 @@ function updateiroad(){
       road0z[i]=roadz[i];
       road0oneway[i]=roadoneway[i];
 	  road0cross[i]=roadcross[i];
+	  road0layer[i]=roadlayer[i];
    }
    iroad0=iroad;
    roadlng0=lngx0;
@@ -13256,4 +13305,5 @@ setTimeout('radiomsg("hello,how are you");',4000);
 </script>
 </body>
 </html>
+
 
