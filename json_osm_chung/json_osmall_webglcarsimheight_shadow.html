@@ -9887,6 +9887,7 @@ for(var i=iway;i<ways.length;i++){
 	  if(way.tags.oneway){var tag=way.tags.oneway;
 	                      if(tag=="yes" || tag=="true" || tag=="1"){oneway=1;}}}
 	if(way.tags.layer){layer=Math.min(1,way.tags.layer+0);}
+	if(layer<=-1){layer=-2;}
 	if(way.tags.bridge){bridge=1;layer=Math.max(0,layer);}
 	if(way.tags["bridge:structure"]){structure=way.tags["bridge:structure"];}
 	if(way.tags["building:colour"]){colour=way.tags["building:colour"];}
