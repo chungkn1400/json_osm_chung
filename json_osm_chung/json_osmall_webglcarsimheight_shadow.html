@@ -2163,12 +2163,13 @@ function sleep(ms){
 var t=timer()+Math.min(10000,ms);
 while(timer()<t){}
 }
-function getterrainheightcar(lngx,latx){
+function getterrainheightcar(lngx,latx,lastz0){
 var xx=((lngx-lng0)/klon)*scale;
 var yy=(latx-lat0)*scale;
-if(ttunnel==0){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}
-else if(ttunnel==2){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.1);}
-else{troad=testroadcar(xx,yy,lastz,lat0,lng0,1.05);}
+if(ttunnel==0 && lastz0<-99){troad=testroadcar(xx,yy,-9999,lat0,lng0,0.5);}
+else if(ttunnel==0){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}
+else if(ttunnel==2){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}//0.1
+else{troad=testroadcar(xx,yy,lastz-0.3,lat0,lng0,1.05);}
 if(troad>0){return zroad;}
 return getterrainheight(lngx,latx);
 }
@@ -2216,7 +2217,8 @@ var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
 var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0;
 var piloto10=0,tpiloto10=0,oldx=[],oldy=[],ioldxy=0,oldxy=0;
-var lastcos1road=1,lastsin1road=0,lastxroad=0,lastyroad=0,ttunnel=0;
+var lastcos1road=1,lastsin1road=0,lastxroad=0,lastyroad=0,ttunnel=0,lastlatx=0,lastlngx=0;
+var zsolprev=0,troadprev=0,ttunnelprev=0,ttesttunnel=0,dzsol0=0;
 for(var i=0;i<=10;i++){oldx[i]=9999999;oldy[i]=9999999;}
 function testkeys() {
 if(tframe>tloadingreverse && tmap==0){
@@ -2273,24 +2275,40 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	var dt=dtime;lastz=zsol;lastz=z-0.69;if(tfoot==0){lastz=z-0.8;}//timer1-timer0;
 	if(dt>300){dt=300;}
 	o10=o1;o20=o2;o30=o3;
-	var zsolprev=zsol,troadprev=troad,ttunnelprev=ttunnel;
-	zsol=getterrainheightcar(lngx,latx);
+	zsolprev=zsol;troadprev=troad;ttunnelprev=ttunnel;
+	if(tinit<2){ttunnelprev=0;ttesttunnel=0;lastlatx=999;}
+	if(tframe>ttesttunnel+4000 || lastlatx>99){zsol=getterrainheightcar(lngx,latx,lastz);}
+	else{latx=lastlatx;lngx=lastlngx;
+         x=((lngx-lng0)/klon)*scale;
+         y=(latx-lat0)*scale;
+         zsol=getterrainheightcar(lngx,latx,-999);}
 	var testwater=twater;
-	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;}
-	if(troad==0 && troadprev==1 && ttunnelprev==1){
-	      //soundcrash();
-	      var co1=lastcos1road,si1=lastsin1road;
-		  var dxx=3;if((x-lastxroad/2)*lastsin1road-(y-lastyroad/2)*lastcos1road>0){dxx=-dxx;}
-	      lngx+=dxx*0.3*si1*klon/scale;
-	      latx-=dxx*0.3*co1/scale;
-	      x+=dxx*0.3*si1;y-=dxx*0.3*co1;pautoroad=-1;
-		  if((tautopilot==0 || Math.random()<0.75) && cos1*co1+sin1*si1<0){o1=diro1(-co1,-si1);cos1=-co1;sin1=-si1;}
-		  else{o1=diro1(co1,si1);cos1=co1;sin1=si1;}
+	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;
+	             lastlatx=latx;lastlngx=lngx;}
+	if(troad==0 && troadprev==1 && ttunnelprev>=1 && lastlatx<99){
+      if(ttunnelprev==2 && Math.random()<0.1){lastlatx=999;}
+	  else{
+	    if(tautopilot==0){soundcrash();}
+	    var co1=lastcos1road,si1=lastsin1road;
+		var dxx=3;if((x-lastxroad/2)*lastsin1road-(y-lastyroad/2)*lastcos1road>0){dxx=-dxx;}
+	    lngx+=dxx*0.3*si1*klon/scale;
+	    latx-=dxx*0.3*co1/scale;
+	    x+=dxx*0.3*si1;y-=dxx*0.3*co1;pautoroad=-1;
+		if((tautopilot==0 || Math.random()<0.75) && cos1*co1+sin1*si1<0){o1=diro1(-co1,-si1);cos1=-co1;sin1=-si1;}
+		else{o1=diro1(co1,si1);cos1=co1;sin1=si1;}
+	    zsol=zsolprev;
+	    zsol=getterrainheightcar(lngx,latx,lastz);
+		if(troad==0){
+		  latx=lastlatx;lngx=lastlngx;
+          x=((lngx-lng0)/klon)*scale;
+          y=(latx-lat0)*scale;
+		  ttesttunnel=tframe;
 	      zsol=zsolprev;
-	      zsol=getterrainheightcar(lngx,latx);
-	}
-	ttunnel=0;if(troad==1){if(road0layer[ixyroad]<=-2){
-	            if(Math.abs(road0tan2[ixyroad])<0.1){ttunnel=1;}else{ttunnel=2;}}}
+	      zsol=getterrainheightcar(lngx,latx,-999);}
+	}}
+	ttunnel=0;if(troad==1){if(road0layer[ixyroad]<=-1){
+	            if(road0layer[ixyroad]<=-2){ttunnel=1;}else{ttunnel=2;}}}
+	if(ttunnel>=1){ttesttunnel=0;}
     if (keys[vk_q]){
 	   if(tfly==0 || tfoot==1){tfly=1;z+=dt*0.002;}
        else{tfly=0;}
@@ -2752,6 +2770,7 @@ testx=0;
 if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
 if(tframe>dtloading+20000){dtloading=tframe;resetkeys();
 	      tloadsol=tframe+50000;
+		  tdrawsol=tframe+9900;
 		  tupdatesoltexture=2;loading=77;tdraw=0;tdraw2=0;
 		  updatesoltexture();return;}
 if(loading==0){
@@ -2975,9 +2994,11 @@ if(twebaudio==1 && tradio==0){
 		                    else{getways();};}
 		//if(tinit==1){tinit=2;tinitgmap=1;setTimeout("x00=999999;",8000);}
 		if(tinitgmap>=1 && (loading==0 || loading>25)){
-		     if(testsrtm>0.01){tdrawsol=0;}
+		     tdrawsol=tframe+9900;//if(testsrtm>0.01){tdrawsol=0;}
 		     loading=22;dtloading=tframe;tinitgmap=0;
-			 latsol0=latsol;lngsol0=lngsol;
+			 //latsol0=latsol;lngsol0=lngsol;
+		     latsol0=latsol;lngsol0=lngsol;
+		     dlatsol0=dlatsol;dlngsol0=dlngsol;
 			 if(tupdatesoltexture==99){tupdatesoltexture=0;tloadsol=tframe+9999000;}
 			 initgmap();
 		     loading=1;tskip2=timer()+dtime+400;
@@ -3038,7 +3059,7 @@ if(twebaudio==1 && tradio==0){
 		   dtinitmap=Math.min(dtinitmap,tframe-3000);
 		   setsnow();
 		   trottoirx=999999;settrottoir();
-		   tdraw=0;tdrawsol=1;
+		   tdraw=0;tdrawsol=Math.min(tdrawsol,tframe+2000);
 		   }
 		if(itime%30==1){
 		 if(tmap==4){scrollTo(0,4000);}else{scrollTo(0,0);}
@@ -4296,6 +4317,8 @@ function updatesoltexture2(){
 
 var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
 var latsol0=lat,lngsol0=lng;
+var latsol00=lat,lngsol00=lng;
+var dlatsol0=1,dlngsol0=1;
 function getmap(zoom,lat,lng,size,type0,scale){
 var type=type0;
 if(type=="jpg"){type="jpg-baseline";}
@@ -4738,7 +4761,7 @@ var tshadownight=0;
 	var cos22=1,sin22=0,cos13=1,sin13=0,o1view=0;
 	var dxview=1;
     var vm2=0,vm20=0,do222=0,o222=0,o333=0,o1save=0,cos1save=1,sin1save=0;
-	var o1head=0;
+	var o1head=0,zview=0;
 	function drawScene() {
 	o1save=o1;cos1save=cos1;sin1save=sin1;
     gl.clearColor(0.85,0.85,1.0, 1.0);
@@ -4775,6 +4798,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		   if(tfoot==1){
 		      tmouse3move=0;tmouse2move=0;
 		      var zz=Math.max(0.2+zsol,z-0.35);//0.29
+			  zview=zz;
 		      mat4.lookAt([x,y,zz],[x+cos1*cos2,y+sin1*cos2,zz+sin2],[0,0,1],mvMatrix);
 		   }else if(iview==1){
 			var o13=0;
@@ -4792,17 +4816,19 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 			var sin133=Math.sin(degtorad(o1view));
 			var xx=x-1.7*cos133*dxview,yy=y-1.7*sin133*dxview;
 			var zz=Math.max(z-0.17-0.2*(1-dxview),0.1+getterrainheight2(xx,yy));
-		    var zzz=Math.max(0.1,z-0.7);
+		    var zzz=Math.max(0.1-ztunnel,z-0.7);
 			if(tfly==0){zz=Math.max(zsol+0.2,zz);zzz=Math.max(zsol+0.2,zzz);}
 			sin22=(zzz-zz)/Math.sqrt(2*2+(zzz-z)*(zzz-z));
+			zview=zz;
 			mat4.lookAt([xx,yy,zz],[x,y,zzz],[0,0,1],mvMatrix);
 			o1=o1view;cos1=cos133;sin1=sin133;
 		   }else{
-		    var zz=Math.max(0.1,z-0.551);//0.46);//0.551);
+		    var zz=Math.max(0.1-ztunnel,z-0.551);//0.46);//0.551);
 		    var o11=o1-mouse2dx*18;if(tmouse3move==1){o11=o1-mouse3dx*18;}
 			o11+=o1head;
 			var co1=Math.cos(degtorad(o11)),si1=Math.sin(degtorad(o11));
 			if(tfly==0){zz=Math.max(zsol+0.2,zz);}
+			zview=zz;
 			mat4.lookAt([x,y,zz],[x+co1*co2,y+si1*co2,zz+mouse2dy*0.45+(si2+0.3*sin2)/1.3],[-co1*si2-si1*si3,-si1*si2+co1*si3,co2*co3],mvMatrix);
 		    o1=o11;cos1=co1;sin1=si1;
 		   }
@@ -7690,28 +7716,34 @@ for(var i=Math.max(1,i0-di);i<Math.min(nsol-1,i0+di);i++){
  }
 }
 }
-var xsol=0,ysol=0,zsol0=-0.02;
+var xsol=0,ysol=0,zsol0=-0.02,xsol0=0,ysol0=0;
 var scalez=1,tloadsol=0,tsea0=0,tdrawsol=0;
 function drawsol(){
 if(tdrawsol==0 && ttunnel==0){return;}
 //xsol=parseInt(x/100)*100;
 //ysol=parseInt(y/100)*100;
     var sc=1;//scalez;
-	var scx=(dlngsol/klon)*scale;
-	var scy=dlatsol*scale;
+	var scx=(dlngsol0/klon)*scale;
+	var scy=dlatsol0*scale;
 xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
 ysol=(latsol0-lat0)*scale-scy/nsol;
-   
 //if(tupdatesoltexture==1){return;}
 	
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.6 || Math.abs(ysol-y)>scy*0.6)){//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
+		  tdrawsol=tframe+9900;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
 	mvPushMatrix();
     //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [xsol,ysol,zsol0]);
+	if(tframe>tdrawsol){dzsol0=zview;xsol0=lngsol0;ysol0=latsol0;}
+	else if(ttunnelprev>=1 && tframe<tdrawsol-401){tdrawsol=tframe+300;z=zsol+0.7;}
+	else if(tframe<tdrawsol-401){tdrawsol=tframe+300;z=Math.max(dzsol0+0.6,zsol+0.3);}
+	if(tframe>tdrawsol){mat4.translate(mvMatrix, [xsol,ysol,zsol0]);}
+	else{var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
+         var ysol1=(ysol0-lat0)*scale-scy/nsol;
+	     mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0)]);}
 	mat4.scale(mvMatrix,[scx,scy,sc]);
 	gl.activeTexture(gl.TEXTURE7);
     gl.bindTexture(gl.TEXTURE_2D,  solTexture);
@@ -9050,9 +9082,11 @@ var py=(py0+(roadlat0-lat10)*scale)*2;
 		  var zroad1=road0tan2[i]*dxy+road0z[i];
 		  dxx=0.37-Math.abs(zroad1-0.22-pz0);//cos1*road0co1[i]+sin1*road0si1[i];
           //if(Math.abs(dxx)>Math.abs(dxx0)){
-          if(zroad1<zsol+0.1){dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.12-pz0));
+          if(road0layer[i]<=-1){dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.12-pz0));
 		                       dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.42-pz0));		  
-		                       dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.84-pz0));}		  
+		                       dxx=Math.max(dxx,0.55-Math.abs(zroad1+0.84-pz0));		  
+		                       if(pz0<-99){dxx=0.75;};
+							   }		  
           if(dxx>dxx0-0.15){		  
 		   test=1;
 		   dxx0=Math.max(dxx,dxx0);
@@ -10209,7 +10243,7 @@ if(way.nodes){
 			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
 			else if(layer<=-2){zz=(getterrainheight(lonxx,latxx)+dhr);
 					   if(ii<di){zz+=dzlayer;}else if(j<jmax){zz+=dhr2;}
-			              zz=Math.max(zz,zz1+(zz2-zz1)*ii/(di));}
+			              }
 			else{zz=getterrainheight(lonxx,latxx)+dhr;}
 			//zz=getterrainheight(lonxx+dlonxx,latxx+dlatxx);
 			//zz=Math.max(zz,getterrainheight(lonxx-dlonxx,latxx-dlatxx));
@@ -10236,6 +10270,7 @@ if(way.nodes){
 			  roadoneway[iroad]=oneway;
 			  roadcross[iroad]=0;
 			  roadlayer[iroad]=layer;
+			  if(layer<=-2){if((ii==1 && j==jstart)||(ii==di && j==jmax)){roadlayer[iroad]=-1;}}
 			  iroadcross=iroad;
 			  iroad+=1;
 			}
@@ -10368,7 +10403,7 @@ if(way.nodes){
 			    if(oneway==1){addcross(xx+(r+0.15)*(si1),yy-(r+0.15)*(co1),zz+zsol0,r+100,co1,si1);
 			                  addcross(xx-(r+0.15)*(si1),yy+(r+0.15)*(co1),zz+zsol0,r+100,co1,si1);}
 
-			addwoman(xx-(r+0.4)*(si1-co1),yy+(r+0.4)*(co1+si1),zz+zsol0,r,-si1,co1);}
+			if(layer==0){addwoman(xx-(r+0.4)*(si1-co1),yy+(r+0.4)*(co1+si1),zz+zsol0,r,-si1,co1);}}
 			index=indexroadband;
 		    append(roadbandvertices,[
               xxx-dx0,yyy-dy0,zzz,
@@ -11569,7 +11604,13 @@ if(tgirlimage==2){tgirlimage=1;var i=w/4,j=h/4;
 else{tgirlimage=2;var i=w/2.5,j=h/2.5;
        context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
 }
-function subtest(){return;
+function subtest(){tloadsol=0;tdrawsol=tframe-1;//return;
+	   if(tupdatesoltexture==0 || tframe>tloadsol){
+	      tloadsol=tframe+50000;
+		  tdrawsol=tframe+9900;
+		  tupdatesoltexture=2;loading=66;
+		  updatesoltexture();return;}
+		  return;
 var srtmfich='http://caper.ws/terrain-srtm30-plus/tms7/14/24.png';
 var srtmimg=new Image();
 //srtmimg.crossOrigin = "anonymous";
