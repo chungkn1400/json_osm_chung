@@ -7743,7 +7743,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	if(tframe>tdrawsol){mat4.translate(mvMatrix, [xsol,ysol,zsol0]);}
 	else{var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
          var ysol1=(ysol0-lat0)*scale-scy/nsol;
-	     mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0)]);}
+	     mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0-0.15-tfoot*0.2)]);}
 	mat4.scale(mvMatrix,[scx,scy,sc]);
 	gl.activeTexture(gl.TEXTURE7);
     gl.bindTexture(gl.TEXTURE_2D,  solTexture);
