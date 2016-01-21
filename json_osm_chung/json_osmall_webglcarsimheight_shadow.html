@@ -2684,8 +2684,12 @@ if(keys[vk_m]){
  else{ 
    if(tmap==0){tmap=2}
    else if(tmap==2){tmap=1;}
-   else if(tmap==1){tmap=3;}
-   else if(tmap==3){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
+   //else if(tmap==1){tmap=3;}
+   else if(tmap==1){tmap=5;substreetview2();}
+   else if(tmap==5){tmap=4;quitstreetview();showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
+   //else if(tmap==3){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
+   //else if(tmap==4){tmap=5;substreetview2();}
+   //else if(tmap==5){tmap=0;quitstreetview();}
    else{tmap=0;}
    if(tmap!=4){hidemap();}
    context.clearRect (0,0,canvas.width,canvas.height);
@@ -2696,7 +2700,10 @@ if(keys[vk_m]){
    }
    sleep(200);
    resetkeys();}
-if(keys[vk_space] && tmap>0){tmap=0;
+if(keys[vk_space] && tmap>0){
+   if(tmap==5){quitstreetview();}
+   tmap=0;
+   hidemap();
    context.clearRect(0,0,canvas.width,canvas.height);
    resetkeys();}
 if(keys[vk_c]){
@@ -13324,10 +13331,28 @@ document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
 }
 }
+function substreetview2(){
+if(tstreetview==0){
+tstreetview=1;
+var urlstreetview="https:"+"//30239318f214b2cdc3b069138f22a3fbc2a194c6.googledrive.com/host/0B6GM9ay7ImZLV1ZBV0w0U1pPRGs/mystreetview.html?"+latx+"&"+lngx+"&"+o1;
+document.getElementById('streetview').src=showosmmapurl();	
+setTimeout("document.getElementById('quitstreetview').focus();",300);
+setTimeout("document.getElementById('quitstreetview').focus();",500);
+}else{tstreetview=0;
+document.getElementById('streetview').src="";
+document.getElementById('streetview').blur();
+}
+}
 function quitstreetview(){
 tstreetview=0;
 document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
+if(keys[vk_space] && tmap>0){
+   tmap=0;
+   hidemap();
+   context.clearRect(0,0,canvas.width,canvas.height);
+   resetkeys();}
+else if(tmap==5){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
 }
 var ntri=0,ndraw=0;
 function gl_drawArrays(glTRIANGLES, x0, numItems){
@@ -13335,6 +13360,15 @@ ndraw+=1;ntri+=numItems/3;gl.drawArrays(glTRIANGLES, x0, numItems);
 }
 function gl_drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0){
 ndraw+=1;ntri+=numItems/3;gl.drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0);
+}
+function showosmmapurl(){
+var dlat=0.001,dlon=0.001*klon;
+var lat1=latx-dlat,lat2=latx+dlat,lng1=lngx-dlon,lng2=lngx+dlon;
+//var osmmapsrc="https://www.openstreetmap.org/?minlon="+lng1+"&minlat="+lat1+"&maxlon="+lng2+"&maxlat="+lat2+"&mlat="+latx+"&mlon="+lngx;
+//var osmmapsrc=http://www.openstreetmap.org/export/embed.html?bbox=33.49883794784546%2C44.61190236910504%2C33.52287054061889%2C44.62091409166478&amp;layer=mapnik&amp;marker=44.61640840520352%2C33.51085424423218"4.6164&amp;mlon=33.5109#map=16/44.6164/33.5109
+var osmmapsrc="https://www.openstreetmap.org/export/embed.html?bbox="+lng1+"%2C"+lat1+"%2C"+lng2+"%2C"+lat2+"&amp;layer=mapnik&amp;";
+//document.location.href=osmmapsrc;
+return osmmapsrc;
 }
 var thour=0;
 var hour=new Date().getHours()+new Date().getMinutes()/60.0+ thour;
