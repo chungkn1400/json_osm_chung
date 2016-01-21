@@ -993,12 +993,18 @@ nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C
 var nodekey,nodekey2,nodekey3,nkeymax=450;
 //nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
 var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];
+var iwaylat=[],iwaylng=[];for(var i=0;i<=2;i++){iwaylat[i]=999;iwaylng[i]=999;};
 function waycallback(r){//alert(r);
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  iiways+=1;if(iiways>2){iiways=0;}
+  if(tilat==1 || tinit<2){iiways+=1};if(iiways>2){iiways=0;}
+  /*var dist0=0;
+  for(var i=0;i<=2;i++){var dx=Math.abs(iwaylat[i]-latx)+0.0000001,dy=Math.abs(iwaylng[i]-lngx)/klon+0.0000001;
+                        var dist=dx*dx+dy*dy;
+                        if(dist0<dist){dist0=dist;iiways=i;}}
+  iwaylat[iiways]=latx;iwaylng[iiways]=lngx;*/
   if(wayjson.elements){iways[iiways]=wayjson.elements;}
   ways=iways[0];
   var j=ways.length;
@@ -1067,7 +1073,7 @@ function nodecallback(r){//alert(r);
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
-  iinodes+=1;if(iinodes>2){iinodes=0;}
+  iinodes=iiways;//iinodes+=1;if(iinodes>2){iinodes=0;}
   inodes[iinodes]=[];
   if(nodejson.elements){inodes[iinodes]=nodejson.elements;}
   nodes=inodes[0];
