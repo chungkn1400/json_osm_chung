@@ -999,12 +999,12 @@ function waycallback(r){//alert(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  //if(tilat==1 || tinit<2){iiways+=1};if(iiways>2){iiways=0;}
-  var dist0=0;
+  if(tilat==1 || tinit<2){iiways+=1};if(iiways>2){iiways=0;}
+  /*var dist0=0;
   for(var i=0;i<=2;i++){var dx=Math.abs(iwaylat[i]-latx)*1000,dy=(Math.abs(iwaylng[i]-lngx)/klon)*1000;
                         var dist=dx*dx+dy*dy;
                         if(dist0<dist){dist0=dist;iiways=i;}}
-  iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;
+  iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;*/
   if(wayjson.elements){iways[iiways]=wayjson.elements;}
   ways=iways[0];
   var j=ways.length;
