@@ -1979,7 +1979,8 @@ if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
 }
 function subhelp(){
 var crlf=String.fromCharCode(13)+String.fromCharCode(10);
-var msg="H => help  /  shift+H => shadow(on/off)"+crlf;
+var msg="H => help"+crlf;
+msg+="shift+H => shadow(on/double/off)"+crlf;
 msg+="esc => quit"+crlf;
 msg+="3 => fullscreen"+crlf;
 msg+="4 => cssscale (lowerres/faster)"+crlf;
@@ -3730,7 +3731,7 @@ function initGL(canvasgl){
 		}
     }
 function initrtttexture(){
-        var s1024=1024,h1024=1024;
+        var s1024=1024,h1024=2048;
         rttFramebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
         rttFramebuffer.width = s1024;
