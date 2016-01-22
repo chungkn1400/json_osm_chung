@@ -1080,7 +1080,7 @@ function nodecallback(r){//alert(r);
   var j=nodes.length;
   for(var i=0;i<inodes[1].length;i++){nodes[j+i]=inodes[1][i];}
   j=nodes.length;
-  for(var i=0;i<inodes[1].length;i++){nodes[j+i]=inodes[1][i];}
+  for(var i=0;i<inodes[2].length;i++){nodes[j+i]=inodes[2][i];}
   //msg+="len="+nodes.length;
   if(resetnode==1){latnodes=[];lonnodes=[];
                    nodesignal=[];}
@@ -11844,6 +11844,7 @@ if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
                trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
 			   trottoirr[ntrottoir]=(Math.abs(latmid-latmid2)+Math.abs(lonmid-lonmid2)/klon)/2;
 			   ntrottoir+=1;}
+var droofmax=80;
 if(h0>3 || hmin>0.1){//tower
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
@@ -11948,7 +11949,8 @@ if(h0>3 || hmin>0.1){//tower
      r=Math.sqrt(dxx*dxx+dyy*dyy)+0.001;
      addtree(xx+dxx/r,yy+dyy/r,ztree);
    }
-  } 
+  }
+  if(larg<droofmax){  
    var hh=0;
    //hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
    hh=h+hh;
@@ -11980,7 +11982,7 @@ if(h0>3 || hmin>0.1){//tower
             ]);
 			itextroof=index;
 		}}
-	}
+	}}
 }else if(larg>12*h0){//commercial 
    if(h00==0){h=Math.max(0.5,Math.min(3,larg/12));}
    var jstart=0;
@@ -12042,6 +12044,7 @@ if(h0>3 || hmin>0.1){//tower
    var r=Math.sqrt(dxx*dxx+dyy*dyy)+0.001;
    addtree(xx+dxx/r,yy+dyy/r,ztree);
   }
+  if(larg<droofmax){  
    var hh=0;
    //hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
    hh=h+hh;
@@ -12073,7 +12076,7 @@ if(h0>3 || hmin>0.1){//tower
             ]);
 			itextroof=index;
 		}}
-	}
+	}}
 }else if(ttower==0){//house
    if(larg>1.5 && h00==0){
      h=Math.max(h0,Math.min(3,h0*12*h0/larg));
@@ -12139,6 +12142,7 @@ if(h0>3 || hmin>0.1){//tower
    var r=Math.sqrt(dxx*dxx+dyy*dyy)+0.001;
    addtree(xx+dxx/r,yy+dyy/r,ztree);
   } 
+  if(larg<droofmax){  
    var hh=h0*0.2;
    hh=Math.max(hh,Math.min(xxmax-xxmin,yymax-yymin)/12);
    hh=h+hh;
@@ -12170,7 +12174,7 @@ if(h0>3 || hmin>0.1){//tower
             ]);
 			itextroof=index;
 		}}
-	}
+	}}
 }
 }
 function addforest(way){
