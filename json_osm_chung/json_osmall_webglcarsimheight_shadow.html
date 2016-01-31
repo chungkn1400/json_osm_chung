@@ -557,7 +557,8 @@ float r,g,b,color;
 		 }
 		 }}else{
            if(gl_FragColor.a<0.5){discard;}else{
-		    if(gl_FragColor.g>gl_FragColor.r*1.07){
+		    if(gl_FragColor.r>0.9){gl_FragColor*=1.6;}
+		    else if(gl_FragColor.g>gl_FragColor.r*1.07){
 			  gl_FragColor.rgb=gl_FragColor.g*ucolor.rgb;}
 		   }
 		 }
@@ -2456,7 +2457,7 @@ if(tfly==1){
 	    if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 		   var dxy=sin1*ncos1[i]-cos1*nsin1[i];
 		   dxx=cos1*ncos1[i]+sin1*nsin1[i];
-		   if(dxy<0.21 || dxx<0){
+		   if(dxy<0.22 || dxx<0){
 		      testxx=1;
 			  if(dxx<0){vcar-=vcar*dtime*0.0022;piloto1=0.7;}
 			  else{if(nvcar[i]>vcar-0.1){vcar+=vcar*dtime*0.002;vrun=1.29;
@@ -2465,9 +2466,9 @@ if(tfly==1){
               if(o3volant<0){o3volant=0.0;}
 			  break;}}}
 	  if(testxx==0){
-	    dxx=x+1.35*cos1-0.6*sin1-nx[i];
+	    dxx=x+1.35*cos1-0.86*sin1-nx[i];
 	    if(Math.abs(dxx)<1){
-	      var dyy=y+1.35*sin1+0.6*cos1-ny[i];
+	      var dyy=y+1.35*sin1+0.86*cos1-ny[i];
 	      if(Math.abs(dyy)<1 && Math.abs(nz[i]-z)<0.5){
 		   var dxy=sin1*ncos1[i]-cos1*nsin1[i];
 		   dxx=cos1*ncos1[i]+sin1*nsin1[i];
@@ -2576,7 +2577,9 @@ if(tfly==1){
 	  if (keys[vk_up] || mouseup || keys[165]) {vrun+=dt*0.0009;tgaz=1;
          if(vcar<0.051){latx+=v*sin1/2;lngx+=v*cos1*klon/2;}}
       if ((keys[vk_down] || mousedown)&& keys[vk_space]==0){vrun-=dt*0.0009;if(vrun<0){vrun=0;};
-         if(vcar<0.015 && vrun<0.001){latx-=v*sin1/2;lngx-=v*cos1*klon/2;vcar=-0.05;};}
+         if(vcar<0.015 && vrun<0.001){latx-=v*sin1/2;lngx-=v*cos1*klon/2;vcar=-0.05;
+					 tbrakes=tframe;
+		 };}
 		 //if (keys[33] || keys[vk_n] || button[1]) {vrun+=dt*0.0003;tgaz=1;};
      //if (keys[34] || keys[vk_b] || button[2]) {vrun-=dt*0.0003;if(vrun<0){vrun=0;};};
 	 //if(tgaz==0){if(vrun>1.50){vrun=1.50;};}
@@ -2586,6 +2589,7 @@ if(tfly==1){
 	 }
 	 if (keys[vk_page_up] || mousepageup || keys[vk_n] || button[1]) {vrun+=dt*0.0009;tgaz=1;};
      if (keys[vk_page_down] || mousepagedown || keys[vk_b] || button[2]) {vrun-=dt*0.0009;if(vrun<0){vrun=0;};
+					 tbrakes=tframe;
 	                                           vcar-=0.0014*dt*(vcar+0.05);
 											   if(vcar<0.001){vcar=0.001;};
 				         if(vcar<0.005 && vrun<0.001 && button[2]){latx-=v*sin1;lngx-=v*cos1*klon;vcar=-0.05;};}
@@ -2862,17 +2866,18 @@ if(tmap==0){
 		 if(do1pilot>2){piloto1=Math.min(1,do1pilot/4);}
 		 if(do1pilot<-2){piloto1=Math.max(-1,do1pilot/4);}
 	 for(var i=0;i<=ncar2;i++){
-      if(i!=typecar){	 
+	  var dxy=cos1*ncos1[i]+sin1*nsin1[i];
+      if(i!=typecar && ((nvcar[i]<vcar && dxy>0.92) || dxy<0)){	 
 	  var dxx=x+1.5*cos1+0.64*sin1-nx[i],testxx=0;
 	  if(Math.abs(dxx)<1){
 	    var dyy=y+1.5*sin1-0.64*cos1-ny[i];
-	    if(Math.abs(dyy)<1){
+	    if(Math.abs(dyy)<1 && Math.abs(z-nz[i])<0.5){
 		      piloto1=0.7;testxx=1;vcar-=vcar*dtime*0.005;break;}}
 	  if(testxx==0){
 	    dxx=x+1.5*cos1-0.64*sin1-nx[i];
 	    if(Math.abs(dxx)<1){
 	      var dyy=y+1.5*sin1+0.64*cos1-ny[i];
-	      if(Math.abs(dyy)<1){
+	      if(Math.abs(dyy)<1 && Math.abs(z-nz[i])<0.5){
 		      piloto1=-0.5;vcar-=vcar*dtime*0.005;break;}}
 	  }}}
 	  var ko3v=60/(60+Math.abs(o3volant));
