@@ -2970,7 +2970,7 @@ if(twebaudio==1 && tradio==0){
 
     var pix=new Uint8Array(16);
     var tframe=0,tframe0=0,tfps=30,fps=10,dtime=1,tmsg=0,clearr,clearg,clearb,tskip=0;
-	var ttimeout=0,testloop=0,tskip2=0,tsrtm=0,itime=0,tinit=0,dtinit=0;
+	var ttimeout=0,testloop=0,tskip2=0,tsrtm=0,itime=0,tinit=0,dtinit=0,timeinit=0;
 	var tmovertt=0,nextdx=0,nextdy=0,avgfps=10,trttok=1,ttestmouse=0;
 	var sunxsave=sunx,sunysave=suny,sunzsave=sunz;
 	function tick(tt) {
@@ -3081,6 +3081,8 @@ if(twebaudio==1 && tradio==0){
 		   updateroadarrow();
 		   testaddphotopanel();
 		   addcitypaneltest();
+		   if(tinit<2){timeinit=tframe;}
+		   if(tframe<timeinit+40000){loadcitypanel();}
 		   resetfindroad();
 		   for(var i=0;i<=10;i++){oldx[i]+=nextdx;oldy[i]+=nextdy;}
 		   tmovertt=1;
@@ -11403,6 +11405,78 @@ for(var i=0;i<ncitypanel;i++){
 	citypanelsi1[i]=0;
 	citypanelh[i]=1;
 	}
+var citypanelsave="";
+function savecitypanel(){
+citypanelsave=latx*100+"/"+lngx*100+"/"+o1+"/"+o2+"/$";
+for(var i=0;i<ncitypanel;i++){
+   citypanelsave+=citypanelr[i]+"/";
+   citypanelsave+=citypanelx[i]+"/";
+   citypanelsave+=citypanely[i]+"/";
+   citypanelsave+=citypanelz[i]+"/";
+   citypanelsave+=citypanelco1[i]+"/";
+   citypanelsave+=citypanelsi1[i]+"/";
+   citypanelsave+=citypanelh[i]+"/";
+   citypanelsave+=citypanelname[i]+"/";
+   citypanelsave+="$";
+ }
+if(localStorage){localStorage.setItem("webglcarsimheight_shadow_citypanelsave",citypanelsave);}
+}
+function clearcitypanelsave(){
+citypanelsave="";
+if(localStorage){localStorage.setItem("webglcarsimheight_shadow_citypanelsave",citypanelsave);}
+}
+function loadcitypanel(){
+if(localStorage){
+   citypanelsave=localStorage.getItem("webglcarsimheight_shadow_citypanelsave");
+   if(citypanelsave==null){return;};}
+else{return;}   
+var words=citypanelsave.split("$");
+var tword=words[0].split("/");
+//alert(tword[1]+"/"+lngx*100+"/");
+if(Math.abs(evaln(tword[0])-latx*100)>0.0015){return;}
+if(Math.abs(evaln(tword[1])-lngx*100)>0.0015){return;}
+//alert(tword[3]+"/"+o2+"/");
+if(Math.abs(evaln(tword[2])-o1)>0.15){return;}
+//if(Math.abs(evaln(tword[3])-o2)>0.0015){return;}
+//alert("ok");
+var nwords=Math.min(ncitypanel+1,words.length);
+for(var i=1;i<nwords;i++){
+    var word=words[i].split("/");
+   if(word[7]=="photo"){
+    var j=-1;
+    j+=1;citypanelr[i]=evaln(word[j]);
+    j+=1;citypanelx[i]=evaln(word[j]);
+    j+=1;citypanely[i]=evaln(word[j]);
+    j+=1;citypanelz[i]=evaln(word[j]);
+    j+=1;citypanelco1[i]=evaln(word[j]);
+    j+=1;citypanelsi1[i]=evaln(word[j]);
+    j+=1;citypanelh[i]=evaln(word[j]);
+    j+=1;citypanelname[i]=word[j];
+    //if(i==1){alert(citypanelname[i]);}
+    //if(i<=1){alert(citypanelh[i]);}
+	var name=citypanelname[i];
+	var h=citypanelh[i];
+    if(name=="photo" && citypanelr[i]>0.001){	
+	     icitypanel=i;
+		 if(h<2){setcitypaneltexture(icitypanel,name);}
+	 	 else if(name.toLowerCase().indexOf("airport")==0){
+	             citypanelh[icitypanel]=2.2;
+	             citypanelr[icitypanel]=0.8;
+		         setcitypaneltexture3(icitypanel,mytown1,mytown2);}
+		 else if(name!="photo"){
+	             //citypanelh[icitypanel]=2.7;
+	             //citypanelr[icitypanel]=Math.max(1.2,name.length*1.15/21.4);
+		         setcitypaneltexture2(icitypanel,mytown1,mytown2);}
+		 else{//ncitypanelTexture[icitypanel]=photoTexture;
+		      citypanelr[icitypanel]=1.2;}
+	}}
+ }
+}
+function testsavecitypanel(){
+ return;
+ savecitypanel();
+ loadcitypanel();
+}
 function seticitypanel(xx,yy,zz,name){
 var j=-1,jj=-1,dist=0;
    for(var i=0;i<ncitypanel;i++){
@@ -11637,7 +11711,9 @@ if(tgirlimage==2){tgirlimage=1;var i=w/4,j=h/4;
 else{tgirlimage=2;var i=w/2.5,j=h/2.5;
        context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
 }
-function subtest(){tloadsol=0;tdrawsol=tframe-1;//return;
+function subtest(){
+       testsavecitypanel();return;
+	   tloadsol=0;tdrawsol=tframe-1;//return;
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
 		  tdrawsol=tframe+9900;
@@ -12737,6 +12813,7 @@ function getparms(hash){
 function setlink(){
   tclose=1;
   alert("copy the adress bar to link to this place later");
+  savecookie();
   setsearchtxt();
   document.location.search=searchtxt;  
 }
@@ -12794,6 +12871,7 @@ function savecookie(){
 var mycookie="";
 var cookie0=document.cookie;
 setsearchtxt();
+savecitypanel();
 mycookie+=searchtxt;
 //alert(mycookie);  
 var pref="jsonosmwebglchung2=";
