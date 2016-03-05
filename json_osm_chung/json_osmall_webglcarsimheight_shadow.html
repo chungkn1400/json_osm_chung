@@ -194,8 +194,11 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
     void main(void) {
         vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
 		//xyz.y *=4.03;
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
 	    gl_Position= uPMatrix *xyz;
-		//if(max(abs(xyz.x),abs(xyz.y))>10.0){z=0.0;}
+		//if(abs(xyz.x)>8.0 || abs(xyz.y)>4.0){z=0.0;}
 		//else{
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -259,6 +262,9 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
     void main(void) {
         vec4 xyz= uMVMatrix * vec4(aVertexPosition, 1.0);
 		//xyz.y *=4.03;
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
 	    gl_Position= uPMatrix *xyz;
         vTextureCoord = aTextureCoord;
 		vec3 normal=aVertexNormal;
@@ -359,6 +365,11 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
         //gl_Position = (uMVMatrix*vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
 		//if(ushadow2==1){xyz.y *=4.03;}
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(ushadow2==1){
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
+		}
 		gl_Position = uPMatrix *xyz;
 		z0=-xyz.z-0.1;//-0.35;
 		if(z0<1.0){z0=0.0;}
@@ -638,6 +649,9 @@ float r,g,b,color;
 		}
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
 		//xyz.y *=4.03;
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -787,6 +801,9 @@ float decodefloatrgb( vec3 rgb ) {
 		//vTextureCoord3.y=aVertexPosition.y*30.0;// /2.5;
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
 		//xyz.y *=4.03;
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
 		if(z<1.0){z=0.0;}
@@ -890,6 +907,11 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 		//gl_Position = (uMVMatrix * vec4(x,y,z, 1.0));
         vec4 xyz= uMVMatrix * vec4(x,y,z, 1.0);
 		//if(ushadow2==1){xyz.y *=4.03;}
+		//float dxy=0.25*abs(xyz.y);//max(abs(xyz.x),abs(xyz.y));
+		if(ushadow2==1){
+		if(xyz.y>14.0){xyz.y=xyz.y*0.5+7.0;}
+		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
+		}
 		gl_Position = uPMatrix *xyz;
 		xyz0=xyz.xyz;
 		z0=-xyz.z-0.1;//-0.35;
@@ -4624,7 +4646,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       //gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     }
-var tshadow=1,distshadow=30,sunzz=1000,sunco2=0,sunsi2=1,sunco1=0,sunsi1=1;
+var tshadow=1,distshadow=30.0,kdxy=0.5,sunzz=1000,sunco2=0,sunsi2=1,sunco1=0,sunsi1=1;
 //var sunx=100,suny=-200,sunz=300;
 var tshadownight=0;
     function drawshadownight(irtt) {
@@ -4638,7 +4660,7 @@ var tshadownight=0;
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		distshadow=30.0;
 		if(noshadow==1){distshadow=60.0;}
-		var wx=distshadow,wy=distshadow;
+		var wx=distshadow,wy=distshadow*kdxy+7.0;
 		var sunxx=sunx-x,sunyy=suny-y,sunzz=sunz-z;
 		var dz=Math.max(0.01,Math.sqrt(sunxx*sunxx+sunyy*sunyy+sunzz*sunzz));
 		var dx=Math.max(0.01,Math.sqrt(sunxx*sunxx+sunyy*sunyy));
@@ -4647,7 +4669,7 @@ var tshadownight=0;
 		sunco1=-cos1;sunsi1=-sin1;
 	if(irtt==0){
         //mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,0.10, 1900.0, pMatrix);
-        mat4.ortho(-wx,wx,-wy,wy,300.3, 900.0, pMatrix);
+        mat4.ortho(-wx,wx,-wy,wy,5.3, 900.0, pMatrix);
     	//mat4.perspective(47, gl.viewportWidth / gl.viewportHeight, 0.2, 3000.0, pMatrix);//3000
 		var d300=300;
 		var xv=x+sunxx*d300/dz,yv=y+sunyy*d300/dz,zv=zsol+sunzz*d300/dz;//20*sunz+51000;
@@ -4657,7 +4679,7 @@ var tshadownight=0;
 		mat4.set(pMatrix,pMatrix0);
         mat4.set(mvMatrix,mvMatrix0);
    	}else{
-          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,300.3, 900.0, pMatrix);
+          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,5.3, 900.0, pMatrix);
 	      //mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
@@ -4708,7 +4730,7 @@ var tshadownight=0;
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		distshadow=30.0;
 		if(noshadow==1){distshadow=60.0;}
-		var wx=distshadow,wy=distshadow;
+		var wx=distshadow,wy=distshadow*kdxy+7.0;
 		var dz=Math.max(0.01,Math.sqrt(sunx*sunx+suny*suny+sunz*sunz));
 		var dx=Math.max(0.01,Math.sqrt(sunx*sunx+suny*suny));
 		sunco2=dx/dz;sunsi2=sunz/dz;
@@ -4716,7 +4738,7 @@ var tshadownight=0;
 	if(irtt==0){
         //last//mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,100.0, 1900.0, pMatrix);
         //mat4.ortho(-wx,wx,-wy*sunsi2,wy*sunsi2,10.0, 9000.0, pMatrix);
-        mat4.ortho(-wx,wx,-wy,wy,10.0, 10000.0, pMatrix);
+        mat4.ortho(-wx,wx,-wy,wy,5.0, 5000.0, pMatrix);
 		var xv=x+sunx*300/dz,yv=y+suny*300/dz,zv=zsol+sunz*300/dz;//20*sunz+51000;
 		mat4.lookAt([xv,yv,zv],[x,y,zsol],[-sunx,-suny,-0.1],mvMatrix);
    		//mat4.translate(mvMatrix, [234*windx/windy,220,-600]);//boussx
@@ -4724,7 +4746,7 @@ var tshadownight=0;
 		mat4.set(pMatrix,pMatrix0);
         mat4.set(mvMatrix,mvMatrix0);
    	}else{
-          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,10.0, 10000.0, pMatrix);
+          mat4.ortho(-wx/2,wx/2,-wy/2,wy/2,5.0, 5000.0, pMatrix);
 	      //mat4.set(pMatrix0,pMatrix);
 	      mat4.set(mvMatrix0,mvMatrix);
     }
