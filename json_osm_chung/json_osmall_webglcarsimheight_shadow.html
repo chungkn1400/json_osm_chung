@@ -10304,7 +10304,7 @@ if(way.nodes){
 			else{zz=getterrainheight(lonxx,latxx)+dhr;}
 			//zz=getterrainheight(lonxx+dlonxx,latxx+dlatxx);
 			//zz=Math.max(zz,getterrainheight(lonxx-dlonxx,latxx-dlatxx));
-			if(zz<0){zz=0;}
+			if(zz<-ztunnel){zz=-ztunnel;}
 			if(ii==1 && j==jstart){zzz-=dhr2;}
 			tan2=(zz-zzz)/dr;
 		    var testband=0;
