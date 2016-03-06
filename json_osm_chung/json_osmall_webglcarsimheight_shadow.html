@@ -9200,12 +9200,12 @@ var py=(py0)*2;
 	   dx=px-roadx[i];
 	   dy=py-roady[i];
 	   dxy=-dx*roadsi1[i]+dy*roadco1[i];
-	   if(Math.abs(dxy)<roadr[i]+r+0.5){
+	   if(Math.abs(dxy)<roadr[i]+r){
 	     dxy=dx*roadco1[i]+dy*roadsi1[i];
 		 if(dxy>-2 && dxy<roadl[i]+2){
 		   var zroad=roadz[i]+dxy*roadtan2[i];
 		   //if(Math.abs(zroad-pz0-0.2)<0.7){return 1;}
-		   if(Math.abs(zroad-pz0)<0.7*roadr[i]){return 1;}
+		   if(Math.abs(zroad-pz0)<0.5 && roadr[i]>1.7){return 1;}
 		 }
 	   }
 	 }
@@ -11182,8 +11182,9 @@ h=(0.075+0.025)*barh[i];
  var test=0;
  if(barcolor[i]==0){//not bridge
    test=testroad2((xx+xxx+barsi1[i]*rr*kscalex)/4,(yy+yyy-barco1[i]*rr*kscalex)/4,latx0,lngx0,rr/2.2);
- }else{var r4=6*barside[i]*1.7,zzzi=barz[i]+rr*bartan2[i];
-       test=testroad23((xx+xxx+barsi1[i]*(rr+r4)*kscalex)/4,(yy+yyy-barco1[i]*(rr+r4)*kscalex)/4,zzzi,latx0,lngx0,rr/2.2);
+ }else{var r4=barside[i],zzzi=barz[i]+rr*bartan2[i];
+       test=testroad23((xx+xxx+barsi1[i]*(r4)*kscalex)/4,(yy+yyy-barco1[i]*(r4)*kscalex)/4,zzzi,latx0,lngx0,0.45);
+       //test=testroad23((xx+xxx+barsi1[i]*(rr+r4)*kscalex)/4,(yy+yyy-barco1[i]*(rr+r4)*kscalex)/4,zzzi,latx0,lngx0,rr/2.2);
  }
  if(test==0){
    r=0;
