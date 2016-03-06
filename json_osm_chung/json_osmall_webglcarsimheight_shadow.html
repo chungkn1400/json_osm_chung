@@ -9200,12 +9200,12 @@ var py=(py0)*2;
 	   dx=px-roadx[i];
 	   dy=py-roady[i];
 	   dxy=-dx*roadsi1[i]+dy*roadco1[i];
-	   if(Math.abs(dxy)<roadr[i]+r){
+	   if(Math.abs(dxy)<roadr[i]+r+0.5){
 	     dxy=dx*roadco1[i]+dy*roadsi1[i];
 		 if(dxy>-2 && dxy<roadl[i]+2){
 		   var zroad=roadz[i]+dxy*roadtan2[i];
 		   //if(Math.abs(zroad-pz0-0.2)<0.7){return 1;}
-		   if(Math.abs(zroad-pz0-0.2)<0.7*roadr[i]){return 1;}
+		   if(Math.abs(zroad-pz0)<0.7*roadr[i]){return 1;}
 		 }
 	   }
 	 }
