@@ -3107,7 +3107,6 @@ if(twebaudio==1 && tradio==0){
 		   updateroadarrow();
 		   testaddphotopanel();
 		   addcitypaneltest();
-		   if(tinit<2){timeinit=tframe;}
 		   if(tframe<timeinit+40000){loadcitypanel();}
 		   resetfindroad();
 		   for(var i=0;i<=10;i++){oldx[i]+=nextdx;oldy[i]+=nextdy;}
@@ -13568,7 +13567,7 @@ while(hour>24){hour-=24;}
 while(hour<0){hour+=24;};
 try{initparms();}catch(e){alert("error initparms()");}
 //getways();
-getweather();
+getweather();timeinit=timer();
 initgooglemap();setTimeout("hidemap();",2000);
 setTimeout("getways();initwebgl();",3000);
 setTimeout('radiomsg("hello,how are you");',4000);
