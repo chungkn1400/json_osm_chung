@@ -3114,12 +3114,13 @@ if(twebaudio==1 && tradio==0){
 		   tmovertt=1;
            loading=0;dtloading=tframe;
 		   nextdx=0;nextdy=0;
-		   if(tinit==0){tinit=1;dtinit=tframe+8000;}
+		   if(tinit==0){tinit=1;dtinit=tframe+8000;tsequoia0=0;tsequoia=0;}
 		   msgload("");
 		   dtinitmap=Math.min(dtinitmap,tframe-3000);
 		   setsnow();
 		   trottoirx=999999;settrottoir();
 		   tdraw=0;tdrawsol=Math.min(tdrawsol,tframe+2000);
+		   tsequoia0=tsequoia;
 		   }
 		if(itime%30==1){
 		 if(tmap==4){scrollTo(0,4000);}else{scrollTo(0,0);}
@@ -3762,7 +3763,7 @@ function initGL(canvasgl){
 	var marisolTexture,womanTexture,churchTexture,boeingTexture;
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
-	var stationTexture,girlimage,girlimage2,girlimage3;
+	var stationTexture,girlimage,girlimage2,girlimage3,sequoiaTexture;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -4071,6 +4072,13 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
             handleLoadedTexture(tree3Texture);
         }
         tree3Texture.image.src = 'tree22.jpg';//pine
+
+        sequoiaTexture = gl.createTexture();
+        sequoiaTexture.image = new Image();
+        sequoiaTexture.image.onload = function () {
+            handleLoadedTexture(sequoiaTexture);
+        }
+        sequoiaTexture.image.src = 'treesequoia.jpg';//pine
 
         autumntreeTexture = gl.createTexture();
         autumntreeTexture.image = new Image();
@@ -4554,6 +4562,25 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 		  gl.uniform1f(treeProgram.cos1Uniform,k*cos1);
           gl.uniform1f(treeProgram.sin1Uniform,k*sin1);
 		}else{k=1.4+0.8*sunsi2;
+		  gl.uniform1f(treeProgram.cos1Uniform,k*sunco1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sunsi1);
+		}
+		gl.uniformMatrix4fv(treeProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, mvMatrix);
+	    //mat4.multiply(pMatrix,mvMatrix,pvMatrix);
+        //gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, pvMatrix);
+		gl.uniform1i(treeProgram.shadowUniform,tshadow);
+		gl.uniform1i(treeProgram.shadowUniform2,tshadow);
+        if(tshadownight==1){gl.uniform1f(treeProgram.lightUniform,2-tlight);}
+		else{gl.uniform1f(treeProgram.lightUniform,0);}
+        gl.uniform1f(treeProgram.fog,fog);
+   }
+   function setMatrixUniformstreesequoia() {
+        var k=3.5;if(tsequoia0==2){k=6.0;}
+		if(tshadow==0){
+		  gl.uniform1f(treeProgram.cos1Uniform,k*cos1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sin1);
+		}else{//k*=1.4+0.8*sunsi2;
 		  gl.uniform1f(treeProgram.cos1Uniform,k*sunco1);
           gl.uniform1f(treeProgram.sin1Uniform,k*sunsi1);
 		}
@@ -6982,6 +7009,7 @@ if(Math.abs(treetypez-zsol)>20 || tframe>ttreetype){
 		
 		mvPopMatrix();
 }
+var tsequoia=1,tsequoia0=1;
 function drawtree2(){
 /*if(Math.abs(treetypez-zsol)>20 || tframe>ttreetype){
  treetypez=zsol;ttreetype=tframe+4000;
@@ -6997,11 +7025,13 @@ function drawtree2(){
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE6);
   if(tautumn==0){
-    if(treetype==0){gl.bindTexture(gl.TEXTURE_2D,tree2Texture);
+    if(tsequoia0>=1){gl.bindTexture(gl.TEXTURE_2D,sequoiaTexture);
+    }else if(treetype==0){gl.bindTexture(gl.TEXTURE_2D,tree2Texture);
     }else{gl.bindTexture(gl.TEXTURE_2D,treeTexture);}
 	gl.uniform1i(treeProgram.samplerUniform, 6);
   }else{
-    if(treetype==0){gl.bindTexture(gl.TEXTURE_2D,autumntree2Texture);
+    if(tsequoia0>=1){gl.bindTexture(gl.TEXTURE_2D,sequoiaTexture);
+    }else if(treetype==0){gl.bindTexture(gl.TEXTURE_2D,autumntree2Texture);
     }else{gl.bindTexture(gl.TEXTURE_2D,autumntreeTexture);}
 	gl.uniform1i(treeProgram.samplerUniform, 6);
   }
@@ -7012,7 +7042,8 @@ function drawtree2(){
     gl.bindBuffer(gl.ARRAY_BUFFER, tree2VertexPositionBuffer[ibuff]);
     gl.vertexAttribPointer(treeProgram.vertexPositionAttribute, tree2VertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
     
-    setMatrixUniformstree(); 
+    if(tsequoia0==0){setMatrixUniformstree();}
+	else{setMatrixUniformstreesequoia();}
     gl_drawArrays(gl.TRIANGLES, 0, tree2VertexPositionBuffer[ibuff].numItems);
 		
 		mvPopMatrix();
@@ -9905,7 +9936,7 @@ context.clearRect (0,0,canvas.width-256,canvas.height);
 printlocationname();
 msgload("drawgl");
 iroad=0;itree=0;iline=0;icross=0;iwoman=0,iwall=0,iwalltree=0,ibar=0;
-iroadarrow=0;itree2=0;
+iroadarrow=0;itree2=0;tsequoia=0;
 roadlng=lngx0;roadlat=latx0;
 indexroad=0;
 itextroad=0;
@@ -10998,15 +11029,16 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
    //if(indextree<3*3*(ntree-1)){
    var zz=tree2z[i]+parseInt(getterrainheight3(xx/2,yy/2,lngx0,latx0)*100)/100;
    itree22+=1;
+   var htree=1;
    index=indextree;
     append(treevertices,[
               xx,yy,zz,
-			  xx,yy,zz+1,
+			  xx,yy,zz+htree,
 			  xx,yy,zz
             ]);
     indextree=index;
 	walltreex[iwalltree]=xx;walltreey[iwalltree]=yy;
-	walltreeh[iwalltree]=zz+1;iwalltree+=1;
+	walltreeh[iwalltree]=zz+htree;iwalltree+=1;
 	}
 }
 }}}
@@ -11027,19 +11059,22 @@ else{//} if(Math.abs(dxx)<50 && Math.abs(dyy)<50){
    tinittree22=0;
 var xx=xx2+((lngx2-lngx0)/klon)*scale*2;
 var yy=yy2+(latx2-latx0)*scale*2;
-if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
+if(testroad2(xx/2,yy/2,latx0,lngx0,0.1+tsequoia*0.55)==0){
    //if(indextree2<3*3*(ntree2-1)){
    var zz=tree22z[i]+parseInt(getterrainheight3(xx/2,yy/2,lngx0,latx0)*100)/100;
    itree222+=1;
+   var htree=1;
+   if(tsequoia==1){htree=9;}
+   if(tsequoia==2){htree=13;}
    index=indextree2;
     append(tree2vertices,[
               xx,yy,zz,
-			  xx,yy,zz+1,
+			  xx,yy,zz+htree,
 			  xx,yy,zz
             ]);
     indextree2=index;
 	walltreex[iwalltree]=xx;walltreey[iwalltree]=yy;
-	walltreeh[iwalltree]=zz+1;iwalltree+=1;
+	walltreeh[iwalltree]=zz+htree;iwalltree+=1;
 	}
 }
 }}}
@@ -12331,7 +12366,19 @@ function addforest(way){
 	   if(yy>yymax){yymax=yy;}
 	   }}
    var xmid=(xxmin+xxmax)/2;
-   var ymid=(yymin+yymax)/2;   
+   var ymid=(yymin+yymax)/2; 
+   var ddmin=9999;
+   for(var j=0;j<=jmax;j++){
+     var inode=way.nodes[j];
+	 if(latnodes[inode]){
+	   yy=(latnodes[inode]-latx0)*scale*2;
+	   xx=((lonnodes[inode]-lngx0)/klon)*scale*2;
+	   ddmin=Math.min(Math.abs(xx-xmid)+Math.abs(yy-ymid),ddmin);
+   }}
+   if(ddmin>9990){return;}
+   ddmin=ddmin+Math.min(xxmax-xxmin,yymax-yymin)/3;   
+   if(ddmin>200){tsequoia=2;}
+   if(ddmin>100 && tsequoia==0){tsequoia=1;}
    for(var j=0;j<=jmax+1;j++){
      var inode;
 	 if(j==(jmax+1)){inode=inode0;}
