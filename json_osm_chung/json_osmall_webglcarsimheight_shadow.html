@@ -2300,7 +2300,7 @@ tmove=0;trot=0;
 //var vcar0=vcar;
 var oo10=o1;
 var testx=0,v=0.00000015*dtime,vv=0.00000015*200;
-if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1){tfoot=0;};resetkeys();reseto3volant();}
+if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1.1){tfoot=0;o2=0;o3=0;};resetkeys();reseto3volant();}
 if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();resetkeys();}
 	tgaz=0;
 	//timer0=timer1;
@@ -2733,8 +2733,8 @@ if(keys[vk_m]){
  else{ 
    if(tmap==0){tmap=2}
    else if(tmap==2){tmap=1;}
-   //else if(tmap==1){tmap=3;}
-   else if(tmap==1){tmap=5;substreetview2();}
+   else if(tmap==1){tmap=3;}
+   else if(tmap==3){tmap=5;substreetview2();}
    else if(tmap==5){tmap=4;quitstreetview();showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
    //else if(tmap==3){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
    //else if(tmap==4){tmap=5;substreetview2();}
@@ -3008,7 +3008,7 @@ if(twebaudio==1 && tradio==0){
         }else{testloop=0;};
 		updatesun();
 		sunxsave=sunx;sunysave=suny;sunzsave=sunz;
-		if(tshadownight==1){sunx=x-0.1*cos1*cos2;suny=y-0.1*sin1*cos2;sunz=z-0.1*sin2+0.01;}
+		if(tshadownight==1){sunx=x-0.1*cos1*cos2;suny=y-0.1*sin1*cos2;sunz=z-0.1*sin2+0.051;}
 		itime+=1;if(itime>10000){itime=0;}
 		tframe0=tframe;
 		tframe=timer();
@@ -3056,9 +3056,10 @@ if(twebaudio==1 && tradio==0){
 		     loading=22;dtloading=tframe;tinitgmap=0;
 			 //latsol0=latsol;lngsol0=lngsol;
 		     latsol0=latsol;lngsol0=lngsol;
+			 dlatsol=dlatsol1;dlngsol=dlngsol1;
 		     dlatsol0=dlatsol;dlngsol0=dlngsol;
 			 if(tupdatesoltexture==99){tupdatesoltexture=0;tloadsol=tframe+9999000;}
-			 initgmap();
+			 initgmap();initgmaptree();
 		     loading=1;tskip2=timer()+dtime+400;
 			 dtinitmap=tframe;tdraw2=2;trygetways=1;tinitgmap=0;
 			 }
@@ -3133,6 +3134,8 @@ if(twebaudio==1 && tradio==0){
 		    tupdatesoltexture=99;
 			handleLoadedTexture(solTexture);
             trygetweather=1;
+	        solTexture.data=gettexturedata(solTexture);
+            solTexture.datasize=parseInt(Math.sqrt(solTexture.data.length/4));
             //updatebuffersolheight();
 		    //tupdatebuffersol=0;
 			//updatebuffersol();
@@ -4356,7 +4359,7 @@ function updatesoltexture(){
 		latsol=latx;lngsol=lngx;
 		getworldxy(zoom,latsol,lngsol);
         getlatlng(zoom,worldx+256,worldy+256)
-		dlatsol=lat-latsol;dlngsol=lng-lngsol;
+		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
 		lat=lat000;lng=lng000;worldx=worldx000;worldy=worldy000;
 		//if(tinitsol0==1){
 		// tinitsol0=0;
@@ -4373,7 +4376,7 @@ function updatesoltexture2(){
 		latsol=lat;lngsol=lng;
 		getworldxy(zoom,lat,lng);
         getlatlng(zoom,worldx+256,worldy+256)
-		dlatsol=lat-latsol;dlngsol=lng-lngsol;
+		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
 		lat=lat000;lng=lng000;*/
         canvas2.setAttribute('width', 512);
         canvas2.setAttribute('height', 512);
@@ -4385,7 +4388,7 @@ function updatesoltexture2(){
 var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
 var latsol0=lat,lngsol0=lng;
 var latsol00=lat,lngsol00=lng;
-var dlatsol0=1,dlngsol0=1;
+var dlatsol0=1,dlngsol0=1,dlatsol1=1,dlngsol1=1;
 function getmap(zoom,lat,lng,size,type0,scale){
 var type=type0;
 if(type=="jpg"){type="jpg-baseline";}
@@ -4690,6 +4693,7 @@ var tshadownight=0;
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		distshadow=30.0;
 		if(noshadow==1){distshadow=60.0;}
+		distshadow*=0.5;
 		var wx=distshadow,wy=distshadow*kdxy+7.0;
 		var sunxx=sunx-x,sunyy=suny-y,sunzz=sunz-z;
 		var dz=Math.max(0.01,Math.sqrt(sunxx*sunxx+sunyy*sunyy+sunzz*sunzz));
@@ -5031,6 +5035,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		   }
            if(tminimap==1 && tmouse3move==0){
 		      //drawtexture(rttTexture);
+			  //drawtexture(solTexture);
 		      gl.useProgram(shaderProgram);
               drawminimap();}}
 		else if(tminimap2==1 && tmap==0){drawminimap();}   
@@ -5399,7 +5404,7 @@ function drawrain(){
 	else{fog0=tfog*0.45;}
 	if(tframe>timerain){
       timerain=tframe+5000+Math.random()*40000;
-      var dtcloud=(parseInt(wclouds/50)+1)*0.035;
+      var dtcloud=(parseInt(wclouds/50)+1)*0.035/3.5;
       if(Math.random()<dtcloud){train=1;}else{train=0;}}
     if(train==0 && train1==0 && train2==0 || ttunnel>=1){stopsoundrain();return;}
 	soundrain();trainfog=tframe;
@@ -6414,6 +6419,7 @@ gl.useProgram(shaderProgram);
 		//if(height00[ixy]<0){colorb+=0.13;colorg+=0.13;colorr+=0.3;} 
 		if(height2[ixy]<0 && (i+j)%2==0){colorb+=0.1;colorg+=0.1;colorr+=0.1;} 
 		//colorr*=1.5;colorg*=1.5;colorb*=1.5;
+		if(maptree[ixy]==1){colorr=1;}
 	    setMatrixUniforms00();
 		gl.uniform1f(shaderProgram.fog,0);
         gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
@@ -7813,8 +7819,8 @@ if(tdrawsol==0 && ttunnel==0){return;}
 //xsol=parseInt(x/100)*100;
 //ysol=parseInt(y/100)*100;
     var sc=1;//scalez;
-	var scx=(dlngsol0/klon)*scale;
-	var scy=dlatsol0*scale;
+	var scx=(dlngsol/klon)*scale;
+	var scy=dlatsol*scale;
 xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
 ysol=(latsol0-lat0)*scale-scy/nsol;
 //if(tupdatesoltexture==1){return;}
@@ -7989,11 +7995,11 @@ function drawtexture(texture){
 	var treeVertexPositionBuffer=[];
     var treeVertexTextureCoordBuffer=[];
 	var treevertices;
-	var ntree=1800;
+	var ntree=1800+800;
 	var tree2VertexPositionBuffer=[];
     var tree2VertexTextureCoordBuffer=[];
 	var tree2vertices;
-	var ntree2=1800;
+	var ntree2=1800+800;
 	var lineVertexPositionBuffer=[];
     var lineVertexTextureCoordBuffer=[];
 	var linevertices,linetexturecoords;
@@ -8019,6 +8025,56 @@ function drawtexture(texture){
 	var n=nsol,nsol2=16,n22=nsol+nsol2+nsol2;
 	var height,kheight,height1,height2,tinitgmap=0;
 	var height00,height0;
+	var maptree=[];
+function initgmaptree(){
+        if(!solTexture.data){return;}
+		var ndata=solTexture.datasize,r=0,g=0,b=0,h=0,ij=0;
+		for (var i=0; i < n; i++) {
+         for(var j=0;j<n;j++){
+		  ij=j*n+i;
+		  maptree[ij]=0;
+		  if(height00[ij]>0){
+		   var k=parseInt(4*(parseInt(Math.min(ndata-1,i*ndata/n))*ndata+parseInt(j*ndata/n)));
+		   r=solTexture.data[k];
+		   g=solTexture.data[k+1];
+		   b=solTexture.data[k+2];
+		   if(g>r*1.2 && g>b*1.2 && g<70 && r<60 && b<60){
+		      maptree[ij]=1;
+		   }}
+		}}
+		//tinittree2=1;tinittree22=1;
+}
+function addgmaptreetest(){
+	//var nx=nsol*(0.5+0.5*(lngpx-lngsol0)/dlngsol)-0.5;
+	//var ny=nsol*(0.5+0.5*(latpy-latsol0)/dlatsol)-0.5;
+	var nmaptree=0,tsequoia00=tsequoia;
+	var dx0=klon*3.8/scale,dy0=3.8/scale,xx=0,yy=0;
+	var lngxx0=dx0*parseInt(lngx0/dx0);
+	var latxx0=dy0*parseInt(latx0/dy0);
+	for(var ii=-25;ii<25;ii++){
+	  var lngxx=lngxx0+dx0*ii;
+      var i=parseInt(nsol*(0.5+0.5*(lngxx-lngsol0)/dlngsol)-0.5);
+      for(var jj=-25+(ii%2)*0.5;jj<25;jj++){
+		  var latxx=latxx0+dy0*jj;
+	      var j=parseInt(nsol*(0.5+0.5*(latxx-latsol0)/dlatsol)-0.5);
+		  if(i>=0 &&  i<n && j>=0 && j<n){
+		   var ij=i*n+j;
+		   if(maptree[ij]==1){
+	           yy=(latxx-latx0)*scale*2;
+	           xx=((lngxx-lngx0)/klon)*scale*2;
+			   var ztree=(latxx+lngxx)*1000000;
+	           ztree=(ztree-100*parseInt(ztree/100))/2000;
+	           ztree+=zsol0-0.01;//-0.06+zsol0;
+    	       //if(tinittree2==1 || Math.max(Math.abs(xx-x),Math.abs(yy-y))>50){
+                  var typtree=parseInt((Math.abs(xx-yy)*10)%5);
+                  if(typtree<=1){addtree22(xx,yy,ztree);}
+                  else{addtree2(xx,yy,ztree);}
+				  nmaptree+=1;
+				  if(nmaptree>900 && tsequoia00==0){tsequoia=2;}
+				  if(nmaptree>350 && tsequoia==0){tsequoia=1;}
+		  }}//}
+	}}
+}
 function initgmap(){
         if(!solTexture2.data){return;}
 		var ndata=solTexture2.datasize,r=0,g=0,b=0,h=0,ij=0;
@@ -10602,6 +10658,7 @@ if(way.nodes){
    addstationtest();
    addhospitaltest();
    addrailstationtest();
+   addgmaptreetest();
    addtreetest();
    addlinetest();
    addbartest();
