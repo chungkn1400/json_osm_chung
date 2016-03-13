@@ -8029,20 +8029,27 @@ function drawtexture(texture){
 function initgmaptree(){
         if(!solTexture.data){return;}
 		var ndata=solTexture.datasize,r=0,g=0,b=0,h=0,ij=0;
+		var rr=0,gg=0,bb=0,rrr=0,ggg=0,bbb=0;
 		for (var i=0; i < n; i++) {
          for(var j=0;j<n;j++){
 		  ij=j*n+i;
 		  maptree[ij]=0;
 		  if(height00[ij]>0){
 		   var k=parseInt(4*(parseInt(Math.min(ndata-1,i*ndata/n))*ndata+parseInt(j*ndata/n)));
+		   rrr=rr;ggg=gg;bbb=bb;
+		   rr=r;gg=g;bb=b;
 		   r=solTexture.data[k];
 		   g=solTexture.data[k+1];
 		   b=solTexture.data[k+2];
-		   if(g>r*1.2 && g>b*1.2 && g<70 && r<60 && b<60){
-		      maptree[ij]=1;
+		   if(g>r*1.2 && g>b*1.2 && g<70 && g>30){
+		     var dr=5,dg=5,db=5;
+			 if(Math.abs(rr-r)>dr || Math.abs(gg-g)>dg || Math.abs(bb-b)>db){
+		        maptree[ij]=1;}
+			 else if(Math.abs(rrr-r)>dr || Math.abs(ggg-g)>dg || Math.abs(bbb-b)>db){
+			    maptree[ij]=1;}	
 		   }}
 		}}
-		tinittree2=1;tinittree22=1;
+		//tinittree2=1;tinittree22=1;
 }
 function addgmaptreetest(){
 	//var nx=nsol*(0.5+0.5*(lngpx-lngsol0)/dlngsol)-0.5;
@@ -8066,14 +8073,14 @@ function addgmaptreetest(){
 			   var ztree=(latxx+lngxx)*1000000;
 	           ztree=(ztree-100*parseInt(ztree/100))/2000;
 	           ztree+=zsol0-0.01;//-0.06+zsol0;
-    	       //if(tinittree2==1 || Math.max(Math.abs(xx-x),Math.abs(yy-y))>50){
+    	       if(tinittree2==1 || Math.max(Math.abs(xx-x),Math.abs(yy-y))>50){
                   var typtree=parseInt((Math.abs(xx-yy)*10))%5;
                   if(typtree<=2){addtree22(xx,yy,ztree);}
                   else{addtree2(xx,yy,ztree);}
 				  nmaptree+=1;
 				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
 				  else if(nmaptree>d20*d20*0.7 && tsequoia==0){tsequoia=1;}
-		  }}//}
+		  }}}
 	}}
 }
 function initgmap(){
