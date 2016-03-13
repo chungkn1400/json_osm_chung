@@ -7837,7 +7837,8 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	else if(ttunnelprev>=1 && tframe<tdrawsol-401){tdrawsol=tframe+300;z=zsol+0.7;}
 	else if(tframe<tdrawsol-401){tdrawsol=tframe+300;z=Math.max(dzsol0+0.6,zsol+0.3);}
 	if(tframe>tdrawsol){mat4.translate(mvMatrix, [xsol,ysol,zsol0]);}
-	else{var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
+	else{z=zsol+0.7;
+	     var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
          var ysol1=(ysol0-lat0)*scale-scy/nsol;
 	     mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0-0.15-tfoot*0.2)]);}
 	mat4.scale(mvMatrix,[scx,scy,sc]);
@@ -7903,7 +7904,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	
 	mvPushMatrix();
     //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [xsol,ysol,zsol0]);
+	mat4.translate(mvMatrix, [xsol,ysol,zsol0+z]);
 	mat4.scale(mvMatrix,[scx/boussx,scy/boussy,sc]);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  solTexture2);
@@ -8041,7 +8042,7 @@ function initgmaptree(){
 		   r=solTexture.data[k];
 		   g=solTexture.data[k+1];
 		   b=solTexture.data[k+2];
-		   if(g>r*1.2 && g>b*1.2 && g<70 && g>30){
+		   if(g>r*1.12 && g>b*1.2 && g<70 && g>10){
 		     var dr=5,dg=5,db=5;
 			 if(Math.abs(rr-r)>dr || Math.abs(gg-g)>dg || Math.abs(bb-b)>db){
 		        maptree[ij]=1;}
