@@ -1291,7 +1291,7 @@ else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
 var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
-if(tinit<1){k=1;kdxmax=1;};
+if(tinit<1){k=1;kdxmax=1;dxmax2=15;};
 //if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
 //else if(k>kdxmax){kdxmax+=0.25;}
 if(k<1 || dtweb>5900){kdxmax-=0.25;}
