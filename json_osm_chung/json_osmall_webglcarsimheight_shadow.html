@@ -2431,11 +2431,11 @@ if(tfly==1){
 	   if(z<zsol+0.70){if(vcar>0.003 && troad==0){
 	                     if(o2<(o2sol-(0.05+vcar)/(0.003+vcar))){
 						    soundpneu();}}
-					   o2=o2sol-0.01;
+					   o2=o2sol-0.02;
                        cos2=Math.cos(degtorad(o2));
                        sin2=Math.sin(degtorad(o2));
 					   landing=1;vzz=0;z=zsol+0.698;
-	   }else{if(z>zsol+1){landing=0;}
+	   }else{if(z>zsol+0.1){landing=0;}
              z+=(vzz-0.03)*dt*0.003;
 	   }
 	   z=Math.max(zsol+0.698,z);
@@ -7995,11 +7995,11 @@ function drawtexture(texture){
 	var treeVertexPositionBuffer=[];
     var treeVertexTextureCoordBuffer=[];
 	var treevertices;
-	var ntree=1800+800;
+	var ntree=1800;
 	var tree2VertexPositionBuffer=[];
     var tree2VertexTextureCoordBuffer=[];
 	var tree2vertices;
-	var ntree2=1800+800;
+	var ntree2=1800;
 	var lineVertexPositionBuffer=[];
     var lineVertexTextureCoordBuffer=[];
 	var linevertices,linetexturecoords;
@@ -8042,36 +8042,37 @@ function initgmaptree(){
 		      maptree[ij]=1;
 		   }}
 		}}
-		//tinittree2=1;tinittree22=1;
+		tinittree2=1;tinittree22=1;
 }
 function addgmaptreetest(){
 	//var nx=nsol*(0.5+0.5*(lngpx-lngsol0)/dlngsol)-0.5;
 	//var ny=nsol*(0.5+0.5*(latpy-latsol0)/dlatsol)-0.5;
 	var nmaptree=0,tsequoia00=tsequoia;
-	var dx0=klon*3.8/scale,dy0=3.8/scale,xx=0,yy=0;
-	var lngxx0=dx0*parseInt(lngx0/dx0);
-	var latxx0=dy0*parseInt(latx0/dy0);
-	for(var ii=-25;ii<25;ii++){
+	var dx0=klon*7.7/scale,dy0=7.7/scale,xx=0,yy=0;
+	var lngxx0=dx0*parseInt(lngx/dx0);
+	var latxx0=dy0*parseInt(latx/dy0);
+	var d91=dxmax*5,d20=parseInt(d91*0.5/7.7);
+	for(var ii=-d20;ii<d20;ii++){
 	  var lngxx=lngxx0+dx0*ii;
       var i=parseInt(nsol*(0.5+0.5*(lngxx-lngsol0)/dlngsol)-0.5);
-      for(var jj=-25+(ii%2)*0.5;jj<25;jj++){
+      for(var jj=-d20+(ii%2)*0.5;jj<d20;jj++){
 		  var latxx=latxx0+dy0*jj;
 	      var j=parseInt(nsol*(0.5+0.5*(latxx-latsol0)/dlatsol)-0.5);
 		  if(i>=0 &&  i<n && j>=0 && j<n){
 		   var ij=i*n+j;
-		   if(maptree[ij]==1){
+		   if(maptree[ij]>=1){
 	           yy=(latxx-latx0)*scale*2;
 	           xx=((lngxx-lngx0)/klon)*scale*2;
 			   var ztree=(latxx+lngxx)*1000000;
 	           ztree=(ztree-100*parseInt(ztree/100))/2000;
 	           ztree+=zsol0-0.01;//-0.06+zsol0;
     	       //if(tinittree2==1 || Math.max(Math.abs(xx-x),Math.abs(yy-y))>50){
-                  var typtree=parseInt((Math.abs(xx-yy)*10)%5);
-                  if(typtree<=1){addtree22(xx,yy,ztree);}
+                  var typtree=parseInt((Math.abs(xx-yy)*10))%5;
+                  if(typtree<=2){addtree22(xx,yy,ztree);}
                   else{addtree2(xx,yy,ztree);}
 				  nmaptree+=1;
-				  if(nmaptree>900 && tsequoia00==0){tsequoia=2;}
-				  if(nmaptree>350 && tsequoia==0){tsequoia=1;}
+				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
+				  else if(nmaptree>d20*d20*0.7 && tsequoia==0){tsequoia=1;}
 		  }}//}
 	}}
 }
@@ -11000,7 +11001,7 @@ setTimeout("tupdatebuffer=4;",t300);
 }
 var treex=[],treey=[],treez=[],itree=0;
 function addtree(xx,yy,zz){
-var typtree=parseInt((Math.abs(xx-yy)*10)%5);
+var typtree=parseInt((Math.abs(xx-yy)*10))%5;
 if(typtree==1){addtree22(xx,yy,zz);}
 else{
    if(itree<ntree){
@@ -11074,7 +11075,8 @@ var xx2=tree2x[i],yy2=tree2y[i];
 var latx2=tree2latx[i],lngx2=tree2lngx[i];
 var dxx=xx2+((lngx2-lngx)/klon)*scale*2;
 var dyy=yy2+(latx2-latx)*scale*2;
-if(Math.abs(dxx)>91 || Math.abs(dyy)>91){//65
+var d91=dxmax*5;
+if(Math.abs(dxx)>d91 || Math.abs(dyy)>d91){//65
    tree2x[i]=999999;
    }
 else{//} if(Math.abs(dxx)<50 && Math.abs(dyy)<50){
@@ -11108,7 +11110,8 @@ var xx2=tree22x[i],yy2=tree22y[i];
 var latx2=tree22latx[i],lngx2=tree22lngx[i];
 var dxx=xx2+((lngx2-lngx)/klon)*scale*2;
 var dyy=yy2+(latx2-latx)*scale*2;
-if(Math.abs(dxx)>91 || Math.abs(dyy)>91){//65
+var d91=dxmax*5;
+if(Math.abs(dxx)>d91 || Math.abs(dyy)>d91){//65
    tree22x[i]=999999;
    }
 else{//} if(Math.abs(dxx)<50 && Math.abs(dyy)<50){
@@ -12475,7 +12478,7 @@ function addforest(way){
 			   var xtree=xmid+dkx*k/dk-dkk*dky/dk;
 			   var ytree=ymid+dky*k/dk+dkk*dkx/dk;
 			   var ztree=parseInt(((xtree+ytree)%3)/2+1)/2000;//getterrainheight3(xtree,ytree,latx0,lngx0);
-			   var typtree=parseInt((Math.abs(xtree+ytree)*10)%2);
+			   var typtree=parseInt((Math.abs(xtree+ytree)*10))%2;
 			   if(typtree==0){addtree2(xtree,ytree,ztree);}
 			   else{addtree22(xtree,ytree,ztree);}
 			}}
