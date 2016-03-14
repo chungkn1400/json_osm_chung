@@ -4990,7 +4990,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		//updatetree();
 		drawtree();
 		drawtree2();
-		if((itime%15)==7){setineartree();}
+		if((itime%10)==7){setineartree();}
         else{if(ineartree>60 && ineartree<=140){soundcricket();}//120
              else{stopsoundcricket();}
              if(ineartree>140){soundnature();}
@@ -11082,7 +11082,7 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
             ]);
     indextree=index;
 	walltreex[iwalltree]=xx;walltreey[iwalltree]=yy;
-	walltreeh[iwalltree]=zz+1;iwalltree+=1;
+	walltreeh[iwalltree]=1;iwalltree+=1;
 	}//}
 }
 addtree2test();
@@ -11118,7 +11118,7 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1)==0){
             ]);
     indextree=index;
 	walltreex[iwalltree]=xx;walltreey[iwalltree]=yy;
-	walltreeh[iwalltree]=zz+htree;iwalltree+=1;
+	walltreeh[iwalltree]=htree;iwalltree+=1;
 	}
 }
 }}}
@@ -11155,7 +11155,7 @@ if(testroad2(xx/2,yy/2,latx0,lngx0,0.1+tsequoia*0.55)==0){
             ]);
     indextree2=index;
 	walltreex[iwalltree]=xx;walltreey[iwalltree]=yy;
-	walltreeh[iwalltree]=zz+htree;iwalltree+=1;
+	walltreeh[iwalltree]=htree;iwalltree+=1;
 	}
 }
 }}}
@@ -11164,7 +11164,7 @@ ineartree=0;
 for(var i=0;i<iwalltree0;i+=2){
   if(Math.abs(walltreex0[i]-x)<20){
    if(Math.abs(walltreey0[i]-y)<20){
-     ineartree+=1;
+     ineartree+=1;if(walltreeh0[i]>4){ineartree+=1;}
 }}}
 }
 function resettree22(){
