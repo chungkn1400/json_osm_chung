@@ -82,6 +82,9 @@ openstreetmap roads to html5 array -->
 <input type="file" id="gamesavefiles" name="files[]" hidden />
     </div>
 </div>
+<div id="zoomdiv" style="position:absolute;top:1400px;left:800px;z-index:400;width:40px;height:20px;">
+<button id="zoom"  onclick="subzoom();">zoom</button>
+</div>
 <script>
 var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 //put here your google static map apikey (=> https://developers.google.com/maps/documentation/static-maps/get-api-key)
@@ -2300,7 +2303,8 @@ tmove=0;trot=0;
 //var vcar0=vcar;
 var oo10=o1;
 var testx=0,v=0.00000015*dtime,vv=0.00000015*200;
-if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1.1){tfoot=0;o2=0;o3=0;};resetkeys();reseto3volant();}
+if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1.1){tfoot=0;o2=0;o3=0;};
+                       testzoom();resetkeys();reseto3volant();}
 if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();resetkeys();}
 	tgaz=0;
 	//timer0=timer1;
@@ -2725,6 +2729,7 @@ if(keys[vk_g]){keys[vk_g]=0;
    if(keys[vk_shift]){geolocate();}
    else if(tfoot==1){tminimap2+=1;if(tminimap2>1){tminimap2=0;}}
    else{tminimap+=1;if(tminimap>1){tminimap=0;}}
+   testzoom();
    resetkeys();}
 if(keys[vk_m]){
  if(keys[vk_shift]==1){substreetview();}
@@ -5066,7 +5071,7 @@ function drawminimap(){
 	gl.viewport(dx-1,dy-1,dxx+2,dyy+2);
     //gl.viewport(100/cssscale,10/cssscaley,60/cssscale,60/cssscaley);
 	mvPushMatrix();
-		mat4.lookAt([x,y,z+29],[x+9.8*cos1,y+9.8*sin1,z],[0,0,1],mvMatrix);
+		mat4.lookAt([x,y,z+29*zoomminimap],[x+9.8*cos1,y+9.8*sin1,z],[0,0,1],mvMatrix);
         gl.useProgram(shaderProgram);
 	/*gl.viewport(windx*0.5-1,dy*3-1,dxx*3+2,dyy*3+2);
 	drawtexture(rtt3Texture);mvPopMatrix();
@@ -12585,6 +12590,24 @@ function sizescreen(){
      document.getElementById('radio').setAttribute('style','top:0px;left:0px;width:119px;height:50px;' );
      tradioexpand=0;radioreduce();	
 	} 
+	testzoom();
+}
+function testzoom(){
+    if(fullscreen==0){
+	 document.getElementById('zoomdiv').setAttribute('style','position:absolute;top:'+parseInt(windy*cssscaley-36)+'px;left:'+parseInt(windx*cssscale*0.657+118)+'px;width:40px;height:20px;z-index:500;' );
+	}else{
+	 document.getElementById('zoomdiv').setAttribute('style','position:absolute;top:'+parseInt(windy*cssscaley-36)+'px;left:'+parseInt(windx*cssscale*0.657+118)+'px;width:120px;height:980px;z-index:500;' );
+	}
+    if((tfoot==0 && tminimap==1) || (tfoot==1 && tminimap2==1)){
+       document.getElementById('zoomdiv').style.visibility = 'visible';}
+    else{document.getElementById('zoomdiv').style.visibility='hidden';}	  
+}
+var zoomminimap=1;
+function subzoom(){
+    if(zoomminimap==1){zoomminimap=2;}
+	else if(zoomminimap==2){zoomminimap=4;}
+	else{zoomminimap=1;}
+document.getElementById('msg').focus();
 }
 function sizescreen2(){
 	if(cssscale2<1){cssscale2=1;}
