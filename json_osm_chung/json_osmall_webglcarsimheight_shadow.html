@@ -103,6 +103,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="rainmp3.js"></script>
 <script src="crashmp3.js"></script>
 <script src="cricketmp3.js"></script>
+<script src="naturemp3.js"></script>
 <script src="jet4mp3.js"></script>
 <!--script src="jscompile_chung.js"></script-->
 <script src="carobjtxt.js"></script>
@@ -4990,8 +4991,10 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		drawtree();
 		drawtree2();
 		if((itime%15)==7){setineartree();}
-        else{if(ineartree>120){soundcricket();}
+        else{if(ineartree>60 && ineartree<=140){soundcricket();}//120
              else{stopsoundcricket();}
+             if(ineartree>140){soundnature();}
+             else{stopsoundnature();}
 		}
 		
 		gl.useProgram(lineProgram);
@@ -12866,6 +12869,24 @@ function soundcricket(){
    }
 function stopsoundcricket(){
    if(tframe<tsoundcricket+4500){tsoundcricket=0;setvol(myaudiocricket,0.002);}
+}
+var myaudionature = audioctx.createBufferSource();
+//audiosrc=folder+"nature."+wav;
+myaudionature.volume=0;
+loadsound64(myaudionature,naturemp3);
+myaudionature.onload=function(){
+ //setTimeout("playloop(myaudionature);",800);
+ setTimeout("setvol(myaudionature,0.3);",700);
+ setTimeout("setspeed(myaudionature,1.0);",700);
+ }
+var tsoundnature=0;
+function soundnature(){
+   if(tframe>tsoundnature+14500){tsoundnature=tframe;
+      setvol(myaudionature,0.4*(ineartree/(ineartree+100)));
+	  playsound(myaudionature);}
+   }
+function stopsoundnature(){
+   if(tframe<tsoundnature+12500){tsoundnature=0;setvol(myaudionature,0.002);}
 }
 var myaudiocrash = audioctx.createBufferSource();
 //audiosrc=folder+"crash."+wav;
