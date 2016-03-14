@@ -7845,9 +7845,12 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 	else{z=zsol+0.7;
 	     var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
          var ysol1=(ysol0-lat0)*scale-scy/nsol;
-	     mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0-0.15-tfoot*0.2)]);
-		 //mat4.translate(mvMatrix, [xsol1,ysol1,zsol0]);
-		 mat4.scale(mvMatrix,[1,1,kdhzsol]);}
+	     if(ttunnelprev>=1){
+		    mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0-0.15-tfoot*0.2)]);}
+		 else{mat4.translate(mvMatrix, [xsol1,ysol1,(zview-dzsol0-zsol0-0.15-tfoot*0.2-5)]);
+		      //mat4.translate(mvMatrix, [xsol1,ysol1,zsol0]);
+		      mat4.scale(mvMatrix,[1,1,kdhzsol]);}
+		 }
 	mat4.scale(mvMatrix,[scx,scy,sc]);
 	gl.activeTexture(gl.TEXTURE7);
     gl.bindTexture(gl.TEXTURE_2D,  solTexture);
@@ -11852,6 +11855,11 @@ else{tgirlimage=2;var i=w/2.5,j=h/2.5;
        context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
 }
 function subtest(){
+if(tupdatesoltexture==0){
+ tupdatesoltexture=2;loading=66;
+ updatesoltexture();
+ }
+ return;
        testsavecitypanel();return;
 	   tloadsol=0;tdrawsol=tframe-1;//return;
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
@@ -11874,10 +11882,6 @@ getnodes4();
 //train=1;
 alert("ok"+countrycode);
 return;
-if(tupdatesoltexture==0){
- tupdatesoltexture=2;loading=66;
- updatesoltexture();
- }
 }
 function addcitypaneltest(){
 var h=0.15,h2=h+0.12,h21=0.765,xx,yy,zz,rr,co1,si1,r,h1;
