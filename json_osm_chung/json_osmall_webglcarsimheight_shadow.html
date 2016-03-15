@@ -2151,8 +2151,8 @@ function subcollide(){
 }
 var tautopilot=0,dtautopilot=0;
 function subautopilot(){
- if(tautopilot==0){if(confirm("set autopilot on ?")){tautopilot=1;}}
- //else if(tautopilot==1){if(confirm("set autopilot random on ?")){tautopilot=2;}}
+ if(tautopilot==0){if(confirm("set autopilot 1 on ?")){tautopilot=2;}}
+ else if(tautopilot==2){if(confirm("set autopilot on ?")){tautopilot=1;}}
  else{if(confirm("set autopilot off ?")){tautopilot=0;}}
 }
 function subshadow(){
@@ -2286,7 +2286,7 @@ if(tmsg<(tframe-150)){tmsg=tframe;
  if(auxtext!=""){msg+=" auxt="+auxtext;}
  if(tfoot==0){msg+=" car";
               if(tautopilot==1){msg+=" auto";};
-			  if(tautopilot==2){msg+=" random";}}
+			  if(tautopilot==2){msg+=" auto1";}}
  if(tfoot==1){if(tascend==1){msg+=" ascend"}}
  if(tmap>=1){msg="lat="+lat+" lng="+lng+"  "+srtmfile;}
  document.getElementById('msg').value=msg;
@@ -2460,7 +2460,7 @@ if(tfly==1){
 		 if(troad==0){vrun=Math.min(vrunmax*0.45,Math.max(0.1,vrun));}
 		 else{vrun=Math.min(vrunmax,Math.max(0.1,vrun));}
 	     if(tupdatebuffer==0){
-		    var kvrun=vrun/Math.max(0.1,vrunauto);vrun=vrunauto;findroad(tautopilot);
+		    var kvrun=vrun/Math.max(0.1,vrunauto);vrun=vrunauto;findroad(1);//tautopilot);
 			vrunauto=vrun;vrun=kvrun*Math.max(0.1,vrunauto);
 			}
 		 var do1pilot=o1pilot-o1;
@@ -9637,6 +9637,7 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
     var i=parseInt(Math.random()*(iautoroad+0.99));
 	pautoroad=autoroad[i];return;
 	}
+if(tautopilot==2){o1pilot=o1;return;}
 r=10;
 dxyauto=-1;dxy0=0;
 iautoroad=-1;
