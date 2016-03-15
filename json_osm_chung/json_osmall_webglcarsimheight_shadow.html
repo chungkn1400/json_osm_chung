@@ -4760,7 +4760,7 @@ var tshadownight=0;
 		tshadow=0;
 	}	
     function drawshadow(irtt) {
-		if(hour<4 || hour>21){tshadownight=1;drawshadownight(irtt);return;}
+		if((hour<4 || hour>21)&& tmap==0){tshadownight=1;drawshadownight(irtt);return;}
 		else{tshadownight=0;}
 	    tshadow=1;
         if(irtt==0){gl.viewport(0, 0, rttTexture.width,rttTexture.height);}//620,419);
@@ -8056,7 +8056,7 @@ function initgmaptree(){
 		   r=solTexture.data[k];
 		   g=solTexture.data[k+1];
 		   b=solTexture.data[k+2];
-		   if(g>r*1.12 && g>b*1.2 && g<70 && g>10){
+		   if(g>r*1.12 && g>b*1.052 && g<70 && g>10){
 		     var dr=5,dg=5,db=5;
 			 if(Math.abs(rr-r)>dr || Math.abs(gg-g)>dg || Math.abs(bb-b)>db){
 		        maptree[ij]=1;}
