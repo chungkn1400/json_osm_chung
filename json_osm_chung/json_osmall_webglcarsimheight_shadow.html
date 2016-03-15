@@ -8069,11 +8069,11 @@ function initgmaptree(){
 function addgmaptreetest(){
 	//var nx=nsol*(0.5+0.5*(lngpx-lngsol0)/dlngsol)-0.5;
 	//var ny=nsol*(0.5+0.5*(latpy-latsol0)/dlatsol)-0.5;
-	var nmaptree=0,tsequoia00=tsequoia;
-	var dx0=klon*7.7/scale,dy0=7.7/scale,xx=0,yy=0;
+	var nmaptree=0,tsequoia00=tsequoia,dxtree=5.7;
+	var dx0=klon*dxtree/scale,dy0=dxtree/scale,xx=0,yy=0;
 	var lngxx0=dx0*parseInt(lngx/dx0);
 	var latxx0=dy0*parseInt(latx/dy0);
-	var d91=dxmax*5,d20=parseInt(d91*0.5/7.7);
+	var d91=dxmax*5,d20=parseInt(d91*0.5/dxtree);
 	for(var ii=-d20;ii<d20;ii++){
 	  var lngxx=lngxx0+dx0*ii;
       var i=parseInt(nsol*(0.5+0.5*(lngxx-lngsol0)/dlngsol)-0.5);
