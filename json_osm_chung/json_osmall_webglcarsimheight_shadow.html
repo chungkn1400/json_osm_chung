@@ -5414,7 +5414,7 @@ function drawrain(){
 	if(tframe>timerain){
       timerain=tframe+5000+Math.random()*40000;
       var dtcloud=(parseInt(wclouds/50)+1)*0.035/3.5;
-      if(Math.random()<dtcloud){train=1;}else{train=0;}}
+      if(Math.random()<dtcloud && humidity>80){train=1;}else{train=0;}}
     if(train==0 && train1==0 && train2==0 || ttunnel>=1){stopsoundrain();return;}
 	soundrain();trainfog=tframe;
     gl.disable(gl.CULL_FACE);
@@ -8094,7 +8094,7 @@ function addgmaptreetest(){
                   else{addtree2(xx,yy,ztree);}
 				  nmaptree+=1;
 				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
-				  else if(nmaptree>d20*d20*0.5 && tsequoia==0){tsequoia=1;}
+				  else if(nmaptree>d20*d20*0.4 && tsequoia==0){tsequoia=1;}
 		  }}}
 	}}
 }
