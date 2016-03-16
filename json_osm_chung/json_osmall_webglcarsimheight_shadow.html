@@ -2741,9 +2741,9 @@ if(keys[vk_m]){
    if(tmap==0){tmap=2}
    else if(tmap==2){tmap=1;}
    else if(tmap==1){tmap=3;}
-   else if(tmap==3){tmap=5;substreetview2();}
-   else if(tmap==5){tmap=4;quitstreetview();showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
-   //else if(tmap==3){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
+   //else if(tmap==3){tmap=5;substreetview2();}
+   //else if(tmap==5){tmap=4;quitstreetview();showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
+   else if(tmap==3){tmap=4;showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
    //else if(tmap==4){tmap=5;substreetview2();}
    //else if(tmap==5){tmap=0;quitstreetview();}
    else{tmap=0;}
@@ -8056,7 +8056,7 @@ function initgmaptree(){
 		   r=solTexture.data[k];
 		   g=solTexture.data[k+1];
 		   b=solTexture.data[k+2];
-		   if(g>r*1.12 && g>b*1.052 && g<70 && g>10){
+		   if(g>r*1.12 && g>-b*1.03 && g<70 && g>10){
 		     var dr=5,dg=5,db=5;
 			 if(Math.abs(rr-r)>dr || Math.abs(gg-g)>dg || Math.abs(bb-b)>db){
 		        maptree[ij]=1;}
@@ -8094,7 +8094,7 @@ function addgmaptreetest(){
                   else{addtree2(xx,yy,ztree);}
 				  nmaptree+=1;
 				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
-				  else if(nmaptree>d20*d20*0.4 && tsequoia==0){tsequoia=1;}
+				  else if(nmaptree>d20*d20*0.5 && tsequoia==0){tsequoia=1;}
 		  }}}
 	}}
 }
