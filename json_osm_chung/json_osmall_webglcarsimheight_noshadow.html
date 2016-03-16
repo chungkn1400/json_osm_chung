@@ -623,13 +623,13 @@ function nodecallback3(r){//alert(r);
   
   tdraw=2;loading=1.75;//drawgl(0);;	 
 }
-var fogweather=0;
+var fogweather=0,humidity=50,temp=20;
 function weathercallback(r){//alert(r);
   var weatherjson=JSON.parse(r);
   var allclouds=weatherjson.clouds.all;//alert(allclouds);
   wclouds=allclouds;
-  var humidity=weatherjson.main.humidity;//alert(humidity);
-  var temp=weatherjson.main.temp-273;//alert(temp);
+  humidity=weatherjson.main.humidity;//alert(humidity);
+  temp=weatherjson.main.temp-273;//alert(temp);
   fogweather=Math.min(1,Math.max(0,(humidity-50)*0.15/Math.max(3,temp)));
   if(Math.abs(loading-1.44)<0.001){loading=0;msgload("");}
   if(temp>=7){tsnow=0;}
@@ -1052,7 +1052,10 @@ for(var i=0;i<ways.length;i++){
    context.fillText("lat="+latt+" lon="+lngg,20,20);
    context.fillText("nways="+i+" nnodes="+nnode,20,40);
    context.fillText("x",canvas.width/2,canvas.height/2);
-   if(auxvar!=null){context.fillText("aux="+auxvar,20,60);}
+   context.fillText("clouds="+wclouds,20,60);
+   context.fillText("temp="+temp+"°C",20,80);
+   context.fillText("hum="+humidity+"%",20,100);
+   if(auxvar!=null){context.fillText("aux="+auxvar,20,120);}
    //alert("drawways="+i);
 }
 function timer(){
@@ -3634,8 +3637,8 @@ var texscalex2=1,texscaley2=1,textdx2=0,textdy2=0;
 function drawrain(){
 	if(tframe>timerain){
       timerain=tframe+5000+Math.random()*40000;
-      var dtcloud=(parseInt(wclouds/50)+1)*0.035;
-      if(Math.random()<dtcloud){train=1;}else{train=0;}}
+      var dtcloud=(parseInt(wclouds/50)+1)*0.035/3.5;
+      if(Math.random()<dtcloud && humidity>80){train=1;}else{train=0;}}
     if(train==0 && train1==0 && train2==0){stopsoundrain();return;}
 	soundrain();
     gl.disable(gl.CULL_FACE);
