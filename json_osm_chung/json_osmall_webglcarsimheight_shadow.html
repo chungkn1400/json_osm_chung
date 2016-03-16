@@ -4751,7 +4751,7 @@ var tshadownight=0;
 	if(irtt==0){
    		gl.useProgram(treeProgram);
 		drawtree();
-		drawtree2();
+		if(tsequoia==0){drawtree2();}
 		gl.useProgram(lineProgram);
 		drawline();
 		drawcross();
