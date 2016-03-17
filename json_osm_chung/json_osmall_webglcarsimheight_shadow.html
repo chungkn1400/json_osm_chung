@@ -1299,7 +1299,7 @@ else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
 var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
-if(tinit<1){k=1;kdxmax=1;dxmax2=15;};
+if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;if(tinit>=2){tinit+=1;};};
 //if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
 //else if(k>kdxmax){kdxmax+=0.25;}
 if(k<1 || dtweb>5900){kdxmax-=0.25;}
@@ -3055,7 +3055,7 @@ if(twebaudio==1 && tradio==0){
         gl.clearColor(1,1,1, 1.0);//auxvar2=loading;//auxvar2=tinitgmap;
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
-		if(tinit==1){tinit=2;trygetways=1;//loading=1;tupdatebuffer=1;
+		if(tinit==1){tinit=2;trygetways=1;latsol0=999;//loading=1;tupdatebuffer=1;
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
                             if(trygetweather==1){trygetweather=0;getweather();}
@@ -7287,6 +7287,7 @@ distairportxx=17+Math.max(Math.abs(airportxx-x),Math.abs(airportyy-y));
          boeingy+=boeingv*dtime*0.0035*(si1-cos11)/scale;scx=-scx;}
     mvPushMatrix();
 	var zz=getterrainheight2(xx,yy)+(Math.abs(xx-x)+Math.abs(yy-y))*0.17;
+	if(distairportxx>400){zz=Math.max(zz,zsol+70);}
 	boeingz+=(Math.max(zsol+3,Math.min(zsol+170,zz+3))-boeingz)*0.05;
 	mat4.translate(mvMatrix, [xx,yy,boeingz]);//0.37
 	sc=sc/(2*boussx);scx=scx/(2*boussx);
@@ -7352,6 +7353,7 @@ function drawboeing2(){
          boeing2y+=boeing2v*dtime*0.00354*(si1-cos11)/scale;scx=-scx;}
     mvPushMatrix();
 	var zz=getterrainheight2(xx,yy)+(Math.abs(xx-x)+Math.abs(yy-y))*0.17;
+	if(distairportxx>400){zz=Math.max(zz,zsol+70);}
 	boeing2z+=(Math.max(zsol+3,Math.min(zsol+170,zz+3))-2-boeing2z)*0.05;
 	mat4.translate(mvMatrix, [xx,yy,boeing2z]);//0.37
 	sc=sc/(2*boussx);scx=scx/(2*boussx);
@@ -13471,7 +13473,7 @@ function initgooglemap(){
     maplatlng = event.latLng;
     latx=maplatlng.lat();
 	lngx=maplatlng.lng();
-	tmap=0;tmousedown=0;
+	tmap=0;tmousedown=0;tinit=0;
   });
 }
 function updatemarker(){
