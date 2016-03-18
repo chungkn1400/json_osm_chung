@@ -1274,7 +1274,7 @@ function weathercallback(r){//alert(r);
   if(temp>=7){tsnow=0;}
 }
 function msgload(text){
-context.clearRect (0,20,100,100);
+context.clearRect (0,23,100,100);
 context.font = "12pt Arial";
 context.fillStyle = '#ff0000';
 context.fillText(text,20,40);
@@ -2444,7 +2444,7 @@ if(tfly==1){
                        cos2=Math.cos(degtorad(o2));
                        sin2=Math.sin(degtorad(o2));
 					   landing=1;vzz=0;z=zsol+0.698;
-	   }else{if(z>zsol+0.75){landing=0;}
+	   }else{if(z>zsol+0.79){landing=0;}
              z+=(vzz-0.03)*dt*0.003;
 	   }
 	   z=Math.max(zsol+0.698,z);
@@ -9577,7 +9577,8 @@ if(pautoroad0>=0){
      py+=(sin1+2*sin10)*sign(dxxxx);}
 }
 r=5;
-if(tautopilot==2){r=2;}
+px-=sin1*0.5;py+=cos1*0.5;
+if(tautopilot==2 && typecar==0){r=3;}
 iautoroad=-1;
 var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
   for(var i=0;i<iroad0;i++){
@@ -9645,7 +9646,7 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
     var i=parseInt(Math.random()*(iautoroad+0.99));
 	pautoroad=autoroad[i];return;
 	}
-if(tautopilot==2){o1pilot=o1;return;}
+if(tautopilot==2 && typecar==0){o1pilot=o1;return;}
 r=10;
 dxyauto=-1;dxy0=0;
 iautoroad=-1;
