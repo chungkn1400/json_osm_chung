@@ -2484,7 +2484,7 @@ if(tfly==1){
 								 for(var i=0;i<=10;i++){
 								  if(Math.abs(oldx[i]-x)+Math.abs(oldy[i]-y)<15 && i!=ioldxy){
 								     for(var j=0;j<=10;j++){oldx[j]=9999999;};
-									 tpiloto10=tframe+Math.random()*2000;break;}}
+									 tpiloto10=tframe+Math.random()*5000;break;}}
 			                     oldxy=0;}}
          if(tframe<tpiloto10+2000){piloto1=0;}else{var vv=0.013*vcar;oldxy+=vv*dtime;}
 	 for(var i=0;i<=ncar2;i++){
@@ -8100,10 +8100,10 @@ function addgmaptreetest(){
                   var typtree=parseInt((Math.abs(xx-yy)*10))%5;
                   if(typtree<=2){addtree22(xx,yy,ztree);}
                   else{addtree2(xx,yy,ztree);}
-				  nmaptree+=1;auxvar3=nmaptree;
+				  nmaptree+=1;auxvar3=parseInt(nmaptree-d20*d20*0.2);
 				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
 				  else if(nmaptree>d20*d20*0.4 && tsequoia==0){tsequoia=1;}
-				  else if(nmaptree>100 && tsequoia==0){tsequoia=1;}
+				  else if(nmaptree>d20*d20*0.2+25 && tsequoia==0){tsequoia=1;}
 		  }}}
 	}}
 }
@@ -9559,7 +9559,7 @@ if(pautoroad>=0){
 		   if(vcar>0.025){vrun=0.2;}
 		   vcar=Math.max(vcar-vcar*dtime*0.001,0.05);
         }
-		if(Math.abs(dxxx)>0.15){
+		if(Math.abs(dxxx)>0.18){
  		 if(dxx>0){o1pilot=o1-3*sign(dxxx*dxyroad);//dyyy);
 		 }else{o1pilot=o1+3*sign(dxxx*dxyroad);//dyyy);
 		}}
