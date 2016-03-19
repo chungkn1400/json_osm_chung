@@ -2538,7 +2538,7 @@ if(tfly==1){
 			                                     nvcar[i]=vcar-0.1;nvrun[i]=0.15;};
 			   break;}}}}
 	  }}
-	 }else{oldxy=0;}
+	 }else{oldxy=0;for(var j=0;j<=10;j++){oldx[j]=9999999;};}
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
@@ -8100,10 +8100,10 @@ function addgmaptreetest(){
                   var typtree=parseInt((Math.abs(xx-yy)*10))%5;
                   if(typtree<=2){addtree22(xx,yy,ztree);}
                   else{addtree2(xx,yy,ztree);}
-				  nmaptree+=1;auxvar3=parseInt(nmaptree-d20*d20*0.2);
+				  nmaptree+=1;auxvar3=parseInt(nmaptree-d20*d20*0.15);
 				  if(nmaptree>d20*d20*2.8 && tsequoia00==0){tsequoia=2;}
 				  else if(nmaptree>d20*d20*0.4 && tsequoia==0){tsequoia=1;}
-				  else if(nmaptree>d20*d20*0.2+25 && tsequoia==0){tsequoia=1;}
+				  else if(nmaptree>d20*d20*0.15+25 && tsequoia==0){tsequoia=1;}
 		  }}}
 	}}
 }
