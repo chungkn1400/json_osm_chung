@@ -1023,14 +1023,14 @@ wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+
 nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
 var nodekey,nodekey2,nodekey3,nkeymax=450;
 //nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
-var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];
+var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];
 var iwaylat=[],iwaylng=[];for(var i=0;i<=2;i++){iwaylat[i]=999;iwaylng[i]=999;};
 function waycallback(r){//alert(r);
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  if(tilat==1 || tinit<2){iiways+=1};if(iiways>2){iiways=0;}
+  if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
   /*var dist0=0;
   for(var i=0;i<=2;i++){var dx=Math.abs(iwaylat[i]-latx)*1000,dy=(Math.abs(iwaylng[i]-lngx)/klon)*1000;
                         var dist=dx*dx+dy*dy;
@@ -1045,10 +1045,22 @@ function waycallback(r){//alert(r);
 	 if(test==0){ways[j]=iways[1][i];j+=1;}
   }
   j=ways.length;
-  var j0=j;
+  j0=j;
   for(var i=0;i<iways[2].length;i++){
      var test=0,id=iways[2][i].id;for(var k=0;k<j0;k++){if(ways[k].id==id){test=1;break;};}
 	 if(test==0){ways[j]=iways[2][i];j+=1;}
+  }
+  j=ways.length;
+  j0=j;
+  for(var i=0;i<iways[3].length;i++){
+     var test=0,id=iways[3][i].id;for(var k=0;k<j0;k++){if(ways[k].id==id){test=1;break;};}
+	 if(test==0){ways[j]=iways[3][i];j+=1;}
+  }
+  j=ways.length;
+  j0=j;
+  for(var i=0;i<iways[4].length;i++){
+     var test=0,id=iways[4][i].id;for(var k=0;k<j0;k++){if(ways[k].id==id){test=1;break;};}
+	 if(test==0){ways[j]=iways[4][i];j+=1;}
   }
   msg+="len="+ways.length;
   if(ways.length>0){
@@ -1099,7 +1111,7 @@ function waycallback2(r){//alert(r);
   setTimeout("getnodes();",t300);
 }
 var nodesignal=[];
-var iinodes=0,inodes=[];inodes[0]=[];inodes[1]=[];inodes[2]=[];
+var iinodes=0,inodes=[];inodes[0]=[];inodes[1]=[];inodes[2]=[];inodes[3]=[];inodes[4]=[];
 function nodecallback(r){//alert(r);
   nodejson=JSON.parse(r);
   var msg="";
@@ -1112,6 +1124,10 @@ function nodecallback(r){//alert(r);
   for(var i=0;i<inodes[1].length;i++){nodes[j+i]=inodes[1][i];}
   j=nodes.length;
   for(var i=0;i<inodes[2].length;i++){nodes[j+i]=inodes[2][i];}
+  j=nodes.length;
+  for(var i=0;i<inodes[3].length;i++){nodes[j+i]=inodes[3][i];}
+  j=nodes.length;
+  for(var i=0;i<inodes[4].length;i++){nodes[j+i]=inodes[4][i];}
   //msg+="len="+nodes.length;
   if(resetnode==1){latnodes=[];lonnodes=[];
                    nodesignal=[];}
