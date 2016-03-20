@@ -6979,15 +6979,20 @@ for(var i=0;i<nroc;i++){
  }
 }
 var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirr=[],trottoirx=0,trottoiry=0;
+var jtrottoir=0;
 function settrottoir(){
 var j=0;
 if(Math.abs(trottoirx-x)<7 && Math.abs(trottoiry-y)<7){return;}
 trottoirx=x;trottoiry=y;
-var dy=0.0008,dx=klon*dy;
+jtrottoir=0;
+var dy1=0.0008,dy=0.0008,dx1=klon*dy1,dx=klon*dy;
 for(var i=0;i<ntrottoir;i++){
-     dy=trottoirr[i]+0.0003;
+ if(Math.abs(trottoirlat[i]-latx)<dy1){
+  if(Math.abs(trottoirlon[i]-lngx)<dx1){
+    jtrottoir+=1;
+    dy=trottoirr[i]+0.0003;
     if(Math.abs(trottoirlat[i]-latx)<dy){
-	  if(Math.abs(trottoirlon[i]-lngx)<dy*klon){j+=1;}}
+	  if(Math.abs(trottoirlon[i]-lngx)<dy*klon){j+=1;}}}}
 }
 if(j>12){ttrottoir=1;}else{ttrottoir=0;}
 }
@@ -8122,6 +8127,7 @@ function addgmaptreetest(){
 				  else if(nmaptree>d20*d20*0.15+25 && tsequoia==0){tsequoia=1;}
 		  }}}
 	}}
+	if(tsequoia==0){settrottoir();if(jtrottoir<20){tsequoia=1;};}
 }
 var kdhzsol=1,dhzsol=1;
 function initgmap(){
