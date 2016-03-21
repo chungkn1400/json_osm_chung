@@ -1891,7 +1891,23 @@ if(testx==1 && loading==0){testx=0;loading=-2;
 	 else{tscale=0;}
      if(tscale!=tscale0){tscale0=tscale;
        if(tscale==1){subscale(1.5);}else{subscale(1);}}
-	   
+
+     timestreetview=tframe+5000;
+}
+var timestreetview=0;
+function teststreetview(){
+if(tframe<timestreetview+2000){return;}
+timestreetview=tframe;
+if(loading==0){
+ loadstreetviewstorage();
+ x=((lngx-lng0)/klon)*scale;
+ y=(latx-lat0)*scale;
+ if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2){
+   //msgload("testx");
+   //resetkeys();
+   dtloading=tframe;
+   trygetways=1;//getways();
+   }}
 }
 function movecar(){
 if(tmap==0){
@@ -2075,7 +2091,7 @@ if(twebaudio==1 && tradio==0){
 		//if(y<ymin){y+=ymax-ymin;tskip=1;};
 		//if(y>ymax){y-=ymax-ymin;tskip=1;};
 		if(tgamesave>=1){tskip=1;}
-		if(tstreetview==1){tskip=1;}
+		if(tstreetview==1){tskip=1;teststreetview();}
 		if(tskip==0 && tframe>tsrtm && testsrtm>=0.01 && loading==0){tsrtm=tframe+3000;testloadsrtm();}
 		if(tframe<tskip2+100){tskip=1;}
         gl.clearColor(1,1,1, 1.0);//auxvar2=loading;
