@@ -9474,19 +9474,31 @@ var tstreetview=0;
 function substreetview(){
 if(tstreetview==0){
 tstreetview=1;
-var urlstreetview="https:"+"//30239318f214b2cdc3b069138f22a3fbc2a194c6.googledrive.com/host/0B6GM9ay7ImZLV1ZBV0w0U1pPRGs/mystreetview.html?"+latx+"&"+lngx+"&"+o1;
+//var urlstreetview="https:"+"//30239318f214b2cdc3b069138f22a3fbc2a194c6.googledrive.com/host/0B6GM9ay7ImZLV1ZBV0w0U1pPRGs/mystreetview.html?"+latx+"&"+lngx+"&"+o1;
+var urlstreetview="mystreetview.html?"+latx+"&"+lngx+"&"+o1;
 document.getElementById('streetview').src=urlstreetview;	
 setTimeout("document.getElementById('quitstreetview').focus();",3000);
 setTimeout("document.getElementById('quitstreetview').focus();",5000);
 }else{tstreetview=0;
 document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
+loadstreetviewstorage();
 }
+}
+function loadstreetviewstorage(){
+if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
+	             if(aux){latx=eval(aux);}
+				 var aux1=localStorage.getItem("mystreetview_log");
+	             if(aux1){lngx=eval(aux1);}
+				 var aux2=localStorage.getItem("mystreetview_o1");
+	             if(aux2){o1=eval(aux2);}
+				}
 }
 function quitstreetview(){
 tstreetview=0;
 document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
+loadstreetviewstorage();
 }
 
 var thour=0;
