@@ -117,6 +117,7 @@ function setlink(){
 function initialize() {
   lat=49.3600 ;log= 0.08361;
   lat=49.35270216564708   ;log=0.06167567398663404   ;o1=10;
+  loadstreetviewstorage();
   var hash=document.location.search;//parent.location.hash;
   if(hash!=""){var txts=hash.split("&");lat=eval(txts[0].substr(1,txts[0].length-1));
     log=eval(txts[1]);
@@ -141,7 +142,7 @@ function initialize() {
       document.getElementById('canvas'),
       panoramaOptions);
   document.getElementById('combo').selectedIndex=2;
-  if(hash==""){subcombo();}else{update();}
+  if(hash=="" && !localStorage){subcombo();}else{update();}
   //panorama.setVisible(true); 
   initmap();
   setxy();
@@ -153,6 +154,15 @@ function savestorage(){
 	   localStorage.setItem("mystreetview_log",log1);
 	   localStorage.setItem("mystreetview_o1",o1);
 	   }
+}
+function loadstreetviewstorage(){
+if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
+	             if(aux){lat=eval(aux);}
+				 var aux1=localStorage.getItem("mystreetview_log");
+	             if(aux1){log=eval(aux1);}
+				 var aux2=localStorage.getItem("mystreetview_o1");
+	             if(aux2){o1=eval(aux2);}
+				}
 }
 function update0(){
   myposition=new google.maps.LatLng(lat-x*0.00015, log+y*0.00015);
