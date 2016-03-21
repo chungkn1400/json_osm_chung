@@ -1,0 +1,426 @@
+<!-- mystreetview_chung a program by NGUYEN.Chung (freeware 2014) -->
+<!-- arrows : move  / H : help -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>mystreetview_chung </title>
+  </head>
+    <style>
+      html, body, #canvas {
+        height: 98%;margin: 0px;padding: 0px;
+      }
+    </style>
+  <body >
+    <div style="height: 97%;width:100%;position:absolute;top:0px;left:0px;margin: 0px;padding: 0px;" >
+    <div id="canvas" onclick="setxy();" ></div>
+		<div style="left:0px; ">
+		<button id="back"  onclick="subback();">back</button>
+        <select id="combo" onChange="subcombo();">
+          <option id="deauville gare">deauville gare</option>
+          <option id="deauville marinas">deauville marinas</option>
+          <option id="deauville tourgeville">deauville tourgeville</option>
+          <option id="deauville plage">deauville plage</option>
+          <option id="trouville">trouville</option>
+          <option id="trouville plage">trouville plage</option>
+          <option id="nancy">nancy</option>
+          <option id="crickvenica">crickvenica</option>
+          <option id="paris tolbiac">paris tolbiac</option>
+          <option id="paris telecom">paris telecom</option>
+          <option id="paris ivry">paris ivry</option>
+          <option id="paris monge">paris monge</option>
+          <option id="paris defense">paris defense</option>
+          <option id="ivry romain roland">ivry romain roland</option>
+          <option id="orsay">orsay</option>
+          <option id="le barcares">le barcares</option>
+          <option id="jerusalem">jerusalem</option>
+        </select>
+		<button id="map"  onclick="showmap();" >map</button>
+		<button id="link"  onclick="setlink();">link</button>
+		<input type="text" onKeyUp="keyup(event);" onKeyDown="keydown(event);" id="intext" maxlength="95" size="95" value=""/>
+		</div>
+		<div id="panel">
+		<input type="text" id="geolocation" onKeyUp="keyup2(event);" maxlength="40" size="40" value=""/>
+		<button id="flyto"  onclick="geolocate();" >flyto</button>
+		</div>
+    <div id="mapcanvas" onKeyUp="keyup(event);"  style="top:0px;left:0px;height:96%;width:100%;"></div>
+	</div>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>
+function subhelp(){
+var crlf=String.fromCharCode(13)+String.fromCharCode(10);
+var msg="H => help"+crlf;
+msg+="M => map"+crlf;
+msg+="esc => quit"+crlf;
+msg+="arrow keys => rotate,move"+crlf;
+msg+="pageup/pagedown => look up/down"+crlf;
+msg+="back => return previous locations"+crlf;
+msg+="link => create in adress bar a link for later return to position"+crlf;  
+msg+=" "+crlf;
+msg+="map: click on map to teleport"+crlf;
+msg+="     mouse wheel => zoom in/out	"+crlf;
+msg+="     blue lines indicate roads covered by streetview"+crlf;
+alert(msg);	 
+document.getElementById('intext').focus();
+}
+var o1=0,x=1,y=0,o10=0,x0=0,y0=0,lat=0,log=0,lat1=0,log1=0,o2=0,o20=0,trun=0,vrun=1;
+var iback=0,tback=10;var o1back=new Array(10000),xback=new Array(10000),yback=new Array(10000);
+var panorama=null,myposition=null,map=null,marker=null;
+var auxvar=null,tkey=0;
+function subcombo(){
+var combotext = document.getElementById('combo')[document.getElementById('combo').selectedIndex].id ;
+if (combotext=="deauville gare"){lat=49.3600 ;log= 0.08361;o1=0;}
+if (combotext=="trouville"){lat=49.3648277251092   ;log=0.08235780384161225   ;o1=140;}
+if (combotext=="deauville marinas"){lat=49.36198047661674   ;log=0.07262960190958628   ;o1=120;}
+if (combotext=="deauville tourgeville"){lat=49.35270216564708   ;log=0.06167567398663404   ;o1=10;}
+if (combotext=="deauville plage"){lat=49.35600551121942   ;log=0.06075459446313726   ;o1=110;}
+if (combotext=="trouville plage"){lat=49.36663106706898   ;log=0.07818353983048315   ;o1=130;}
+if (combotext=="nancy"){lat=48.69306979368741   ;log=6.182922715725031   ;o1=70;}
+if (combotext=="crickvenica"){lat=45.1734569955986   ;log=14.689314428610118   ;o1=-110;}
+if (combotext=="paris tolbiac"){lat=48.826125291730506   ;log=2.3570559500472212   ;o1=0;}
+if (combotext=="paris telecom"){lat=48.82593389580492   ;log=2.346686781039077   ;o1=90;}
+if (combotext=="paris ivry"){lat=48.81728451119838   ;log=2.373548807472703   ;o1=-80;}
+if (combotext=="paris monge"){lat=48.84287915011299   ;log=2.351857733442072   ;o1=50;}
+if (combotext=="paris defense"){lat=48.891977155490395   ;log=2.237673523003608   ;o1=160;}
+if (combotext=="ivry romain roland"){lat=48.80346335679542   ;log=2.3934673532940915   ;o1=-50;}
+if (combotext=="orsay"){lat=48.706787   ;log=2.180894999999964   ;o1=-30;}
+if (combotext=="le barcares"){lat=42.78764305091493   ;log=3.0338932951133533   ;o1=175;} 
+if (combotext=="jerusalem"){lat=31.776636707589287   ;log=35.2337121963501   ;o1=36.3920;}
+x=0;y=0;tmap=2;
+update();
+}
+function setxy(){setTimeout("setxy2();",250);}
+function setxy2(){
+  var position=panorama.getPosition();
+  lat1=position.lat();log1=position.lng();
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  y=(lat1-lat)/0.00014;x=(log-log1)/(kx*0.00014);
+  var pov=panorama.getPov();
+  o1=90-pov.heading;
+  tmap=2;update();
+  //lat1=lat+y*0.00014; log1=log-kx*x*0.00014;
+  //setTimeout("setxy();",1000);
+}
+function setxy3(){
+  var position=panorama.getPosition();
+  lat1=position.lat();log1=position.lng();
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  y=(lat1-lat)/0.00014;x=(log-log1)/(kx*0.00014);
+  var pov=panorama.getPov();
+  o1=90-pov.heading;
+}
+function setlink(){
+  alert("copy the adress bar to link to this place later");
+  document.location.search=lat1+"&"+log1+"&"+o1;  
+  document.getElementById('intext').focus();
+}
+function initialize() {
+  lat=49.3600 ;log= 0.08361;
+  lat=49.35270216564708   ;log=0.06167567398663404   ;o1=10;
+  var hash=document.location.search;//parent.location.hash;
+  if(hash!=""){var txts=hash.split("&");lat=eval(txts[0].substr(1,txts[0].length-1));
+    log=eval(txts[1]);
+    o1=eval(txts[2]);x=0;y=0;
+    lat1=lat;log1=log;}
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  lat1=lat+y*0.00014; log1=log-kx*x*0.00014;
+  if(lat1>85){lat1=85;y=(lat1-lat)/0.00014;}
+  if(lat1<-85){lat1=-85;y=(lat1-lat)/0.00014;}
+  var deauville=new google.maps.LatLng(lat1,log1);
+  var panoramaOptions = {
+    position: deauville,
+    pov: {
+      heading: eval(90-o1),
+      pitch: o2
+    },
+    zoom: 2.3,
+    panControl: true,zoomControl:false
+	
+  };
+  panorama = new google.maps.StreetViewPanorama(
+      document.getElementById('canvas'),
+      panoramaOptions);
+  document.getElementById('combo').selectedIndex=2;
+  if(hash==""){subcombo();}else{update();}
+  //panorama.setVisible(true); 
+  initmap();
+  setxy();
+  savestorage();
+}
+function savestorage(){
+    if(localStorage){
+	   localStorage.setItem("mystreetview_lat",lat1);
+	   localStorage.setItem("mystreetview_log",log1);
+	   localStorage.setItem("mystreetview_o1",o1);
+	   }
+}
+function update0(){
+  myposition=new google.maps.LatLng(lat-x*0.00015, log+y*0.00015);
+  panorama = map.getStreetView();
+  panorama.setPosition(myposition);
+  panorama.setPov({
+    heading: eval(90-o1),
+    pitch:0}
+  );
+}
+var timer0=0,timer1=0;
+function timer(){
+return (new Date()).getTime();//ms
+}
+var keys=new Array(256),keys0=new Array(256),tkeys=new Array(256);
+for(var i=0;i<256;i++){keys[i]=0;keys0[i]=0;tkeys[i]=0;}
+function keydown(e){
+var key=eval(e.which || e.keyCode)
+var t=timer();
+if(key>0 && key<256){keys[key]=1;tkeys[key]=t;if(keys0[key]==0){keys0[key]=1;}}
+if(tkey>(t-3000)){tkey=t;}else{tkey=t;testkeys();}
+}
+function keyup(e){
+var key=eval(e.which || e.keyCode)
+if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
+var t=timer();
+for(var i=33;i<=40;i++){if(tkeys[i]<(t-3000)){keys[i]=0;keys0[i]=0;};}
+}
+var tpano=null,tpano0=null;
+function testkeys() {
+timer0=timer1;timer1=timer();
+if (tkey>(timer1-3000)){
+	var dt=timer1-timer0;if(dt>300){dt=300;}
+    //left=37,up=38,right=39,down=40,pageup=33,pagedown=34,m=77,esc=27,h=72
+    if (keys[72]) {subhelp();keys[72]=0;}
+	//if (keys[27]) {document.location.href="http://chungswebsite.blogspot.fr/p/exit.html";}
+    if (keys[77]) {keys[77]=0;if(tmap==0){showmap();}else{o10=o1+1;};}
+    if (keys[33]) {o2+=dt*0.01;if(o2>80){o2=80;};}
+    if (keys[34]) {o2-=dt*0.01;if(o2<-80){o2=-80;};}
+    if (keys[37]) {o1+=dt*0.014;}
+    if (keys[39]) {o1-=dt*0.014;}
+    if(keys0[38]==1){
+	  if (keys[38]) {if(timer1<(trun+2800)){vrun=1.3;}else{vrun=1;};trun=timer1;
+                     document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1;
+	                 x-=vrun*Math.cos(o1*3.1416/180);y+=vrun*Math.sin(o1*3.1416/180);keys0[38]=2;}
+    }
+	if(keys0[40]==1){
+	  if (keys[40]) {trun=0;vrun=1;
+	                 x+=Math.cos(o1*3.1416/180);y-=Math.sin(o1*3.1416/180);keys0[40]=2;}
+	}
+	if(o1>180){o1-=360;}
+	if(o1<-180){o1+=360;}
+	if(Math.abs(x-x0)>0.00001 || Math.abs(y-y0)>0.00001){
+		tmap=-1;o2=0;
+		tback+=1;if(tback>=10){tback=0;
+			iback+=1;if(iback>=10000){iback=10000;};
+	        o1back[iback]=o1;xback[iback]=x;yback[iback]=y;}
+		}    				   
+	if(Math.abs(o1-o10)>0.01 || Math.abs(x-x0)>0.00001 || Math.abs(y-y0)>0.00001 || Math.abs(o2-o20)>0.01){
+	   o10=o1;x0=x;y0=y;o20=o2;update();
+	}
+/*	tpano0=tpano;tpano=panorama.getPano();
+	if(tpano!=tpano0){
+if (auxvar==null){document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1+"   ready";}
+else {document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1+"  aux="+auxvar;}
+	}*/
+    setTimeout("testkeys();",47);
+}
+}
+function keyup2(e) {
+if (e.which == 13 || e.keyCode == 13) {
+   geolocate();
+   }
+}
+function mykeypress(e) {
+if (tkey==0){tkey=1;
+    if (e.which == 13 || e.keyCode == 13) {
+    }
+    //left = 37,up = 38,right = 39,down = 40
+    if (e.which == 37 || e.keyCode == 37) {o1+=10;}
+    if (e.which == 39 || e.keyCode == 39) {o1-=10;}
+    if (e.which == 38 || e.keyCode == 38) {x-=Math.cos(o1*3.1416/180);y+=Math.sin(o1*3.1416/180);}
+    if (e.which == 40 || e.keyCode == 40) {x+=Math.cos(o1*3.1416/180);y-=Math.sin(o1*3.1416/180);}
+	if(o1>180){o1-=360;}
+	if(o1<-180){o1+=360;}
+	if((x!=x0) || (y!=y0)){
+		tmap=-1;
+		tback+=1;if(tback>=10){tback=0;
+			iback+=1;if(iback>=10000){iback=10000;};
+	        o1back[iback]=o1;xback[iback]=x;yback[iback]=y;}
+		}    				   
+	if((o1!=o10) || (x!=x0) || (y!=y0)){
+	   o10=o1;x0=x;y0=y;update();
+	}
+	//return true;
+}
+tkey=0;
+}
+function subback(){
+if(iback>=1){
+  o1=o1back[iback];x=xback[iback];y=yback[iback];
+  iback-=1;tback=10;tmap=2;//-1;
+  update();
+}
+document.getElementById('intext').focus();
+}
+var panoid=null,panoid0=null,panoidx=0,panoidy=0,panoidx0=0,panoidy0=0,tmap=0,tcenter=0;
+function updateold(){
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  lat1=lat+y*0.00014; log1=log-kx*x*0.00014;
+  if(lat1>85){lat1=85;y=(lat1-lat)/0.00014;}
+  if(lat1<-85){lat1=-85;y=(lat1-lat)/0.00014;}
+  myposition=new google.maps.LatLng(lat1,log1);//lat+y/10000.0, log-x/10000.0);
+  //if(tmap>0){  
+    if(tmap==-1 || tmap>=1){panorama.setPosition(myposition);}
+    panorama.setPov({
+      heading: eval(90-o1),
+      pitch: o2
+    });
+    panorama.setZoom(2.3);
+	//}
+	panorama.setVisible(true);
+	if(tmap==1){panoid0=panoid;panoid=panorama.getPano();}
+	if(tmap==-1){
+	 panoid0=panoid;
+     panoid=panorama.getPano();
+	 var dist=(1.3)*Math.sqrt((x-panoidx)*(x-panoidx)+(y-panoidy)*(y-panoidy));
+	 dist/=vrun;
+	 if((panoid==panoid0) && (dist>3)){x=panoidx0;y=panoidy0;panoidx=x;panoidy=y;}
+	 if((panoid!=panoid0) && (dist<3)){panoidx=x;panoidy=y;panoidx0=x;panoidy0=y;}
+	 if((panoid!=panoid0) && (dist>4)){panoidx=x;panoidy=y;}
+	 if((dist>1.7) && (dist<=4)){x=panoidx;y=panoidy;}
+	}
+	tmap=0;
+
+if (auxvar==null){document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1;}
+else {document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1+"  aux="+auxvar;}
+document.getElementById('intext').focus();
+window.scrollTo(0,0);
+tcenter+=1;if(tcenter>30){tcenter=0;setpanoidpos();}
+}
+function update(){
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  lat1=lat+y*0.00014; log1=log-kx*x*0.00014;
+  if(lat1>85){lat1=85;y=(lat1-lat)/0.00014;}
+  if(lat1<-85){lat1=-85;y=(lat1-lat)/0.00014;}
+  myposition=new google.maps.LatLng(lat1,log1);//lat+y/10000.0, log-x/10000.0);
+  //if(tmap>0){  
+    if(tmap==-1 || tmap>=1){panorama.setPosition(myposition);}
+    panorama.setPov({
+      heading: eval(90-o1),
+      pitch: o2
+    });
+    panorama.setZoom(2.3);
+	//}
+	panorama.setVisible(true);
+	if(tmap==1){panoid0=panoid;panoid=panorama.getPano();}
+	if(tmap==-1){
+	 panoid0=panoid;
+     panoid=panorama.getPano();
+	 var dist=(1.3)*Math.sqrt((x-panoidx)*(x-panoidx)+(y-panoidy)*(y-panoidy));
+	 dist/=vrun;
+	 if((panoid==panoid0) && (dist>3)){x=panoidx0;y=panoidy0;panoidx=x;panoidy=y;}
+	 if((panoid!=panoid0) && (dist<3)){panoidx=x;panoidy=y;panoidx0=x;panoidy0=y;}
+	 if((panoid!=panoid0) && (dist>4)){panoidx=x;panoidy=y;}
+	 if((dist>1.7) && (dist<=4)){x=panoidx;y=panoidy;}
+	}
+	tmap=0;
+
+if (auxvar==null){document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1;}
+else {document.getElementById('intext').value="lat="+lat1+"   log="+log1+"   o1="+o1+"  aux="+auxvar;}
+document.getElementById('intext').focus();
+window.scrollTo(0,0);
+tcenter+=1;if(tcenter>25){tcenter=0;setpanoidpos();}
+savestorage();
+}
+var sv=null,sv2=null;
+function panorama_setPosition(myposition){
+if(sv==null){sv = new google.maps.StreetViewService();}
+sv.getPanoramaByLocation(myposition, 50, processSVData);
+}
+function processSVData(data, status) {
+if (status == google.maps.StreetViewStatus.OK) {
+   panorama.setPano(data.location.pano);
+}
+}
+function setpanoidpos(){
+  if(sv2==null){sv2 = new google.maps.StreetViewService();}
+  sv2.getPanoramaById(panorama.getPano(), processSVData2);
+}
+function processSVData2(data, status) {
+if (status == google.maps.StreetViewStatus.OK) {
+  myposition=data.location.latLng;
+  tmap=2;
+  lat1=myposition.lat();log1=myposition.lng();
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  y=(lat1-lat)/0.00014;x=(log-log1)/(kx*0.00014);
+  update();
+  }
+}  
+function update2(){
+  tmap=1;
+  lat1=myposition.lat();log1=myposition.lng();
+  var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
+  y=(lat1-lat)/0.00014;x=(log-log1)/(kx*0.00014);
+  update();
+}
+var streetViewLayer=null;
+function initmap(){
+  var mapOptions = {
+    center: myposition,
+    zoom: 17
+  };
+  if(map==null){map = new google.maps.Map(
+      document.getElementById('mapcanvas'), mapOptions);
+      marker = new google.maps.Marker({
+                 map: map,
+                 position: myposition,
+                 title: ''});
+      google.maps.event.addListener(map, 'click', function(e) {
+            myposition=e.latLng;update2();
+            });
+      streetViewLayer = new google.maps.StreetViewCoverageLayer();
+      streetViewLayer.setMap(map);
+	  }
+}	  
+function showmap(){tmap=2;
+  var mapOptions = {
+    center: myposition,
+    zoom: 17
+  };
+  if(map==null){map = new google.maps.Map(
+      document.getElementById('mapcanvas'), mapOptions);
+      marker = new google.maps.Marker({
+                 map: map,
+                 position: myposition,
+                 title: ''});
+      google.maps.event.addListener(map, 'click', function(e) {
+            myposition=e.latLng;update2();
+            });
+      streetViewLayer = new google.maps.StreetViewCoverageLayer();
+      streetViewLayer.setMap(map);
+	  }
+map.setCenter(myposition);
+map.setZoom(17);
+marker.setPosition(myposition);  
+window.scrollTo(0,parseInt(screen.height*0.97)); 
+setTimeout("document.getElementById('intext').focus();",1000);
+}
+function geolocate(){
+var geolocation = document.getElementById('geolocation').value;
+//alert("geolocation="+geolocation);
+if (geolocation.length>0){
+ var geocoder = new google.maps.Geocoder();
+  geocoder.geocode( { 'address': geolocation}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      map.setCenter(results[0].geometry.location);
+    } else {
+      alert('Geolocation not found ! ' + status);
+    }
+  });
+}
+document.getElementById('intext').focus();
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+//alert("ok");
+document.getElementById('intext').focus();
+    </script>
+  </body>
+</html>
+
