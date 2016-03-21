@@ -960,8 +960,9 @@ context.lineWidth = 1;
 //auxvar=context.getImageData(200,100,1,1).data[0];
 context.font = "12pt Arial";
 for(var i=0;i<ways.length;i++){
-   var way=(ways[i]),test=1;
-   waytype="none";wayname="";
+  var way=(ways[i]),test=1;
+  waytype="none";wayname="";
+  if(way.nodes){
    if(way.tags){if(way.tags.highway){
       waytype=way.tags.highway;}}
    if(way.tags){if(way.tags.building){
@@ -1045,7 +1046,7 @@ for(var i=0;i<ways.length;i++){
    /*if(waytype=="forest" || waytype=="wood"){
       context.fillStyle = '#00ff00';
 	  context.fill();}*/	  
-   }}
+   }}}
    context.fillStyle = '#ff0000';
    var latt=parseInt(lat*1000)/1000;
    var lngg=parseInt(lng*1000)/1000;
