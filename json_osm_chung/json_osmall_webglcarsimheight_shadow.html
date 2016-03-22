@@ -1316,6 +1316,8 @@ var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
 if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;
+            if(tinit==0){cos1=0;sin1=-1;};
+            if(tinit==1){cos1=0;sin1=1;};
             if(tinit==2){cos1=1;sin1=0;};
             if(tinit==3){cos1=-1;sin1=0;};
 			if(tinit>=2){tinit+=1;};}
@@ -2040,7 +2042,7 @@ msg+="esc => quit"+crlf;
 msg+="3 => fullscreen"+crlf;
 msg+="4 => cssscale (lowerres/faster)"+crlf;
 msg+="1,2 => cockpit height"+crlf;
-msg+="Q,S => fly up/down"+crlf;
+msg+="Q,S => fly mode /up/down"+crlf;
 msg+="shift+G => flyto geolocation "+crlf;
 msg+="G => minimap(on/off)"+crlf;
 msg+="V => view type"+crlf;
@@ -2229,9 +2231,9 @@ function getterrainheightcar(lngx,latx,lastz0){
 var xx=((lngx-lng0)/klon)*scale;
 var yy=(latx-lat0)*scale;
 if(ttunnel==0 && lastz0<-99){troad=testroadcar(xx,yy,-9999,lat0,lng0,0.5);}
-else if(ttunnel==0){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}
-else if(ttunnel==2){troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);}//0.1
-else{troad=testroadcar(xx,yy,lastz-0.3,lat0,lng0,1.05);}
+else if(ttunnel==0){troad=testroadcar(xx,yy,lastz0,lat0,lng0,0.5);}
+else if(ttunnel==2){troad=testroadcar(xx,yy,lastz0,lat0,lng0,0.5);}//0.1
+else{troad=testroadcar(xx,yy,lastz0-0.3,lat0,lng0,1.05);}
 if(troad>0){return zroad;}
 return getterrainheight(lngx,latx);
 }
@@ -2309,9 +2311,10 @@ if(tmsg<(tframe-150)){tmsg=tframe;
  if(auxvar3!=null){msg+=" aux3="+auxvar3;}
  if(auxtext!=""){msg+=" auxt="+auxtext;}
  if(tfoot==0){msg+=" car";
-              if(tautopilot==1){msg+=" auto";};
-			  if(tautopilot==2){msg+=" auto1";}}
- if(tfoot==1){if(tascend==1){msg+=" ascend"}}
+              if(tfly==1){msg+=" fly";}
+              else if(tautopilot==1){msg+=" auto";}
+			  else if(tautopilot==2){msg+=" auto1";}}
+ if(tfoot==1){if(tfly==1){msg+=" fly";};if(tascend==1){msg+=" ascend"}}
  if(tmap>=1){msg="lat="+lat+" lng="+lng+"  "+srtmfile;}
  document.getElementById('msg').value=msg;
  if(tmap==4){document.getElementById('msgmap').value=msg;
@@ -2380,9 +2383,9 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
     if(tfly==0){z=Math.min(Math.max(zsol+1.8,z-0.01),z);};
     if(z<zsol+0.55){if(tfoot==1){tfly=0;z=zsol+0.58;}
 	                else{z=zsol+0.60;o2=Math.max(8,o2);soundpneu();}}
-	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);z=Math.max(z-0.03,zsol+0.58);
-	         if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}
-			 }}
+	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);z=Math.max(z-0.03,zsol+0.58);}
+	             if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}
+			    }
      vcar=0;landing=1;vrun=0;o3=0;
 	 tcar=0;
 	 if(keys[vk_a]){if(tascend==0){tascend=1;}else{tascend=0;};resetkeys();}
@@ -2478,7 +2481,7 @@ if(tfly==1){
      if(isNaN(o3volant)){o3volant=0.0;}
 	 var piloto1=0;
 	 if(tautopilot>=1 && tframe>dtautopilot-2000){teststopcar();}
-	 if(tautopilot>=1 && tframe>dtautopilot){
+	 if(tautopilot>=1 && tframe>dtautopilot && landing==1 && tfly==0){
 	     vrunauto0=Math.max(0.3,Math.min(1.0,vrunauto0));
 	     vrun+=(vrunauto0-vrun)*dtime*0.0006;
 		 if(troad==0){vrun=Math.min(vrunmax*0.45,Math.max(0.1,vrun));}
@@ -3137,9 +3140,9 @@ if(twebaudio==1 && tradio==0){
 		   loading=tupdatebuffer;
 		   tupdatebuffer=0;
            updatebuffersolheight();
-		   if(ibuff1==0){ibuff0=0;ibuff1=1;}
-		   else{ibuff0=1;ibuff1=0;}
-		   ibuff=ibuff0;
+		   if(ibuff1==0){ibuff=0;ibuff0=0;ibuff1=1;}
+		   else{ibuff=1;ibuff0=1;ibuff1=0;}
+		   //ibuff=ibuff0;
            addwomantest();
            nextdx=((lng0-lngx0)/klon)*scale;
            nextdy=(lat0-latx0)*scale;
@@ -4908,7 +4911,8 @@ var tshadownight=0;
 
 var ksuspension=20,kfps=Math.min(3,dtime*0.03);
 if(tfoot==0){//suspensions
- if(iview==1){ksuspension=5;}else{ksuspension=20;} 
+ if(iview==1){ksuspension=5;}else{ksuspension=20;}
+ if(tfly==1){ksuspension=7;} 
  vm20=vm2;
  vm2=(vmx2*cos1+vmy2*sin1)*100;
  if(vm2<0.01){vm2=0;}
@@ -4975,14 +4979,14 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		}else{return;
 		   mat4.lookAt([x,y,z+0.5+200],[x+cos1,y+sin1,z+0.5],[0,0,1],mvMatrix);
 		   gl.useProgram(shaderProgram);
-		   ibuff=ibuff0;
+		   //ibuff=ibuff0;
 		   drawsol3();
 		   return;
 		   //mat4.lookAt([x,y,z+200.5],[x+cos1*cos2,y+sin1*cos2,z+sin2+0.5],[0,0,1],mvMatrix);
 		}
 		   
 		gl.useProgram(shader0Program);
-		ibuff=ibuff0;
+		//ibuff=ibuff0;
 		var fogsave=fog;fog*=0.73;
 		if(tmap==0){drawsky();
 		   //if(tcloud>=1){movecloud();drawcloud();}
@@ -5617,7 +5621,7 @@ var dtcollide=0,timecollide=0,tcollide2=0,ywall=0;
 function testcollide(){
 if(tframe<dtcollide){return;}
 if(tframe<timecollide){return;}
-if(ttunnel>=1){return;}
+if(ttunnel>=1 || tfly==1){return;}
 //timecollide=tframe+250;
 //drawtestcollide();
 //auxvar=context.getImageData(200,100,1,1).data[0];
@@ -7887,11 +7891,11 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
     //mat4.identity(mvMatrix);
-	if(tframe>tdrawsol){dzsol0=zview;xsol0=lngsol0;ysol0=latsol0;}
+	if(tframe>tdrawsol || tfly==1){dzsol0=zview;xsol0=lngsol0;ysol0=latsol0;}
 	else if(ttunnelprev>=1 && tframe<tdrawsol-401){tdrawsol=tframe+300;z=zsol+0.7;}
 	else if(tframe<tdrawsol-401){tdrawsol=tframe+300;z=Math.max(dzsol0+0.6,zsol+0.3);}
 	mvPushMatrix();
-	if(tframe>tdrawsol){mat4.translate(mvMatrix, [xsol,ysol,zsol0]);}
+	if(tframe>tdrawsol || tfly==1){mat4.translate(mvMatrix, [xsol,ysol,zsol0]);}
 	else{z=zsol+0.7;
 	     var xsol1=((xsol0-lng0)/klon)*scale+scx/nsol;
          var ysol1=(ysol0-lat0)*scale-scy/nsol;
@@ -9619,9 +9623,78 @@ if(pautoroad0>=0){
   else{px+=(cos1+2*cos10)*sign(dxxxx);
      py+=(sin1+2*sin10)*sign(dxxxx);}
 }
-r=5;
+r=3;//5
 px-=sin1*0.3;py+=cos1*0.3;
-if(tautopilot==2 && typecar==0){r=3;}
+iautoroad=-1;
+if(typecar==0){
+var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
+  for(var i=0;i<iroad0;i++){
+    dx=px-road0x[i];
+	if(Math.abs(dx)<r){
+	if(road0oneway[i]==0){dxy=Math.abs(cos10*road0co1[i]+sin10*road0si1[i]);}
+	else{dxy=(cos10*road0co1[i]+sin10*road0si1[i]);}
+	if(dxy<0.607){dxy=0;}//0.607
+	if(Math.abs(dx+dxy*sin1)<r){
+	 dy=py-road0y[i];
+	 if(Math.abs(dy)<r){
+	 if(Math.abs(dy-dxy*cos1)<r){
+       var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5-(sin2/2)*road0l[i]-z);
+       if(dx*cos1+dy*sin1<0 && dxxh>0){
+	    if(iautoroad<nautoroad && i!=pautoroad0){
+		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
+          if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
+		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
+		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+	   }}}}}}}
+  for(var i=0;i<iroad0;i++){
+    dx=px-road0x[i]-road0l[i]*road0co1[i];
+	if(Math.abs(dx)<r){
+	if(road0oneway[i]==0){dxy=Math.abs(cos10*road0co1[i]+sin10*road0si1[i]);}
+	else{dxy=(cos10*road0co1[i]+sin10*road0si1[i]);}
+	if(dxy<0.607){dxy=0;}//0.607
+	if(Math.abs(dx+dxy*sin1)<r){
+	 dy=py-road0y[i]-road0l[i]*road0si1[i];
+	 if(Math.abs(dy)<r){
+	 if(Math.abs(dy-dxy*cos1)<r){
+       var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]-sin2/2)*road0l[i]-z);
+	   if(dx*cos1+dy*sin1<0 && dxxh>0){
+	    if(iautoroad<nautoroad && i!=pautoroad0){
+		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
+          if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
+		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
+		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+	   }}}}}}}
+  for(var i=0;i<iroad0;i++){
+    dx=px-road0x[i]-road0l[i]*road0co1[i]/2;
+	if(Math.abs(dx)<r){
+	if(road0oneway[i]==0){dxy=Math.abs(cos10*road0co1[i]+sin10*road0si1[i]);}
+	else{dxy=(cos10*road0co1[i]+sin10*road0si1[i]);}
+	if(dxy<0.607){dxy=0;}//0.607
+	if(Math.abs(dx+dxy*sin1)<r){
+	 dy=py-road0y[i]-road0l[i]*road0si1[i]/2;
+	 if(Math.abs(dy)<r){
+	 if(Math.abs(dy-dxy*cos1)<r){
+       var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]/2-sin2/2)*road0l[i]-z);
+	   if(dx*cos1+dy*sin1<0 && dxxh>0){
+	    if(iautoroad<nautoroad && i!=pautoroad0){
+		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
+          if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
+		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
+		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+	   }}}}}}}
+  if(idxyauto>=0 && (auto==1 || iautoroad<0)){pautoroad=idxyauto;return;}
+  if(iautoroad>=0){
+    var i=parseInt(Math.random()*(iautoroad+0.99));
+	pautoroad=autoroad[i];return;
+	}
+}
+r=5;
 iautoroad=-1;
 var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
   for(var i=0;i<iroad0;i++){
@@ -10483,7 +10556,8 @@ if(way.nodes){
     		  if(j==(jmax)){		    
         	    if(dr0>10 || jmax>4){testband=1;}}}
 			}
-		if((xx-x)*(xx-x)+(yy-y)*(yy-y)<(5*dxmax*5*dxmax)){
+			auxvar=dxmax;
+		if((xx-x)*(xx-x)+(yy-y)*(yy-y)<Math.max(200*200,5*dxmax*5*dxmax)){
 			if(iroad<nroad){
 			  roadx[iroad]=xxx;roady[iroad]=yyy;
 			  roadr[iroad]=r;
@@ -10797,12 +10871,12 @@ for(var i=0;i<indextower;i++){
 	    x,y,z, x,y,z, x,y,z
             ]);
  } 
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (towernormals), gl.STATIC_DRAW);
-   towerVertexNormalBuffer[ibuff].itemSize = 3;
-   towerVertexNormalBuffer[ibuff].numItems = index/3;
-   ibuff=ibuff0;
+   towerVertexNormalBuffer[ibuff1].itemSize = 3;
+   towerVertexNormalBuffer[ibuff1].numItems = index/3;
+   //ibuff=ibuff0;
 }
 function setchurchnormals(){
 var x,y,z,r;
@@ -10829,12 +10903,12 @@ for(var i=0;i<indexchurch;i++){
 	    x,y,z, x,y,z, x,y,z
             ]);
  } 
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexNormalBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexNormalBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (churchnormals), gl.STATIC_DRAW);
-   churchVertexNormalBuffer[ibuff].itemSize = 3;
-   churchVertexNormalBuffer[ibuff].numItems = index/3;
-   ibuff=ibuff0;
+   churchVertexNormalBuffer[ibuff1].itemSize = 3;
+   churchVertexNormalBuffer[ibuff1].numItems = index/3;
+   //ibuff=ibuff0;
 }
 function sethousenormals(){
 var x,y,z,r;
@@ -10861,12 +10935,12 @@ for(var i=0;i<indexhouse;i++){
 	    x,y,z, x,y,z, x,y,z
             ]);
  } 
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexNormalBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexNormalBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (housenormals), gl.STATIC_DRAW);
-   houseVertexNormalBuffer[ibuff].itemSize = 3;
-   houseVertexNormalBuffer[ibuff].numItems = index/3;
-   ibuff=ibuff0;
+   houseVertexNormalBuffer[ibuff1].itemSize = 3;
+   houseVertexNormalBuffer[ibuff1].numItems = index/3;
+   //ibuff=ibuff0;
 }
 function setroadnormals(){
 var x,y,z,r;
@@ -10893,12 +10967,12 @@ for(var i=0;i<indexroad;i++){
 	    x,y,z, x,y,z, x,y,z
             ]);
  } 
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexNormalBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexNormalBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roadnormals), gl.STATIC_DRAW);
-   roadVertexNormalBuffer[ibuff].itemSize = 3;
-   roadVertexNormalBuffer[ibuff].numItems = index/3;
-   ibuff=ibuff0;
+   roadVertexNormalBuffer[ibuff1].itemSize = 3;
+   roadVertexNormalBuffer[ibuff1].numItems = index/3;
+   //ibuff=ibuff0;
 }
 function updateiroad(){
    for(var i=0;i<iroad;i++){
@@ -10956,122 +11030,122 @@ function updateiroad(){
    nstop0=nstop;
 }
 function updatebuffer1(){   
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roadvertices), gl.STATIC_DRAW);
-   roadVertexPositionBuffer[ibuff].itemSize = 3;
-   roadVertexPositionBuffer[ibuff].numItems = indexroad/3;
+   roadVertexPositionBuffer[ibuff1].itemSize = 3;
+   roadVertexPositionBuffer[ibuff1].numItems = indexroad/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roadtextureCoords), gl.STATIC_DRAW);
-   roadVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   roadVertexTextureCoordBuffer[ibuff].numItems = itextroad/2;
+   roadVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   roadVertexTextureCoordBuffer[ibuff1].numItems = itextroad/2;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, roadbandVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadbandVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roadbandvertices), gl.STATIC_DRAW);
-   roadbandVertexPositionBuffer[ibuff].itemSize = 3;
-   roadbandVertexPositionBuffer[ibuff].numItems = indexroadband/3;
+   roadbandVertexPositionBuffer[ibuff1].itemSize = 3;
+   roadbandVertexPositionBuffer[ibuff1].numItems = indexroadband/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, roadbandVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, roadbandVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roadbandtextureCoords), gl.STATIC_DRAW);
-   roadbandVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   roadbandVertexTextureCoordBuffer[ibuff].numItems = itextroadband/2;
-   ibuff=ibuff0;
+   roadbandVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   roadbandVertexTextureCoordBuffer[ibuff1].numItems = itextroadband/2;
+   //ibuff=ibuff0;
 tupdatebuffer=2;
 }
 function updatebuffer2(){
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (towervertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
-   towerVertexPositionBuffer[ibuff].itemSize = 3;
-   towerVertexPositionBuffer[ibuff].numItems = indextower/3;
+   towerVertexPositionBuffer[ibuff1].itemSize = 3;
+   towerVertexPositionBuffer[ibuff1].numItems = indextower/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (towertextureCoords), gl.STATIC_DRAW);
-   towerVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   towerVertexTextureCoordBuffer[ibuff].numItems = itexttower/2;
+   towerVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   towerVertexTextureCoordBuffer[ibuff1].numItems = itexttower/2;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (churchvertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
-   churchVertexPositionBuffer[ibuff].itemSize = 3;
-   churchVertexPositionBuffer[ibuff].numItems = indexchurch/3;
+   churchVertexPositionBuffer[ibuff1].itemSize = 3;
+   churchVertexPositionBuffer[ibuff1].numItems = indexchurch/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (churchtextureCoords), gl.STATIC_DRAW);
-   churchVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   churchVertexTextureCoordBuffer[ibuff].numItems = itextchurch/2;
+   churchVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   churchVertexTextureCoordBuffer[ibuff1].numItems = itextchurch/2;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (housevertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
-   houseVertexPositionBuffer[ibuff].itemSize = 3;
-   houseVertexPositionBuffer[ibuff].numItems = indexhouse/3;
+   houseVertexPositionBuffer[ibuff1].itemSize = 3;
+   houseVertexPositionBuffer[ibuff1].numItems = indexhouse/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, houseVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (housetextureCoords), gl.STATIC_DRAW);
-   houseVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   houseVertexTextureCoordBuffer[ibuff].numItems = itexthouse/2;
+   houseVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   houseVertexTextureCoordBuffer[ibuff1].numItems = itexthouse/2;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, treeVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, treeVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (treevertices), gl.STATIC_DRAW);
-   treeVertexPositionBuffer[ibuff].itemSize = 3;
-   treeVertexPositionBuffer[ibuff].numItems = indextree/3;
+   treeVertexPositionBuffer[ibuff1].itemSize = 3;
+   treeVertexPositionBuffer[ibuff1].numItems = indextree/3;
 	
-   //gl.bindBuffer(gl.ARRAY_BUFFER, treeVertexTextureCoordBuffer[ibuff]);
+   //gl.bindBuffer(gl.ARRAY_BUFFER, treeVertexTextureCoordBuffer[ibuff1]);
    //gl.bufferData(gl.ARRAY_BUFFER, (treetextureCoords), gl.STATIC_DRAW);
-   treeVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   treeVertexTextureCoordBuffer[ibuff].numItems = indextree/3;
+   treeVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   treeVertexTextureCoordBuffer[ibuff1].numItems = indextree/3;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, tree2VertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, tree2VertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (tree2vertices), gl.STATIC_DRAW);
-   tree2VertexPositionBuffer[ibuff].itemSize = 3;
-   tree2VertexPositionBuffer[ibuff].numItems = indextree2/3;
+   tree2VertexPositionBuffer[ibuff1].itemSize = 3;
+   tree2VertexPositionBuffer[ibuff1].numItems = indextree2/3;
 	
-   //gl.bindBuffer(gl.ARRAY_BUFFER, tree2VertexTextureCoordBuffer[ibuff]);
+   //gl.bindBuffer(gl.ARRAY_BUFFER, tree2VertexTextureCoordBuffer[ibuff1]);
    //gl.bufferData(gl.ARRAY_BUFFER, (tree2textureCoords), gl.STATIC_DRAW);
-   tree2VertexTextureCoordBuffer[ibuff].itemSize = 2;
-   tree2VertexTextureCoordBuffer[ibuff].numItems = indextree2/3;
+   tree2VertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   tree2VertexTextureCoordBuffer[ibuff1].numItems = indextree2/3;
    
-   gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (linevertices), gl.STATIC_DRAW);
-   lineVertexPositionBuffer[ibuff].itemSize = 4;
-   lineVertexPositionBuffer[ibuff].numItems = indexline/4;
+   lineVertexPositionBuffer[ibuff1].itemSize = 4;
+   lineVertexPositionBuffer[ibuff1].numItems = indexline/4;
 
-   gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (linetexturecoords), gl.STATIC_DRAW);
-   lineVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   lineVertexTextureCoordBuffer[ibuff].numItems = indexline/4;
-   //lineVertexTextureCoordBuffer[ibuff].numItems = indexlinetext/2;//indexline/4;
+   lineVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   lineVertexTextureCoordBuffer[ibuff1].numItems = indexline/4;
+   //lineVertexTextureCoordBuffer[ibuff1].numItems = indexlinetext/2;//indexline/4;
 
-   gl.bindBuffer(gl.ARRAY_BUFFER, crossVertexPositionBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, crossVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (crossvertices), gl.STATIC_DRAW);
-   crossVertexPositionBuffer[ibuff].itemSize = 4;
-   crossVertexPositionBuffer[ibuff].numItems = indexcross/4;
+   crossVertexPositionBuffer[ibuff1].itemSize = 4;
+   crossVertexPositionBuffer[ibuff1].numItems = indexcross/4;
 
-   //gl.bindBuffer(gl.ARRAY_BUFFER, crossVertexTextureCoordBuffer[ibuff]);
+   //gl.bindBuffer(gl.ARRAY_BUFFER, crossVertexTextureCoordBuffer[ibuff1]);
    //gl.bufferData(gl.ARRAY_BUFFER, (crosstextureCoords), gl.STATIC_DRAW);
-   crossVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   crossVertexTextureCoordBuffer[ibuff].numItems = indexcross/4;
+   crossVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   crossVertexTextureCoordBuffer[ibuff1].numItems = indexcross/4;
 
-   ibuff=ibuff0;
+   //ibuff=ibuff0;
 tupdatebuffer=3;
 }
 function updatebuffer3(){
-   var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer[ibuff]);
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (roofvertices), gl.STATIC_DRAW);
-   roofVertexPositionBuffer[ibuff].itemSize = 3;
-   roofVertexPositionBuffer[ibuff].numItems = indexroof/3;
+   roofVertexPositionBuffer[ibuff1].itemSize = 3;
+   roofVertexPositionBuffer[ibuff1].numItems = indexroof/3;
 	
-   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer[ibuff]);
+   gl.bindBuffer(gl.ARRAY_BUFFER, roofVertexTextureCoordBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (rooftextureCoords), gl.STATIC_DRAW);
-   roofVertexTextureCoordBuffer[ibuff].itemSize = 2;
-   roofVertexTextureCoordBuffer[ibuff].numItems = itextroof/2;
+   roofVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   roofVertexTextureCoordBuffer[ibuff1].numItems = itextroof/2;
    
    ////lat0=lat;lng0=lng;
    //x0=((lng-lng0)/klon)*scale;
    //y0=(lat-lat0)*scale;
    
-   ibuff=ibuff0;
+   //ibuff=ibuff0;
 setTimeout("tupdatebuffer=4;",t300);
 }
 var treex=[],treey=[],treez=[],itree=0;
