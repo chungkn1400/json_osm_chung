@@ -7040,6 +7040,7 @@ if(Math.abs(zsol-snowzsol)>20 || Math.abs(snowlat-latx)>2){
  if(latx<0){twinter=(1+Math.min(Math.abs(6-month),Math.abs(7-month)))*50/(20+Math.abs(latx));}
  if(Math.random()*Math.max(0.55,twinter*30/Math.max(15,zsol))<0.5){tsnow=1;}
  tpine=0;if(Math.abs(latx)*zsol*(0.5+Math.random())>45*90){tpine=1;}
+ if(temp>5){tsnow=0;}
 }
 tautumn=0;
 var dmonth=0;
