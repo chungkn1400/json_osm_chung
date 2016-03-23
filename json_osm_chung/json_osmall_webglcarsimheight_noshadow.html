@@ -1480,6 +1480,7 @@ if(tfly==1){
 	var h0=zsol,h1=zsol,h2=zsol,dx=1,dy=0.7;
 	o2sol=0.04;o3sol=0;
 	if(tcar==1 && tmap==0 && troad==0){
+	  h0=getterrainheight2(x,y);
 	  h1=getterrainheight2(x+dx*cos1-dy*sin1,y+dx*sin1+dy*cos1);
 	  h2=getterrainheight2(x+dx*cos1+dy*sin1,y+dx*sin1-dy*cos1);
 	  //h0=getterrainheight2(x,y);
