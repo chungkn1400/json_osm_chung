@@ -6948,7 +6948,7 @@ for(var i=0;i<nroc;i++){
 		var d=rocscale[i]*1.8+Math.min(roch[i]*0.8,0);
 		if(Math.abs(rocx[i]-x)<d){
 		   if(Math.abs(rocy[i]-y)<d){
-		      if(rocz[i]>zroc){tcollide=1;};};}
+		      if(rocz[i]>zroc && tfly==0){tcollide=1;};};}
 	    if(test==11){var dnroc=nroc*40000/(40000+nways*nways*19*19/(dxmax*dxmax));
 					 if(i>(dnroc) || dnroc<5){rocz[i]=-999999;}
 		             else{rocz[i]=1;}}
