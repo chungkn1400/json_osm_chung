@@ -1024,18 +1024,20 @@ nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C
 var nodekey,nodekey2,nodekey3,nkeymax=450;
 //nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
 var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];
-var iwaylat=[],iwaylng=[];for(var i=0;i<=2;i++){iwaylat[i]=999;iwaylng[i]=999;};
+var iwaylat=[],iwaylng=[];for(var i=0;i<=4;i++){iwaylat[i]=999;iwaylng[i]=999;};
 function waycallback(r){//alert(r);
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
   nnode=0;
   ways=[];
-  if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
-  /*var dist0=0;
-  for(var i=0;i<=2;i++){var dx=Math.abs(iwaylat[i]-latx)*1000,dy=(Math.abs(iwaylng[i]-lngx)/klon)*1000;
+  //if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
+  iiways=0;
+  var dist0=0;
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*1000;
+                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*1000;
                         var dist=dx*dx+dy*dy;
                         if(dist0<dist){dist0=dist;iiways=i;}}
-  iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;*/
+  iwaylat[iiways]=latx0;iwaylng[iiways]=lngx0;
   if(wayjson.elements){iways[iiways]=wayjson.elements;}
   ways=iways[0];
   var j=ways.length;
@@ -2864,7 +2866,7 @@ if(tframe>dtloading+20000){dtloading=tframe;resetkeys();
 		  updatesoltexture();return;}
 if(loading==0){
  //if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>Math.min(24,dxmax*1.2)){testx=1;}
- if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2){testx=1;}
+ if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2 || testiiways()){testx=1;}
 }
 if(testx==1 && loading==0){testx=0;//loading=-2;
    msgload("testx");
@@ -2891,12 +2893,23 @@ if(loading==0){
  loadstreetviewstorage();
  x=((lngx-lng0)/klon)*scale;
  y=(latx-lat0)*scale;
- if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2){
+ if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2 || testiiways()){
    //msgload("testx");
    //resetkeys();
    dtloading=tframe;
    trygetways=1;//getways();
    }}
+}
+function testiiways(){
+  var dist0=9999999,dist1=dxmax*1.2;
+  var latxx0=latx+sin1*dxmax*0.74/scale;
+  var lngxx0=lngx+cos1*dxmax*0.74*klon/scale;
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale;
+                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale;
+                        var dist=dx*dx+dy*dy;
+                        if(dist0>dist){dist0=dist;}}
+  if(dist0>dist1*dist1){return 1;}
+  return 0;
 }
 function movecar(){
 if(tmap==0){
