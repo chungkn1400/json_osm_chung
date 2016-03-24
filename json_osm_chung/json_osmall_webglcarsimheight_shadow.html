@@ -2892,12 +2892,12 @@ if(testx==1 && loading==0){testx=0;//loading=-2;
      if(tscale!=tscale0){tscale0=tscale;
        if(tscale==1){subscale(1.5);}else{subscale(1);}}
 	   
-	 timestreetview=tframe+5000;
+	 timestreetview=tframe+200;
 	 altz=Math.min(44,z-zsol);
 }
 var timestreetview=0;
 function teststreetview(){
-if(tframe<timestreetview+2000){return;}
+if(tframe<timestreetview+1000){return;}
 timestreetview=tframe;
 if(loading==0){
  loadstreetviewstorage();
@@ -2909,6 +2909,8 @@ if(loading==0){
    dtloading=tframe;
    trygetways=1;//getways();
    }}
+loadstreetviewmsg();
+if(streetviewmsg=="quit"){quitstreetview();}
 }
 function testiiways(){
   var dist0=9999999,dist1=dxmax*1.2;
@@ -13882,15 +13884,17 @@ if(tstreetview==0){
 tstreetview=1;
 //var urlstreetview="https:"+"//30239318f214b2cdc3b069138f22a3fbc2a194c6.googledrive.com/host/0B6GM9ay7ImZLV1ZBV0w0U1pPRGs/mystreetview.html?"+latx+"&"+lngx+"&"+o1;
 var urlstreetview="mystreetview.html?"+latx+"&"+lngx+"&"+o1;
+savestreetviewstorage();
 document.getElementById('streetview').src=urlstreetview;	
-setTimeout("document.getElementById('quitstreetview').focus();",3000);
-setTimeout("document.getElementById('quitstreetview').focus();",5000);
+//setTimeout("document.getElementById('quitstreetview').focus();",3000);
+//setTimeout("document.getElementById('quitstreetview').focus();",5000);
 }else{tstreetview=0;
 document.getElementById('streetview').src="";
 document.getElementById('streetview').blur();
 loadstreetviewstorage();
 }
 }
+var streetviewmsg="off";
 function loadstreetviewstorage(){
 if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
 	             if(aux){latx=eval(aux);}
@@ -13899,6 +13903,20 @@ if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
 				 var aux2=localStorage.getItem("mystreetview_o1");
 	             if(aux2){o1=eval(aux2);}
 				}
+}
+function loadstreetviewmsg(){
+if(localStorage){var aux3=localStorage.getItem("mystreetview_msg");
+	             if(aux3){streetviewmsg=aux3;}
+				}
+}
+function savestreetviewstorage(){
+    streetviewmsg="start";
+    if(localStorage){
+	   localStorage.setItem("mystreetview_lat",latx);
+	   localStorage.setItem("mystreetview_log",lngx);
+	   localStorage.setItem("mystreetview_o1",o1);
+	   localStorage.setItem("mystreetview_msg",streetviewmsg);
+	   }
 }
 function substreetview2(){
 if(tstreetview==0){

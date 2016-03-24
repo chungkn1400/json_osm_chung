@@ -46,6 +46,7 @@
     <div id="mapcanvas" onKeyUp="keyup(event);"  style="top:0px;left:0px;height:96%;width:100%;"></div>
 	</div>
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script src="vk_keys.js"></script>
     <script>
 function subhelp(){
 var crlf=String.fromCharCode(13)+String.fromCharCode(10);
@@ -155,6 +156,12 @@ function savestorage(){
 	   localStorage.setItem("mystreetview_o1",o1);
 	   }
 }
+function savemsg(){
+    var msg="quit";
+    if(localStorage){
+	   localStorage.setItem("mystreetview_msg",msg);
+	   }
+}
 function loadstreetviewstorage(){
 if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
 	             if(aux){lat=eval(aux);}
@@ -191,6 +198,9 @@ if(key>0 && key<256){keys[key]=0;keys0[key]=0;}
 var t=timer();
 for(var i=33;i<=40;i++){if(tkeys[i]<(t-3000)){keys[i]=0;keys0[i]=0;};}
 }
+function resetkeys(){
+ for(var i=0;i<256;i++){keys[i]=0;keys0[i]=0;tkeys[i]=0;}
+}
 var tpano=null,tpano0=null;
 function testkeys() {
 timer0=timer1;timer1=timer();
@@ -198,6 +208,8 @@ if (tkey>(timer1-3000)){
 	var dt=timer1-timer0;if(dt>300){dt=300;}
     //left=37,up=38,right=39,down=40,pageup=33,pagedown=34,m=77,esc=27,h=72
     if (keys[72]) {subhelp();keys[72]=0;}
+	if (keys[vk_escape] || keys[vk_space] || keys[vk_return]){
+	    savemsg();resetkeys();}
 	//if (keys[27]) {document.location.href="http://chungswebsite.blogspot.fr/p/exit.html";}
     if (keys[77]) {keys[77]=0;if(tmap==0){showmap();}else{o10=o1+1;};}
     if (keys[33]) {o2+=dt*0.01;if(o2>80){o2=80;};}
