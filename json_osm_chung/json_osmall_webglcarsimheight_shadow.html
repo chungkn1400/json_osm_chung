@@ -2379,8 +2379,8 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	            if(road0layer[ixyroad]<=-2){ttunnel=1;}else{ttunnel=2;}}}
 	if(ttunnel>=1){ttesttunnel=0;}
 	if(tfly==1){if(tinit<=2){altz=Math.min(20,z-zsol);}else{z=altz+zsol;};}
-	else if(ttunnel==0 & ttunnelprev==0){
-	            if(tinit<=2){altz=Math.min(0.7,z-zsol);}else{z=altz+zsol;};}
+	//else if(ttunnel==0 & ttunnelprev==0){
+	//            if(tinit<=2){altz=Math.min(0.7,z-zsol);}else{z=altz+zsol;};}
     if (keys[vk_q]){
 	   if(tfly==0 || tfoot==1){tfly=1;z+=dt*0.002;}
        else{tfly=0;}
