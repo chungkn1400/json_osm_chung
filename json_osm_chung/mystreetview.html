@@ -122,8 +122,9 @@ function initialize() {
   var hash=document.location.search;//parent.location.hash;
   if(hash!=""){var txts=hash.split("&");lat=eval(txts[0].substr(1,txts[0].length-1));
     log=eval(txts[1]);
-    o1=eval(txts[2]);x=0;y=0;
-    lat1=lat;log1=log;}
+    o1=eval(txts[2]);}
+  x=0;y=0;
+  lat1=lat;log1=log;
   var kx=1.0/(0.01+Math.cos(lat1*3.1416/180));
   lat1=lat+y*0.00014; log1=log-kx*x*0.00014;
   if(lat1>85){lat1=85;y=(lat1-lat)/0.00014;}
@@ -143,7 +144,7 @@ function initialize() {
       document.getElementById('canvas'),
       panoramaOptions);
   document.getElementById('combo').selectedIndex=2;
-  if(hash=="" && !localStorage){subcombo();}else{update();}
+  if(hash=="" && okstorage<3){subcombo();}else{update();}
   //panorama.setVisible(true); 
   initmap();
   setxy();
@@ -162,14 +163,18 @@ function savemsg(){
 	   localStorage.setItem("mystreetview_msg",msg);
 	   }
 }
+var okstorage=0;
 function loadstreetviewstorage(){
+okstorage=0;
+var lat0,log0,o10;
 if(localStorage){var aux=localStorage.getItem("mystreetview_lat");
-	             if(aux){lat=eval(aux);}
+	             if(aux){lat0=eval(aux);okstorage+=1;}
 				 var aux1=localStorage.getItem("mystreetview_log");
-	             if(aux1){log=eval(aux1);}
+	             if(aux1){log0=eval(aux1);okstorage+=1;}
 				 var aux2=localStorage.getItem("mystreetview_o1");
-	             if(aux2){o1=eval(aux2);}
+	             if(aux2){o10=eval(aux2);okstorage+=1;}
 				}
+if(okstorage>=3){lat=lat0;log=log0;o1=o10;}
 }
 function update0(){
   myposition=new google.maps.LatLng(lat-x*0.00015, log+y*0.00015);
