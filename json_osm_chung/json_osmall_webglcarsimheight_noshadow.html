@@ -3118,11 +3118,13 @@ function updatesoltexture2(){
         getlatlng(zoom,worldx+256,worldy+256)
 		dlatsol=lat-latsol;dlngsol=lng-lngsol;
 		lat=lat000;lng=lng000;*/
+        var lngsol2=lngsol+dlngsol/nsol;
+        var latsol2=latsol+dlatsol/nsol;
         canvas2.setAttribute('width', 512);
         canvas2.setAttribute('height', 512);
 		solTexture2.image.crossOrigin = "anonymous";
         //solTexture2.image.src = getterrain(zoom,lat,lng,512,"jpg",2);//map2jpg;
-        solTexture2.image.src = getterrain(zoom,latsol,lngsol,552,"jpg",1);//map2jpg;
+        solTexture2.image.src = getterrain(zoom,latsol2,lngsol2,552,"jpg",1);//map2jpg;
 }
 
 var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
@@ -3325,6 +3327,8 @@ var tshadow=0,distshadow=0,sunzz=1000,sunco2=0,sunsi2=1,sunco1=0,sunsi1=1;
 
 var ksuspension=20,kfps=Math.min(3,dtime*0.03);
 if(tfoot==0){//suspensions 
+ if(iview==1){ksuspension=5;}else if(troad==0){ksuspension=9;}else{ksuspension=20;};
+ if(tfly==1){ksuspension=7;} 
  vm20=vm2;
  vm2=(vmx2*cos1+vmy2*sin1)*100;
  if(vm2<0.01){vm2=0;}
@@ -5461,13 +5465,13 @@ function drawsol3(){
     var sc=1;//scalez;
 	var scx=(dlngsol/klon)*scale;
 	var scy=dlatsol*scale;
-xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
-ysol=(latsol0-lat0)*scale-scy/nsol;
+xsol=((lngsol0-lng0)/klon)*scale+1.5*scx/nsol;
+ysol=(latsol0-lat0)*scale+0.5*scy/nsol;
    
 	
 	mvPushMatrix();
     //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [xsol,ysol,zsol0]);
+	mat4.translate(mvMatrix, [xsol,ysol,zsol0+z]);
 	mat4.scale(mvMatrix,[scx/boussx,scy/boussy,sc]);
 	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  solTexture2);

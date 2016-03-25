@@ -4445,6 +4445,8 @@ function updatesoltexture(){
         getlatlng(zoom,worldx+256,worldy+256)
 		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
 		lat=lat000;lng=lng000;worldx=worldx000;worldy=worldy000;
+        //var lngsol2=lngsol+dlngsol1/nsol;
+        //var latsol2=latsol+dlatsol1/nsol;
 		//if(tinitsol0==1){
 		// tinitsol0=0;
 		 //solTexture.image.crossOrigin = "";
@@ -4462,11 +4464,13 @@ function updatesoltexture2(){
         getlatlng(zoom,worldx+256,worldy+256)
 		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
 		lat=lat000;lng=lng000;*/
+        var lngsol2=lngsol+dlngsol1/nsol;
+        var latsol2=latsol+dlatsol1/nsol;
         canvas2.setAttribute('width', 512);
         canvas2.setAttribute('height', 512);
 		solTexture2.image.crossOrigin = "anonymous";
         //solTexture2.image.src = getterrain(zoom,lat,lng,512,"jpg",2);//map2jpg;
-        solTexture2.image.src = getterrain(zoom,latsol,lngsol,552,"jpg",1);//map2jpg;
+        solTexture2.image.src = getterrain(zoom,latsol2,lngsol2,552,"jpg",1);//map2jpg;
 }
 
 var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
@@ -4946,7 +4950,7 @@ var tshadownight=0;
 
 var ksuspension=20,kfps=Math.min(3,dtime*0.03);
 if(tfoot==0){//suspensions
- if(iview==1){ksuspension=5;}else{ksuspension=20;}
+ if(iview==1){ksuspension=5;}else if(troad==0){ksuspension=9;}else{ksuspension=20;};
  if(tfly==1){ksuspension=7;} 
  vm20=vm2;
  vm2=(vmx2*cos1+vmy2*sin1)*100;
@@ -8071,8 +8075,8 @@ function drawsol3(){
     var sc=1;//scalez;
 	var scx=(dlngsol/klon)*scale;
 	var scy=dlatsol*scale;
-xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
-ysol=(latsol0-lat0)*scale-scy/nsol;
+xsol=((lngsol0-lng0)/klon)*scale+1.5*scx/nsol;
+ysol=(latsol0-lat0)*scale+0.5*scy/nsol;
    
 	
 	mvPushMatrix();
