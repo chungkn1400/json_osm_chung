@@ -7220,7 +7220,7 @@ function updategrass(){if(tmove==0){return;};
 		     zc=-999;
 			 if(testmapgrass(xc,yc)==1){
 		       if(testroad(xc,yc,lat0,lng0,0.5)==0){zc=getterrainheight2(xc,yc)+0.01;};}
-		     if(zc<0.1){zc=-999;}
+		     if(zc<0){zc=-999;}
 		     append(grassvertices,[
                xc,yc,zc,  xc,yc,zc+grassh[i],  xc,yc,zc			 
 			   ]);}else{index+=9;}; 
@@ -7262,7 +7262,7 @@ function updateflower(){if(tmove==0){return;};
 		     zc=-999;
 			 if(testmapgrass(xc,yc)==1){
 		       if(testroad(xc,yc,lat0,lng0,0.5)==0){zc=getterrainheight2(xc,yc)+0.01;};}
-		     if(zc<0.1){zc=-999;}
+		     if(zc<0){zc=-999;}
 		     h=flowerh[i];		
 		     append(flowervertices,[
                xc,yc,zc,  xc,yc,zc+h,  xc,yc,zc,
