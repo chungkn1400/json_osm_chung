@@ -1353,7 +1353,7 @@ var kx=2;
 lat1=lat-kx*dlat/2;lon1=lng-kx*dlon/2;
 lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 tilat=0;if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
-ilat=lat;ilng=lng;auxvar=tilat;
+ilat=lat;ilng=lng;
 if(tilat==1){
  ilat+=sin1*dlat/1.75;
  ilng+=cos1*dlon/1.75;
@@ -1785,6 +1785,25 @@ if(tframe>tlocationname){context.fillStyle = '#00df00';}
 else{context.fillStyle = '#b00000';}
 context.fillText(locationname,ix,iy);
 }
+var contextx=0,contexty=0,contextpattern=0;
+function context_moveTo(x,y){
+  context.moveTo(x,y);
+  contextx=x;contexty=y;
+}
+function context_lineTo(x,y){
+  if(contextpattern==0){context.lineTo(x,y);}
+  else if(contextpattern==2){
+     var dr=20,dx=(x-contextx),dy=(y-contexty),dn=Math.sqrt(dx*dx+dy*dy)/dr;
+	 for(var i=0;i<dn;i++){context.moveTo(contextx+i*dx/dn,contexty+i*dy/dn);
+	           context.lineTo(contextx+i*dx/dn+dx*11/(dr*dn),contexty+i*dy/dn+dy*11/(dr*dn));}
+     }
+  else{
+     var dr=10,dx=(x-contextx),dy=(y-contexty),dn=Math.sqrt(dx*dx+dy*dy)/dr;
+	 for(var i=0;i<dn;i++){context.moveTo(contextx+i*dx/dn,contexty+i*dy/dn);
+	           context.lineTo(contextx+i*dx/dn+dx*6/(dr*dn),contexty+i*dy/dn+dy*6/(dr*dn));}
+     }
+contextx=x;contexty=y;
+}
 function draw(){
 var windx0=canvas.width,windy0=canvas.height;
 context.clearRect (0,0,canvas.width-256,canvas.height);
@@ -1861,7 +1880,9 @@ for(var i=0;i<ways.length;i++){
      context.strokeStyle = '#000000';
    }
    if(test==1){
-   if(layer<0){context.strokeStyle = '#999900';}
+   contextpattern=0;
+   if(layer<-1){contextpattern=2;}//context.strokeStyle = '#707000';}
+   else if(layer<0){contextpattern=1;}//context.strokeStyle = '#999900';}
    context.beginPath();
    for(var j=0;j<way.nodes.length;j++){
      var inode=way.nodes[j];
@@ -1874,8 +1895,8 @@ for(var i=0;i<ways.length;i++){
 	   var x=windx0*(lonnodes[inode]-lon1-dlon)/(lon2-lon1);
 	   x=windx0/2+0.7*(x-windx0/2);
 	   y=windy0/2+0.7*(y-windy0/2);
-	   if(j==0){context.moveTo(x,y);}
-	   else{context.lineTo(x,y);}
+	   if(j==0){context_moveTo(x,y);}
+	   else{context_lineTo(x,y);}
 	 }  
    }
    context.stroke();
