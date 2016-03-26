@@ -901,13 +901,15 @@ vec4 encodefloatrgba( float v ) {//range 0.0 - 5000.0
 	    float y=aVertexPosition.y;
 	    float z=aVertexPosition.z;
 		//if(z<0.15 || z>20.0){vTextureCoord.x=-2.0;
+		float scale2=2.0;
+		if(ushadow2>=10){scale2=float(ushadow2)/120.0;}
 		if(z<-0.1){vTextureCoord.x=-2.0;
 		  gl_Position = vec4(1.0,1.0,1.0, 1.0); 
 		}else{
 		if(int(mod(floor((z)*2000.0),20.0)+0.1)==1){
-		 if(aTextureCoord.x<0.2){x-=usin1*2.0;y+=ucos1*2.0;z-=0.47;}
-		 else if(aTextureCoord.x>0.8){x+=usin1*2.0;y-=ucos1*2.0;z-=0.47;}
-		 else{z+=2.0;}
+		 if(aTextureCoord.x<0.2){x-=usin1;y+=ucos1;z-=0.235*scale2;}//0.47;}
+		 else if(aTextureCoord.x>0.8){x+=usin1*scale2;y-=ucos1*scale2;z-=0.235*scale2;}//0.47;}
+		 else{z+=scale2;}
 		}else{
 		 if(aTextureCoord.x<0.2){x-=usin1;y+=ucos1;}
 		 if(aTextureCoord.x>0.8){x+=usin1;y-=ucos1;}
@@ -3219,6 +3221,7 @@ if(twebaudio==1 && tradio==0){
 		   trottoirx=999999;settrottoir();
 		   tdraw=0;tdrawsol=Math.min(tdrawsol,tframe+2000);
 		   tsequoia0=tsequoia;
+		   testupdategrass=1;testupdateflower=1;
 		   }
 		if(itime%30==1){
 		 if(tmap==4){scrollTo(0,4000);}else{scrollTo(0,0);}
@@ -3864,6 +3867,7 @@ function initGL(canvasgl){
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
 	var stationTexture,girlimage,girlimage2,girlimage3,sequoiaTexture;
+	var grassTexture,flowerTexture;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -4407,6 +4411,22 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         stationTexture.image.src = "station2.jpg";
 
+        grassTexture = gl.createTexture();
+        grassTexture.image = new Image();
+        grassTexture.image.onload = function () {
+            handleLoadedTexture(grassTexture);
+        }
+
+        grassTexture.image.src = "grass11.jpg";//grass1jpg;
+
+        flowerTexture = gl.createTexture();
+        flowerTexture.image = new Image();
+        flowerTexture.image.onload = function () {
+            handleLoadedTexture(flowerTexture);
+        }
+
+        flowerTexture.image.src = "flowerblue.jpg";
+        
 		arrowgreenforward=new Image();
 		arrowgreenforward.src="arrowgreenforward.png";
 		arrowgreenleft=new Image();
@@ -4715,6 +4735,41 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         //gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, pvMatrix);
 		gl.uniform1i(treeProgram.shadowUniform,1);
 		gl.uniform1f(treeProgram.lightUniform,0);
+        gl.uniform1f(treeProgram.fog,fog);
+    }
+	
+   function setMatrixUniformsgrass() {
+        var k=0.15;
+		if(tshadow==0){
+		  gl.uniform1f(treeProgram.cos1Uniform,k*cos1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sin1);
+		}else{//k*=1.4+0.8*sunsi2;
+		  gl.uniform1f(treeProgram.cos1Uniform,k*sunco1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sunsi1);
+		}
+		gl.uniformMatrix4fv(treeProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, mvMatrix);
+		gl.uniform1i(treeProgram.shadowUniform,tshadow);
+		gl.uniform1i(treeProgram.shadowUniform2,k*300);//tshadow);
+        if(tshadownight==1){gl.uniform1f(treeProgram.lightUniform,2-tlight);}
+		else{gl.uniform1f(treeProgram.lightUniform,0);}
+        gl.uniform1f(treeProgram.fog,fog);
+    }
+   function setMatrixUniformsflower() {
+        var k=0.12;
+		if(tshadow==0){
+		  gl.uniform1f(treeProgram.cos1Uniform,k*cos1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sin1);
+		}else{//k*=1.4+0.8*sunsi2;
+		  gl.uniform1f(treeProgram.cos1Uniform,k*sunco1);
+          gl.uniform1f(treeProgram.sin1Uniform,k*sunsi1);
+		}
+		gl.uniformMatrix4fv(treeProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(treeProgram.mvMatrixUniform, false, mvMatrix);
+		gl.uniform1i(treeProgram.shadowUniform,tshadow);
+		gl.uniform1i(treeProgram.shadowUniform2,k*100);//tshadow);
+        if(tshadownight==1){gl.uniform1f(treeProgram.lightUniform,2-tlight);}
+		else{gl.uniform1f(treeProgram.lightUniform,0);}
         gl.uniform1f(treeProgram.fog,fog);
     }
 	var ksea=0,tlight=1,cloudx0=0;
@@ -5100,7 +5155,10 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
              if(ineartree>140){soundnature();}
              else{stopsoundnature();}
 		}
-		
+		if(z<zsol+10){if(loading<=995){updategrass();};drawgrass();
+		              if(loading<=995){updateflower();};drawflower();
+					  }
+
 		gl.useProgram(lineProgram);
 		drawline();
 		drawcross();
@@ -7030,6 +7088,16 @@ function updateroc(){
 for(var i=0;i<nroc;i++){
    rocx[i]+=nextdx;
    rocy[i]+=nextdy;
+}
+//}
+//function updategrass0(){
+for(var i=0;i<ngrass;i++){
+   grassx[i]+=nextdx;
+   grassy[i]+=nextdy;
+}
+for(var i=0;i<nflower;i++){
+   flowerx[i]+=nextdx;
+   flowery[i]+=nextdy;
 }}
 var x1=0,y1=0,z1=0,x2=0,y2=0,z2=0;
 function rotavion(x,y,z,r){
@@ -7131,6 +7199,78 @@ for(var i=0;i<nroc;i++){
 		mvPopMatrix();
     }}
  }
+}
+var testupdategrass=0;
+function updategrass(){if(tmove==0){return;};
+        gl.bindBuffer(gl.ARRAY_BUFFER, grassVertexPositionBuffer);
+		var xc=0,yc=0,zc=0,distmax=6.8,test=0,h=0.3;	
+		index=0;
+		for (var i=0; i < ngrass; i++) {
+		   xc=grassvertices[index];
+		   yc=grassvertices[index+1];
+		   zc=grassvertices[index+2];
+		   //grassx[i]=xc;grassy[i]=yc;grassz[i]=zc;	 
+		   test=testupdategrass;
+		   if(test==1){xc=grassx[i];yc=grassy[i];}
+		   while(xc<(x-distmax)){xc+=distmax*1.99999;test=1;};
+		   while(xc>(x+distmax)){xc-=distmax*1.99999;test=1;};
+		   while(yc<(y-distmax)){yc+=distmax*1.99999;test=1;};
+		   while(yc>(y+distmax)){yc-=distmax*1.99999;test=1;};
+		   if(test==1){
+		     zc=-999;
+			 if(testmapgrass(xc,yc)==1){
+		       if(testroad(xc,yc,lat0,lng0,0.5)==0){zc=getterrainheight2(xc,yc)+0.01;};}
+		     if(zc<0.1){zc=-999;}
+		     append(grassvertices,[
+               xc,yc,zc,  xc,yc,zc+grassh[i],  xc,yc,zc			 
+			   ]);}else{index+=9;}; 
+		}	
+        /*var igrass=0;
+		index=0;
+		for (var i=0; i < ngrass; i++) {
+		    if(grassz[i]>0){
+			  xc=grassx[i];yc=grassy[i];zc=grassz[i];
+			  if(rotavion(xc-x,yc-y,zc-z,grassh[i])>0){
+			    igrass+=1;
+			    addindexcloud(grassvertices2,[
+               xc,yc,zc,  xc,yc,zc+grassh[i],  xc,yc,zc			 
+			   ]);
+			  }
+			}
+		}
+        gl.bufferData(gl.ARRAY_BUFFER, (grassvertices2), gl.STATIC_DRAW);
+		grassVertexPositionBuffer.numItems=igrass*3;*/
+        gl.bufferData(gl.ARRAY_BUFFER, (grassvertices), gl.STATIC_DRAW);
+		testupdategrass=0;
+}
+var testupdateflower=0;
+function updateflower(){if(tmove==0){return;};
+        gl.bindBuffer(gl.ARRAY_BUFFER, flowerVertexPositionBuffer);
+		var xc=0,yc=0,zc=0,distmax=6.8,test=0,h=0.3;	
+		index=0;
+		for (var i=0; i < nflower; i++) {
+		   xc=flowervertices[index];
+		   yc=flowervertices[index+1];
+		   zc=flowervertices[index+2];
+		   test=testupdateflower;
+		   if(test==1){xc=flowerx[i];yc=flowery[i];}
+		   while(xc<(x-distmax)){xc+=distmax*1.99999;test=1;};
+		   while(xc>(x+distmax)){xc-=distmax*1.99999;test=1;};
+		   while(yc<(y-distmax)){yc+=distmax*1.99999;test=1;};
+		   while(yc>(y+distmax)){yc-=distmax*1.99999;test=1;};
+		   if(test==1){
+		     zc=-999;
+			 if(testmapgrass(xc,yc)==1){
+		       if(testroad(xc,yc,lat0,lng0,0.5)==0){zc=getterrainheight2(xc,yc)+0.01;};}
+		     if(zc<0.1){zc=-999;}
+		     h=flowerh[i];		
+		     append(flowervertices,[
+               xc,yc,zc,  xc,yc,zc+h,  xc,yc,zc,
+               xc,yc,zc+h, xc,yc,zc+h, xc,yc,zc			   
+			   ]);}else{index+=18;}; 
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (flowervertices), gl.STATIC_DRAW);
+		testupdateflower=0;
 }
 var ttrottoir=0,ntrottoir=0,trottoirlat=[],trottoirlon=[],trottoirr=[],trottoirx=0,trottoiry=0;
 var jtrottoir=0;
@@ -7241,6 +7381,48 @@ function drawtree2(){
     if(tsequoia0==0){setMatrixUniformstree();}
 	else{setMatrixUniformstreesequoia();}
     gl_drawArrays(gl.TRIANGLES, 0, tree2VertexPositionBuffer[ibuff].numItems);
+		
+		mvPopMatrix();
+}
+function drawgrass(){
+        mvPushMatrix();
+	if(tshadow==0){mat4.translate(mvMatrix, [0,0,zsol0]);}
+    else{mat4.translate(mvMatrix, [0,0,zsol0+0.02]);}
+	var sc=1;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D,  grassTexture);
+    gl.uniform1i(treeProgram.samplerUniform, 11);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, grassVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(treeProgram.textureCoordAttribute, grassVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, grassVertexPositionBuffer);
+    gl.vertexAttribPointer(treeProgram.vertexPositionAttribute, grassVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    
+	setMatrixUniformsgrass(); 
+    gl_drawArrays(gl.TRIANGLES, 0, grassVertexPositionBuffer.numItems);
+		
+		mvPopMatrix();
+}
+function drawflower(){
+        mvPushMatrix();
+	if(tshadow==0){mat4.translate(mvMatrix, [0,0,zsol0]);}
+    else{mat4.translate(mvMatrix, [0,0,zsol0+0.02]);}
+	//var sc=1;
+    //mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE13);
+    gl.bindTexture(gl.TEXTURE_2D,  flowerTexture);
+    gl.uniform1i(treeProgram.samplerUniform, 13);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, flowerVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(treeProgram.textureCoordAttribute, flowerVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, flowerVertexPositionBuffer);
+    gl.vertexAttribPointer(treeProgram.vertexPositionAttribute, flowerVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    
+	setMatrixUniformsflower(); 
+    gl_drawArrays(gl.TRIANGLES, 0, flowerVertexPositionBuffer.numItems);
 		
 		mvPopMatrix();
 }
@@ -8211,6 +8393,13 @@ function drawtexture(texture){
     var citypanelVertexTextureCoordBuffer=[];
 	var citypanelvertices,citypaneltextureCoords;
 	var ncitypanel=40,ncitypanelTexture=[];
+	var ngrass=1500,nflower=50;
+	var grassVertexPositionBuffer;
+    var grassVertexTextureCoordBuffer;
+	var grassvertices,grassh,grassvertices2,grassx,grassy,grassz;
+	var flowerVertexPositionBuffer;
+    var flowerVertexTextureCoordBuffer;
+	var flowervertices,flowerh,flowerx,flowery,flowerz;
 
 	var maxvertice=15000*6*2,ibuff=0,ibuff0=0,ibuff1=0;
 	maxvertice=10000*6*2;
@@ -8224,7 +8413,12 @@ function drawtexture(texture){
 	var n=nsol,nsol2=16,n22=nsol+nsol2+nsol2;
 	var height,kheight,height1,height2,tinitgmap=0;
 	var height00,height0;
-	var maptree=[];
+	var maptree=[],mapgrass=[];
+	for (var i=0; i < n; i++) {
+      for(var j=0;j<n;j++){
+		  var ij=j*n+i;
+		  maptree[ij]=0;mapgrass[ij]=0;
+	}}
 function initgmaptree(){
         if(!solTexture.data){return;}
 		var ndata=solTexture.datasize,r=0,g=0,b=0,h=0,ij=0;
@@ -8232,7 +8426,7 @@ function initgmaptree(){
 		for (var i=0; i < n; i++) {
          for(var j=0;j<n;j++){
 		  ij=j*n+i;
-		  maptree[ij]=0;
+		  maptree[ij]=0;mapgrass[ij]=0;
 		  if(height00[ij]>0){
 		   var k=parseInt(4*(parseInt(Math.min(ndata-1,i*ndata/n))*ndata+parseInt(j*ndata/n)));
 		   rrr=rr;ggg=gg;bbb=bb;
@@ -8240,13 +8434,16 @@ function initgmaptree(){
 		   r=solTexture.data[k];
 		   g=solTexture.data[k+1];
 		   b=solTexture.data[k+2];
-		   if(g>r*1.12 && g>-b*1.03 && g<70 && g>10){
+		   if(g>r*1.12 && g>b*1.02 && g<70 && g>10){
 		     var dr=5,dg=5,db=5;
 			 if(Math.abs(rr-r)>dr || Math.abs(gg-g)>dg || Math.abs(bb-b)>db){
 		        maptree[ij]=1;}
 			 else if(Math.abs(rrr-r)>dr || Math.abs(ggg-g)>dg || Math.abs(bbb-b)>db){
 			    maptree[ij]=1;}	
-		   }}
+		   }
+		   if(g>r*1.2 && g>b*1.2 && g>20){mapgrass[ij]=1;}
+		   //mapgrass[ij]=maptree[ij];
+		   }
 		}}
 		//tinittree2=1;tinittree22=1;
 }
@@ -8283,6 +8480,16 @@ function addgmaptreetest(){
 		  }}}
 	}}
 	if(tsequoia==0){settrottoir();if(jtrottoir<20){tsequoia=1;};}
+}
+function testmapgrass(xx,yy){
+var lngxx=xx*klon/(scale)+lng0;
+var latxx=yy/(scale)+lat0;
+var i=parseInt(nsol*(0.5+0.5*(lngxx-lngsol0)/dlngsol)-0.5);
+var j=parseInt(nsol*(0.5+0.5*(latxx-latsol0)/dlatsol)-0.5);
+if(i>=0 &&  i<n && j>=0 && j<n){
+		   var ij=i*n+j;
+		   if(mapgrass[ij]>=1){return 1;}}
+return 0;
 }
 var kdhzsol=1,dhzsol=1;
 function initgmap(){
@@ -9297,6 +9504,88 @@ function updatebuffersol(){
         }
 		}
 		
+		if(ibuff==0){
+        grassVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, grassVertexPositionBuffer);
+        grassvertices = new Float32Array(3*3*ngrass);
+        grassvertices2 = new Float32Array(3*3*ngrass);
+		grassh=new Array(ngrass);
+		grassx=new Array(ngrass);
+		grassy=new Array(ngrass);
+		grassz=new Array(ngrass);
+		xc=0;yc=0;zc=0;
+		index=0;
+		for (var i=0; i < ngrass; i++) {
+		   zc=1;
+		   var h=2*0.3;
+		   s=Math.random()*2*24+x;
+		   t=Math.random()*2*24+y;
+		   zc=getterrainheight2(s,t)+0.15;
+		   h=0.2*(1+Math.random()*0.5);
+		   grassh[i]=h;
+		   grassx[i]=s;grassy[i]=t;grassz[i]=zc;
+		   append(grassvertices,[
+             s,t,zc,  s,t,zc+h,  s,t,zc			 
+			 ]); 
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (grassvertices), gl.STATIC_DRAW);
+        grassVertexPositionBuffer.itemSize = 3;
+        grassVertexPositionBuffer.numItems = 3*ngrass;
+
+        grassVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, grassVertexTextureCoordBuffer);
+        var grasstextureCoords = new Float32Array(2*3*ngrass);
+		index=0;
+		for (var i=0; i < ngrass; i++) {
+		   append(grasstextureCoords,[
+             0,0,  0.5,1,  1,0
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (grasstextureCoords), gl.STATIC_DRAW);
+        grassVertexTextureCoordBuffer.itemSize = 2;
+        grassVertexTextureCoordBuffer.numItems = 3*ngrass;
+
+        flowerVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, flowerVertexPositionBuffer);
+        flowervertices = new Float32Array(3*6*nflower);
+    	flowerh=new Array(nflower);
+    	flowerx=new Array(nflower);
+    	flowery=new Array(nflower);
+    	flowerz=new Array(nflower);
+		xc=0;yc=0;zc=0;
+		index=0;
+		for (var i=0; i < nflower; i++) {
+		   zc=1;
+		   var h=2*0.3;
+		   s=Math.random()*2*24+(xmax-xmin)*0.5;
+		   t=Math.random()*2*24+(ymax-ymin)*0.5;
+		   zc=getterrainheight2(s,t)+0.15;
+		   h=0.12*(1+Math.random()*0.3);flowerh[i]=h;
+		   flowerx[i]=s;flowery[i]=t;flowerz[i]=zc;
+		   append(flowervertices,[
+             s,t,zc,  s,t,zc+h,  s,t,zc,
+             s,t,zc+h, s,t,zc+h, s,t,zc			 
+			 ]); 
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (flowervertices), gl.STATIC_DRAW);
+        flowerVertexPositionBuffer.itemSize = 3;
+        flowerVertexPositionBuffer.numItems = 6*nflower;
+
+        flowerVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, flowerVertexTextureCoordBuffer);
+        var flowertextureCoords = new Float32Array(2*6*nflower);
+		index=0;
+		for (var i=0; i < nflower; i++) {
+		   append(flowertextureCoords,[
+             0,0,  0,1,  1,0,
+			 0,1,  1,1,  1,0
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (flowertextureCoords), gl.STATIC_DRAW);
+        flowerVertexTextureCoordBuffer.itemSize = 2;
+        flowerVertexTextureCoordBuffer.numItems = 6*nflower;
+		}
+
 		}
 var nroad=maxvertice-1,iroad=0,iroad0=0;
 var roadlng0=0,roadlat0=0,roadlng=0,roadlat=0;
