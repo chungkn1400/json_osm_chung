@@ -3110,8 +3110,8 @@ if(twebaudio==1 && tradio==0){
 		sunxsave=sunx;sunysave=suny;sunzsave=sunz;
 		if(tshadownight==1){sunx=x-0.1*cos1*cos2;suny=y-0.1*sin1*cos2;sunz=z-0.1*sin2+0.051;}
 		itime+=1;if(itime>10000){itime=0;}
-		//tframe0=tframe;
-		//tframe=timer();
+		tframe0=tframe;
+		tframe=timer();
 		dtime=tframe-tframe0;
 		if(dtime>180){dtime=180;}
 		if(tgamesave==1){ttestmouse=tframe+2000;}
@@ -3122,8 +3122,6 @@ if(twebaudio==1 && tradio==0){
 		else{if(keys[vk_left] || keys[vk_right]){document.getElementById('streetview').focus();resetkeys();}
 		     if(keys[vk_m] || keys[vk_escape] || keys[vk_space]){quitstreetview();sleep(200);resetkeys();}}
         if(tmouseup==1){testmouseup();}
-		tframe0=tframe;
-		tframe=timer();
 		tskip=0;
 		ndraw=0;ntri=0;
 		//if(x<xmin){x+=xmax-xmin;tskip=1;};
