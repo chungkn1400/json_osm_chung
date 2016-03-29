@@ -1210,6 +1210,7 @@ msg+="7 => change season"+crlf;
 msg+="shift+X => scalex"+crlf;
 msg+="shift+E => change cockpit"+crlf;
 msg+="shift+N => number of cars"+crlf;
+msg+="B,N / pageup,down => motor gaz"+crlf;
 msg+="button 1 => accelerate"+crlf;
 msg+="button 2 => decelerate"+crlf;
 msg+="button 4 => car / foot"+crlf;
@@ -1748,7 +1749,7 @@ if(tfly==1){
 	vcarz=vcar*sin2;
   }
 
-if(keys[vk_n]){subncar();resetkeys();}
+if(keys[vk_n] && keys[vk_shift]){subncar();resetkeys();}
 if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  

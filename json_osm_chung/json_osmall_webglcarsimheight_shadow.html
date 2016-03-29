@@ -1040,6 +1040,7 @@ function waycallback(r){//alert(r);
   for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/2+iwaydlat[i]);
                         var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
+						if(dist>700*700){iwaylat[i]=99;iways[i]=[];inodes[i]=[];}
                         if(dist0<dist){dist0=dist;iiways=i;}}
   iwaylat[iiways]=latx0;iwaylng[iiways]=lngx0;
   iwaydlat[iiways]=dlat;iwaydlng[iiways]=dlon;
@@ -1124,7 +1125,7 @@ function nodecallback(r){//alert(r);
   var msg="";
   nodes=[];
   iinodes=iiways;//iinodes+=1;if(iinodes>2){iinodes=0;}
-  inodes[iinodes]=[];
+  //inodes[iinodes]=[];
   if(nodejson.elements){inodes[iinodes]=nodejson.elements;}
   nodes=inodes[0];
   var j=nodes.length;
@@ -2105,6 +2106,7 @@ msg+="shift+X => scalex"+crlf;
 msg+="space+arrows => turn head"+crlf;
 msg+="shift+E => change cockpit"+crlf;
 msg+="shift+N => number of cars"+crlf;
+msg+="B,N / pageup,down => motor gaz"+crlf;
 msg+="button 1 => accelerate"+crlf;
 msg+="button 2 => decelerate"+crlf;
 msg+="button 4 => car / foot"+crlf;
@@ -2112,6 +2114,7 @@ msg+="button 6 => brakes"+crlf;
 msg+="button 5 => turn left"+crlf;
 msg+="button 7 => turn right"+crlf;
 msg+=crlf+"joystick and gamepad supported"+crlf;
+soundcaroff();
 alert(msg);
 document.getElementById('msg').focus();
 }
@@ -2507,7 +2510,7 @@ if(tfly==1){
 	   if(z<zsol+0.70){if(vcar>0.003 && troad==0){
 	                     if(o2<(o2sol-(0.05+vcar)/(0.003+vcar))){
 						    soundpneu();}}
-					   o2=o2sol-0.052;
+					   o2+=(o2sol-0.02-o2)/2;
                        cos2=Math.cos(degtorad(o2));
                        sin2=Math.sin(degtorad(o2));
 					   landing=1;vzz=0;z=zsol+0.698;
@@ -2731,7 +2734,7 @@ if(tfly==1){
     vcruise=2;if(tfly==1){vcruise=0.3;}
 	if(landing==0 || (tfly==1 && z>zsol+0.79)){
 	 o2+=(vcar*air-vcruise)*cos2*dt*0.004*(1+tfly*5);
-    }else if(troad==0){o2=o2sol-0.02;}
+    }else if(troad==0){o2+=(o2sol-0.02-o2)/2;}
 	if(o3>0.1){o3-=dt*0.001;}
 	else if(o3<-0.1){o3+=dt*0.001;}
 	//else if(landing==1){o3=0;}
@@ -2766,7 +2769,7 @@ if(tfly==1){
 	vcarz=vcar*sin2;
   }
 
-if(keys[vk_n]){subncar();resetkeys();}
+if(keys[vk_n] && keys[vk_shift]){subncar();resetkeys();}
 if(keys[vk_p]){subautopilot();resetkeys();}
 if(keys[vk_r]){if(keys[vk_shift]){subsrtm();}
                else{subradio();};resetkeys();}  
@@ -5046,7 +5049,8 @@ var tshadownight=0;
 
 var ksuspension=20,kfps=Math.min(3,dtime*0.03);
 if(tfoot==0){//suspensions
- if(iview==1){ksuspension=5;}else if(troad==0){ksuspension=9;}else{ksuspension=20;};
+ if(iview==1){ksuspension=5;}else if(troad==0){ksuspension+=(9-ksuspension)/3;}
+ else{ksuspension+=(20-ksuspension)/3;};
  if(tfly==1){ksuspension=7;} 
  vm20=vm2;
  vm2=(vmx2*cos1+vmy2*sin1)*100;
@@ -8224,7 +8228,7 @@ ysol=(latsol0-lat0)*scale-scy/nsol;
     if(loading==0 &&(Math.abs(xsol-x)>scx*0.45 || Math.abs(ysol-y)>scy*0.45)){//0.6//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
-		  tdrawsol=tframe+9900;
+		  tdrawsol=tframe+19900;
 		  tupdatesoltexture=2;loading=66;
 		  updatesoltexture();return;}}
     //mat4.identity(mvMatrix);
@@ -13360,6 +13364,8 @@ function soundcaron(){
 }
 function soundcaroff(){
 //soundpause(myaudiocar);
+setvol(myaudiocar,0.01);
+setvol(myaudiocar2,0.01);
 }
 var myaudiocar2 = audioctx.createBufferSource();
 myaudiocar2.volume=0;
