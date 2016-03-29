@@ -1036,13 +1036,13 @@ function waycallback(r){//alert(r);
   ways=[];
   //if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
   iiways=0;
-  var dist0=0;
+  var dist0=0,dist2=3*Math.max(200*200,5*dxmax*5*dxmax);
   for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/2+iwaydlat[i]);
                         var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
-						if(dist>700*700){iwaylat[i]=99;iways[i]=[];inodes[i]=[];}
+						if(dist>dist2){iwaylat[i]=99;iways[i]=[];inodes[i]=[];}
                         if(dist0<dist){dist0=dist;iiways=i;}}
-  iwaylat[iiways]=latx0;iwaylng[iiways]=lngx0;
+  iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;
   iwaydlat[iiways]=dlat;iwaydlng[iiways]=dlon;
   if(wayjson.elements){iways[iiways]=wayjson.elements;}
   ways=iways[0];
@@ -1362,13 +1362,14 @@ lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 //if(Math.abs(ilat-lat)<dlat/4 && Math.abs(ilng-lng)<dlon/4){
 //   tilat+=1;if(tilat<4){auxvar+=1000;auxvar3+=1000;loading=0;return;}}
 tilat=0;
-if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
-if(tilat==0){
+//if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
+/*if(tilat==0){
  for(var i=0;i<=4;i++){
   if(Math.abs(iwaylat[i]-lat)<iwaydlat[i]/2 && Math.abs(iwaylng[i]-lng)<iwaydlng[i]/2){
        tilat=1;break;}
  }
-} 
+}*/
+if(testiiwaysilat()==0){tilat=1;} 
 ilat=lat;ilng=lng;
 if(tilat==1){
  ilat+=sin1*dlat/1.75;
@@ -2959,6 +2960,27 @@ function testiiways(){
   var dist0=9999999,dist1=dxmax*1.2/1.5;
   var latxx0=latx+sin1*dxmax*0.74/scale;
   var lngxx0=lngx+cos1*dxmax*0.74*klon/scale;
+  //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
+                        var dist=dx*dx+dy*dy;
+                        if(dist0>dist){dist0=dist;}}
+  if(dist0>dist1*dist1*0.8*0.8){return 1;}
+  latxx0+=sin1*dlat/1.75;
+  lngxx0+=cos1*dlon/1.75;
+  dist0=9999999;
+  //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
+                        var dist=dx*dx+dy*dy;
+                        if(dist0>dist){dist0=dist;}}
+  if(dist0>dist1*dist1*0.8*0.8){return 1;}
+  return 0;
+}
+function testiiwaysilat(){
+  var dist0=9999999,dist1=dxmax*1.2/1.5;
+  var latxx0=lat;
+  var lngxx0=lng;
   //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
   for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
                         var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
@@ -5232,13 +5254,13 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 			  //drawtexture(solTexture);
 		      gl.useProgram(shaderProgram);
               drawminimap();}}
-		else if(tminimap2==1 && tmap==0){drawminimap();}   
+		else if(tminimap2==1 && tmap==0){gl.useProgram(shaderProgram);drawminimap();}   
 		if(tmap==0){
 		   gl.useProgram(shaderProgram);
 		   drawbouss();}
 
 		if(tfoot==0 && tcollideon==1 && tautopilot==0){
-		  gl.useProgram(shaderaProgram);
+		  //gl.useProgram(shaderaProgram);
 		  //drawtestcollide();
 		  testcollide();
 		  if(tcollide2==1){
