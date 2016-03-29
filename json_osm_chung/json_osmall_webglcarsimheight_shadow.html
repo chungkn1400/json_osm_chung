@@ -4528,8 +4528,8 @@ function updatesoltexture(){
 		getworldxy(zoom,latsol,lngsol);
         getlatlng(zoom,worldx+256,worldy+256)
 		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
-		latsol+=dlatsol1*sin1*0.15;
-		lngsol+=dlngsol1*cos1*0.15;
+		//latsol+=dlatsol1*sin1*0.15;
+		//lngsol+=dlngsol1*cos1*0.15;
 		lat=lat000;lng=lng000;worldx=worldx000;worldy=worldy000;
         //var lngsol2=lngsol+dlngsol1/nsol;
         //var latsol2=latsol+dlatsol1/nsol;
@@ -8247,7 +8247,7 @@ xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
 ysol=(latsol0-lat0)*scale-scy/nsol;
 //if(tupdatesoltexture==1){return;}
 	
-    if(loading==0 &&(Math.abs(xsol-x)>scx*0.45 || Math.abs(ysol-y)>scy*0.45)){//0.6//0.75
+    if(loading==0 &&(Math.abs(xsol-x)>scx*0.5 || Math.abs(ysol-y)>scy*0.5)){//0.6//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
 		  tdrawsol=tframe+19900;
