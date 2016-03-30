@@ -2430,7 +2430,11 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
     if(tfly==0){z=Math.min(Math.max(zsol+1.8,z-0.01),z);};
     if(z<zsol+0.55){if(tfoot==1){tfly=0;z=zsol+0.58;}
 	                else{z=zsol+0.60;o2=Math.max(8,o2);soundpneu();}}
-	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);z=Math.max(z-0.03,zsol+0.58);}
+	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);
+	                         //z=Math.max(z-0.03,zsol+0.58);
+							 if(z>zsol+0.5801){vzz=Math.max(-1,vzz-0.0015*dtime);}
+							 else{vzz=-0.03;}
+							 z=Math.max(z+0.002*vzz*dtime,zsol+0.58);}
 	             if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}
 			    }
      vcar=0;landing=1;vrun=0;o3=0;
@@ -2507,7 +2511,7 @@ if(tfly==1){
 	else if(z>zroad+0.69){z=zroad+0.68;zsol=zroad;}
 	if(tcar==1 && (troad==0 || zroad>zsol-0.01)){
 	   if(z>zsol+10){z=zsol+10;}
-	   vzz-=dt*0.0006;if(vzz<-1.0){vzz=-1.0;}
+	   vzz-=dt*0.0007;if(vzz<-1.0){vzz=-1.0;}
 	   if(z<zsol+0.70){if(vcar>0.003 && troad==0){
 	                     if(o2<(o2sol-(0.05+vcar)/(0.003+vcar))){
 						    soundpneu();}}
