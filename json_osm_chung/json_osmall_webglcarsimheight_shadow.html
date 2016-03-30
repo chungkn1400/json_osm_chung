@@ -1028,7 +1028,7 @@ var nodekey,nodekey2,nodekey3,nkeymax=450;
 //nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
 var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];
 var iwaylat=[],iwaylng=[];for(var i=0;i<=4;i++){iwaylat[i]=999;iwaylng[i]=999;};
-var iwaydlat=[],iwaydlng=[];for(var i=0;i<=4;i++){iwaydlat[i]=1;iwaydlng[i]=1;};
+var iwaydlat=[],iwaydlng=[];for(var i=0;i<=4;i++){iwaydlat[i]=0;iwaydlng[i]=0;};
 function waycallback(r){//alert(r);
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
@@ -1036,11 +1036,11 @@ function waycallback(r){//alert(r);
   ways=[];
   //if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
   iiways=0;
-  var dist0=0,dist2=3*Math.max(200*200,5*dxmax*5*dxmax);
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/2+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
+  var dist0=0,dist2=2.5*2.5*Math.max(200*200,5*dxmax*5*dxmax);
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/4+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/4+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
-						if(dist>dist2){iwaylat[i]=99;iways[i]=[];inodes[i]=[];}
+						if(dist>dist2){iwaylat[i]=999;iwaydlat[i]=0;iways[i]=[];inodes[i]=[];}
                         if(dist0<dist){dist0=dist;iiways=i;}}
   iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;
   iwaydlat[iiways]=dlat;iwaydlng[iiways]=dlon;
@@ -1337,8 +1337,8 @@ if(k<0.5){kdxmax-=0.25;}
 kdxmax=Math.max(0.75,Math.min(4,kdxmax));auxvar2=kdxmax;
 //auxvar=kdxmax;auxvar2=nodes.length;
 dxmax=Math.max(19,dxmax2*kdxmax);
-lat=latx+sin1*dxmax*0.74/scale;
-lng=lngx+cos1*dxmax*0.74*klon/scale;
+lat=latx+sin1*dxmax/scale;
+lng=lngx+cos1*dxmax*klon/scale;
 lat=Math.max(-87,Math.min(87,lat));
 lng=Math.max(-179,Math.min(179,lng));
 latx0=lat;lngx0=lng;
@@ -1363,13 +1363,12 @@ lat2=lat+kx*dlat/2;lon2=lng+kx*dlon/2;
 //   tilat+=1;if(tilat<4){auxvar+=1000;auxvar3+=1000;loading=0;return;}}
 tilat=0;
 //if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
-/*if(tilat==0){
+//if(tilat==0){
  for(var i=0;i<=4;i++){
-  if(Math.abs(iwaylat[i]-lat)<iwaydlat[i]/2 && Math.abs(iwaylng[i]-lng)<iwaydlng[i]/2){
+  if(Math.abs(iwaylat[i]-lat)<iwaydlat[i]/4 && Math.abs(iwaylng[i]-lng)<iwaydlng[i]/4){
        tilat=1;break;}
  }
-}*/
-if(testiiwaysilat()==0){tilat=1;} 
+//} 
 ilat=lat;ilng=lng;
 if(tilat==1){
  ilat+=sin1*dlat/1.75;
@@ -2430,11 +2429,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
     if(tfly==0){z=Math.min(Math.max(zsol+1.8,z-0.01),z);};
     if(z<zsol+0.55){if(tfoot==1){tfly=0;z=zsol+0.58;}
 	                else{z=zsol+0.60;o2=Math.max(8,o2);soundpneu();}}
-	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);
-	                         //z=Math.max(z-0.03,zsol+0.58);
-							 if(z>zsol+0.5801){vzz=Math.max(-1,vzz-0.0015*dtime);}
-							 else{vzz=-0.03;}
-							 z=Math.max(z+0.002*vzz*dtime,zsol+0.58);}
+	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);z=Math.max(z-0.03,zsol+0.58);}
 	             if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}
 			    }
      vcar=0;landing=1;vrun=0;o3=0;
@@ -2511,7 +2506,7 @@ if(tfly==1){
 	else if(z>zroad+0.69){z=zroad+0.68;zsol=zroad;}
 	if(tcar==1 && (troad==0 || zroad>zsol-0.01)){
 	   if(z>zsol+10){z=zsol+10;}
-	   vzz-=dt*0.0007;if(vzz<-1.0){vzz=-1.0;}
+	   vzz-=dt*0.0006;if(vzz<-1.0){vzz=-1.0;}
 	   if(z<zsol+0.70){if(vcar>0.003 && troad==0){
 	                     if(o2<(o2sol-(0.05+vcar)/(0.003+vcar))){
 						    soundpneu();}}
@@ -2922,7 +2917,7 @@ if(tframe>dtloading+20000){dtloading=tframe;resetkeys();
 if(loading==0){
  //if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>Math.min(24,dxmax*1.2)){testx=1;}
  //if(Math.max(Math.abs(x-x00),Math.abs(y-y00))>dxmax*1.2 || testiiways()){testx=1;}
- if(testiiways()){testx=1;}
+ if(testiiways()==1){testx=1;}
 }
 if(testx==1 && loading==0){testx=0;//loading=-2;
    msgload("testx");
@@ -2961,33 +2956,36 @@ loadstreetviewmsg();
 if(streetviewmsg=="quit"){quitstreetview();}
 }
 function testiiways(){
+//if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
+//if(tilat==0){
+ var testilat=0;
+ var latxx0=latx+sin1*dxmax/scale;
+ var lngxx0=lngx+cos1*dxmax*klon/scale;
+ for(var i=0;i<=4;i++){
+  if(Math.abs(iwaylat[i]-latxx0)<iwaydlat[i]/4 && Math.abs(iwaylng[i]-lngxx0)<iwaydlng[i]/4){
+       testilat=1;break;}
+ }
+ if(testilat==0){return 1;}
+ var dlat1=dxmax*5/scale;
+ var dlon1=dlat1*klon;
+ latxx0+=sin1*dlat1/1.75;
+ lngxx0+=cos1*dlon1/1.75;
+ testilat=0;
+ for(var i=0;i<=4;i++){
+  if(Math.abs(iwaylat[i]-latxx0)<iwaydlat[i]/4 && Math.abs(iwaylng[i]-lngxx0)<iwaydlng[i]/4){
+       testilat=1;break;}
+ }
+ if(testilat==0){return 1;}
+ return 0; 
+//} 
+}
+function testiiways0(){
   var dist0=9999999,dist1=dxmax*1.2/1.5;
   var latxx0=latx+sin1*dxmax*0.74/scale;
   var lngxx0=lngx+cos1*dxmax*0.74*klon/scale;
   //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
-                        var dist=dx*dx+dy*dy;
-                        if(dist0>dist){dist0=dist;}}
-  if(dist0>dist1*dist1*0.8*0.8){return 1;}
-  latxx0+=sin1*dlat/1.75;
-  lngxx0+=cos1*dlon/1.75;
-  dist0=9999999;
-  //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
-                        var dist=dx*dx+dy*dy;
-                        if(dist0>dist){dist0=dist;}}
-  if(dist0>dist1*dist1*0.8*0.8){return 1;}
-  return 0;
-}
-function testiiwaysilat(){
-  var dist0=9999999,dist1=dxmax*1.2/1.5;
-  var latxx0=lat;
-  var lngxx0=lng;
-  //if(Math.abs(ilat-latxx0)<dlat/4 && Math.abs(ilng-lngxx0)<dlon/4){return 0;}
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/4+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/4+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
                         if(dist0>dist){dist0=dist;}}
   if(dist0>dist1*dist1*0.8*0.8){return 1;}
@@ -4532,8 +4530,8 @@ function updatesoltexture(){
 		getworldxy(zoom,latsol,lngsol);
         getlatlng(zoom,worldx+256,worldy+256)
 		dlatsol1=lat-latsol;dlngsol1=lng-lngsol;
-		//latsol+=dlatsol1*sin1*0.15;
-		//lngsol+=dlngsol1*cos1*0.15;
+		latsol+=dlatsol1*sin1*0.15;
+		lngsol+=dlngsol1*cos1*0.15;
 		lat=lat000;lng=lng000;worldx=worldx000;worldy=worldy000;
         //var lngsol2=lngsol+dlngsol1/nsol;
         //var latsol2=latsol+dlatsol1/nsol;
@@ -8251,7 +8249,7 @@ xsol=((lngsol0-lng0)/klon)*scale+scx/nsol;
 ysol=(latsol0-lat0)*scale-scy/nsol;
 //if(tupdatesoltexture==1){return;}
 	
-    if(loading==0 &&(Math.abs(xsol-x)>scx*0.5 || Math.abs(ysol-y)>scy*0.5)){//0.6//0.75
+    if(loading==0 &&(Math.abs(xsol-x)>scx*0.45 || Math.abs(ysol-y)>scy*0.45)){//0.6//0.75
 	   if(tupdatesoltexture==0 || tframe>tloadsol){
 	      tloadsol=tframe+50000;
 		  tdrawsol=tframe+19900;
@@ -10100,6 +10098,7 @@ if(pautoroad0>=0){
 r=3;//5
 px-=sin1*0.3;py+=cos1*0.3;
 iautoroad=-1;
+if(tautopilot==2 && typecar==0){
 if(typecar==0){
 var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
   for(var i=0;i<iroad0;i++){
@@ -10167,7 +10166,7 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
     var i=parseInt(Math.random()*(iautoroad+0.99));
 	pautoroad=autoroad[i];return;
 	}
-}
+}}
 r=5;
 iautoroad=-1;
 var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
