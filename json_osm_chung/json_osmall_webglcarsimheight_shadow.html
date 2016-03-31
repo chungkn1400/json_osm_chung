@@ -1030,6 +1030,7 @@ var iiways=0,iways=[];iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[
 var iwaylat=[],iwaylng=[];for(var i=0;i<=4;i++){iwaylat[i]=999;iwaylng[i]=999;};
 var iwaydlat=[],iwaydlng=[];for(var i=0;i<=4;i++){iwaydlat[i]=0;iwaydlng[i]=0;};
 function waycallback(r){//alert(r);
+  //msgload("ok");
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
   nnode=0;
@@ -1094,6 +1095,7 @@ function waycallback(r){//alert(r);
 }
 var wayjson2,ways2=[],nnode2=0;
 function waycallback2(r){//alert(r);
+  //msgload("ok");
   wayjson2=JSON.parse(r);
   var msg="",ntest=0;
   nnode2=0;
@@ -1121,6 +1123,7 @@ function waycallback2(r){//alert(r);
 var nodesignal=[];
 var iinodes=0,inodes=[];inodes[0]=[];inodes[1]=[];inodes[2]=[];inodes[3]=[];inodes[4]=[];
 function nodecallback(r){//alert(r);
+  //msgload("ok");
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
@@ -1152,11 +1155,12 @@ function nodecallback(r){//alert(r);
 	 }}
   //alert(msg+nodes.length);
   
-  tdraw=1;loading=1.5;//drawgl(0);;	 
+  tdraw=1;//loading=1.5;//drawgl(0);;	 
 }
 var nmarket=0,marketlon=[],marketlat=[];
 var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
+  //msgload("ok");
   nodejson2=JSON.parse(r);
   //var msg="";
   nodes2=[];nstation=0;nhospital=0;nrailstation=0;nmarket=0;
@@ -1204,6 +1208,7 @@ function nodecallback2(r){//alert(r);
 }
 var nodejson3,nodes3=[];
 function nodecallback3(r){//alert(r);
+  //msgload("ok");
   nodejson3=JSON.parse(r);
   //var msg="";
   nodes3=[];
@@ -1227,6 +1232,7 @@ function nodecallback3(r){//alert(r);
 }
 var nodejson31,nodes31=[];
 function nodecallback31(r){//alert(r);
+  //msgload("ok");
   nodejson31=JSON.parse(r);
   //var msg="";
   nodes31=[];
@@ -1305,7 +1311,7 @@ context.fillText(text,20,40);
 }
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
 var trygetways=0,dtweb=0;
-var ilat=0,ilng=0,tilat=0; 
+var ilat=0,ilng=0,tilat=0,tautopilot0=0; 
 function getways(){
 trygetways=1;
 if(tframe<dtgetways){return;}
@@ -1313,7 +1319,7 @@ dtgetways=timer()+4000;
 //resetkeys();
 dtloading=timer();
 if(loading>=1){return;}
-if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
+if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(1+tfps));}
 trygetways=0;
 loading=1;
 if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
@@ -1324,9 +1330,9 @@ var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
 if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;
-            if(tinit==0){cos1=0;sin1=-1;ilat=99;};
+            if(tinit==0){cos1=0;sin1=-1;};
             if(tinit==1){cos1=0;sin1=1;};
-            if(tinit==2){cos1=1;sin1=0;};
+            if(tinit==2){cos1=1;sin1=0;ilat=99;};
             if(tinit==3){cos1=-1;sin1=0;};
 			if(tinit>=2){tinit+=1;};}
 //if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
@@ -1427,7 +1433,7 @@ try{
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
 }
-var waylat2=990,waylon2=0;
+/*var waylat2=990,waylon2=0;
 function getways2(){
 //if(Math.max(Math.abs(latx-waylat2),Math.abs(lngx-waylon2)/klon)<dlat/3 || tinit<1){
 if(tinit<1){
@@ -1450,11 +1456,12 @@ var wayurl2=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3
 try{		
 httpGet(wayurl2,waycallback2);
 }catch (e){alert("error getways2");loading=0;}
-}
+}*/
 var resetnode=0,tgetnode=1;
 function getnodes(){
 msgload("getnodes");
 if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
+lat=latx0;lng=lngx0;
 //lat1=lat-dlat/2;lon1=lng-dlon/2;
 //lat2=lat+dlat/2;lon2=lng+dlon/2;
 lat1=lat-dlat/2;lon1=lng-dlon/2;
@@ -1480,6 +1487,7 @@ httpGet(nodeurl,nodecallback);
 function getnodes2(){
 msgload("getnodes2");
 if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
+lat=latx0;lng=lngx0;
 lat1=lat-dlat/2;lon1=lng-dlon/2;
 lat2=lat+dlat/2;lon2=lng+dlon/2;
 var dx=0.001;
@@ -2385,7 +2393,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	if(dt>300){dt=300;}
 	o10=o1;o20=o2;o30=o3;
 	zsolprev=zsol;troadprev=troad;ttunnelprev=ttunnel;
-	if(tinit<2){ttunnelprev=0;ttesttunnel=0;lastlatx=999;}
+	if(tinit<2 || tframe>ttesttunnel+10000){ttunnelprev=0;ttesttunnel=0;lastlatx=999;}
 	if(tframe>ttesttunnel+4000 || lastlatx>99){zsol=getterrainheightcar(lngx,latx,lastz);}
 	else{latx=lastlatx;lngx=lastlngx;
          x=((lngx-lng0)/klon)*scale;
@@ -3190,6 +3198,7 @@ if(twebaudio==1 && tradio==0){
         gl.clearColor(1,1,1, 1.0);//auxvar2=loading;//auxvar2=tinitgmap;
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
+        if(tinit<4){dtautopilot=tframe+3000;vcar=0;vrun=0;vmx=0;vmy=0;vmz=0;}
 		if(tinit==1){tinit=2;trygetways=1;latsol0=999;//loading=1;tupdatebuffer=1;
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
@@ -10456,6 +10465,7 @@ for(var i=0;i<ways2.length;i++){
    else{setTimeout("getnodes2();",20);}
 }		
 function drawglroad(iway){
+lat=latx0;lng=lngx0;
 if(iway==0){
 for(var i=0;i<nsol;i++){
  for(var j=0;j<nsol;j++){
@@ -10608,6 +10618,7 @@ function hextodec(h) {var h4="00000000"+h;h4=h4.substr(h4.length-8,8);
 var taddbar=0,layer=0,distairport1=0,distairport2=0,icolor=0;
 var layernode2=[],ilayer2=0,ilayernode2=[];
 function drawgl(iway){
+lat=latx0;lng=lngx0;
 if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(tfps));}
 if(iway==0){
 context.clearRect (0,0,canvas.width-256,canvas.height);
