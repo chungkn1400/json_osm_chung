@@ -1038,10 +1038,11 @@ function waycallback(r){//alert(r);
   //if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
   iiways=0;
   var dist0=0,dist2=2.5*2.5*Math.max(200*200,5*dxmax*5*dxmax);
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/4+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/4+iwaydlng[i]);
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/2+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
-						if(dist>dist2){iwaylat[i]=999;iwaydlat[i]=0;iways[i]=[];inodes[i]=[];}
+						if(dist>dist2 && iwaylat[i]<98){
+						   iwaylat[i]=999;iwaydlat[i]=0;iways[i]=[];inodes[i]=[];}
                         if(dist0<dist){dist0=dist;iiways=i;}}
   iwaylat[iiways]=ilat;iwaylng[iiways]=ilng;
   iwaydlat[iiways]=dlat;iwaydlng[iiways]=dlon;
@@ -12848,7 +12849,6 @@ if(amenity=="place_of_worship"){h=Math.max(3.1,h);tmarket=0;}
 var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
-auxvar3=nmarket;
 if(tmarket==1){var r=3,g=15,b=3;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 if(trailstation==1){var r=3,g=3,b=15;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 var dty=0;if(icolor>19999){dty=icolor;}
