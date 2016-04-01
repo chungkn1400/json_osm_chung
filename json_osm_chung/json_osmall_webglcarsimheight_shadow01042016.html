@@ -3905,7 +3905,7 @@ function initGL(canvasgl){
     }
 
     var towerTexture,roadTexture,solTexture,towernightTexture;
-	var houseTexture,roofTexture,solTexture2,shopTexture;
+	var houseTexture,roofTexture,solTexture2;
 	var carTexture,volantTexture,arrowTexture,volant2Texture;
 	var rpmTexture,boussTexture,skydomeTexture;
 	var treeTexture,solTexture0,seaTexture,solTexture02;
@@ -4101,13 +4101,6 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 			handleLoadedTexture(roofTexture);
         }
         roofTexture.image.src = "roof.jpg";
-
-        shopTexture = gl.createTexture();
-        shopTexture.image = new Image();
-        shopTexture.image.onload = function () {
-			handleLoadedTexture(shopTexture);
-        }
-        shopTexture.image.src = "vitrines2.jpg";
 
         solTexture0 = gl.createTexture();
         solTexture0.image = new Image();
@@ -4954,7 +4947,6 @@ var tshadownight=0;
 		drawchurchs2();
 		drawhouses2();
 		drawroofs2();
-		drawshops2();
 		drawwoman2();
 		drawroc2();
 		drawroads2();
@@ -5022,7 +5014,6 @@ var tshadownight=0;
 		drawchurchs2();
 		drawhouses2();
 		drawroofs2();
-		drawshops2();
 		drawwoman2();
 		drawroc2();
 		drawroads2();
@@ -5193,7 +5184,6 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		drawchurchs();
 		drawhouses();
 		drawroofs();
-		drawshops();
 
         gl.useProgram(shaderProgram);
 		drawroads();
@@ -5453,8 +5443,7 @@ function drawchurchs(){
     colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
-}
-function drawhouses(){
+}function drawhouses(){
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
     mvPushMatrix();
@@ -5504,33 +5493,6 @@ function drawroofs(){
 	else{setMatrixUniforms00();}
     colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
-	mvPopMatrix();
-}
-function drawshops(){
-    gl.disable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-    mvPushMatrix();
-    //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [0,0,0]);
-    var sc=0.5;
-    mat4.scale(mvMatrix,[sc,sc,1]);
-	gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D,  shopTexture);
-    gl.uniform1i(shaderProgram.samplerUniform, 2);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexTextureCoordBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, shopVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, shopVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexNormalBuffer[ibuff]);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, shopVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    colorr=1;colorg=1;colorb=1;colora=1;
-	setMatrixUniforms();
-    colorr=1;colorg=1;colorb=1;colora=1;
-    gl_drawArrays(gl.TRIANGLES, 0, shopVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function setmatrix2(){
@@ -5653,27 +5615,6 @@ function drawroofs2(){
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, roofVertexPositionBuffer[ibuff].numItems);
-	mvPopMatrix();
-}
-function drawshops2(){
-    gl.disable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-    mvPushMatrix();
-    //mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, [0,0,0]);
-    var sc=0.5;
-    mat4.scale(mvMatrix,[sc,sc,1]);
-	gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,  roofTexture);
-    gl.uniform1i(shader22Program.samplerUniform, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff]);
-    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, shopVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
-
-    colorr=1;colorg=1;colorb=1;colora=0;
-	setMatrixUniforms22();
-    colorr=1;colorg=1;colorb=1;colora=1;
-    gl_drawArrays(gl.TRIANGLES, 0, shopVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 var timerain=0,train0=0,wclouds=50.1;
@@ -8439,7 +8380,6 @@ function drawtexture(texture){
 	var indexchurch=0,itextchurch=0;
 	var indexhouse=0,itexthouse=0;
 	var indexroof=0,itextroof=0;
-	var indexshop=0,itextshop=0;
 	var indextree=0,indexline=0,indexcross=0,indexcitypanel=0;
 	var indextree2=0,indexlinetext=0;
 	function append(tab,values){
@@ -8483,11 +8423,6 @@ function drawtexture(texture){
 	var roofvertices,rooftextureCoords;
 	var roofVertexNormalBuffer=[];
 	var roofnormals;
-	var shopVertexPositionBuffer=[];
-	var shopVertexTextureCoordBuffer=[];
-	var shopvertices,shoptextureCoords;
-	var shopVertexNormalBuffer=[];
-	var shopnormals;
 	var boussVertexPositionBuffer;
     var boussVertexTextureCoordBuffer;
     var bouss2VertexTextureCoordBuffer;
@@ -9213,52 +9148,6 @@ function updatebuffersol(){
         gl.bufferData(gl.ARRAY_BUFFER, (housenormals), gl.STATIC_DRAW);
         houseVertexNormalBuffer[ibuff].itemSize = 3;
         houseVertexNormalBuffer[ibuff].numItems = maxvertice;
-
-        shopVertexPositionBuffer[ibuff] = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff]);
-        if(ibuff==0){shopvertices = new Float32Array(3*maxvertice);
-		}
-		//var px=0,py=0,pz=0;
-		index=0;
-		for(var i=0;i<maxvertice;i++){
-		   append(shopvertices,[
-             px,py,pz
-            ]);
-		   
-		}		
-        gl.bufferData(gl.ARRAY_BUFFER, (shopvertices), gl.STATIC_DRAW);
-        shopVertexPositionBuffer[ibuff].itemSize = 3;
-        shopVertexPositionBuffer[ibuff].numItems = maxvertice;
-	
-        shopVertexTextureCoordBuffer[ibuff] = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexTextureCoordBuffer[ibuff]);
-        if(ibuff==0){shoptextureCoords = new Float32Array(2*maxvertice);
-		}
-		index=0;
-		for (var i=0;i<maxvertice;i++) {
-		   append(shoptextureCoords,[
-             0,0        
-			 ]);
-		}	
-        gl.bufferData(gl.ARRAY_BUFFER, (shoptextureCoords), gl.STATIC_DRAW);
-        shopVertexTextureCoordBuffer[ibuff].itemSize = 2;
-        shopVertexTextureCoordBuffer[ibuff].numItems = maxvertice;//24;
-
-        shopVertexNormalBuffer[ibuff] = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexNormalBuffer[ibuff]);
-        if(ibuff==0){shopnormals = new Float32Array(3*maxvertice);
-		}
-		//var px=0,py=0,pz=0;
-		index=0;
-		for(var i=0;i<maxvertice;i++){
-		   append(shopnormals,[
-             px,py,pz
-            ]);
-		   
-		}		
-        gl.bufferData(gl.ARRAY_BUFFER, (shopnormals), gl.STATIC_DRAW);
-        shopVertexNormalBuffer[ibuff].itemSize = 3;
-        shopVertexNormalBuffer[ibuff].numItems = maxvertice;
 
         if(ibuff==0){
 		solVertexPositionBuffer = gl.createBuffer();
@@ -10750,8 +10639,6 @@ indexhouse=0;
 itexthouse=0;
 indexroof=0;
 itextroof=0;
-indexshop=0;
-itextshop=0;
 indextree=0;indextree2=0;
 indexline=0;indexlinetext=0;
 indexcross=0;
@@ -11413,7 +11300,6 @@ if(way.nodes){
    settowernormals();
    setchurchnormals();
    sethousenormals();
-   setshopnormals();
    //setroadnormals();
    //updatebuffersolheight();
    //loading=0;dtloading=tframe;
@@ -11538,38 +11424,6 @@ for(var i=0;i<indexhouse;i++){
    gl.bufferData(gl.ARRAY_BUFFER, (housenormals), gl.STATIC_DRAW);
    houseVertexNormalBuffer[ibuff1].itemSize = 3;
    houseVertexNormalBuffer[ibuff1].numItems = index/3;
-   //ibuff=ibuff0;
-}
-function setshopnormals(){
-var x,y,z,r;
-var Ax,Ay,Az,Bx,By,Bz,Cx,Cy,Cz;
-index=0;
-for(var i=0;i<indexshop;i++){
- Ax=shopvertices[i];i++;
- Ay=shopvertices[i];i++;
- Az=shopvertices[i];i++;
- Bx=shopvertices[i];i++;
- By=shopvertices[i];i++;
- Bz=shopvertices[i];i++;
- Cx=shopvertices[i];i++;
- Cy=shopvertices[i];i++;
- Cz=shopvertices[i];
- x = (By - Ay) * (Cz - Az) - (Bz - Az) * (Cy - Ay);
- y = (Bz - Az) * (Cx - Ax) - (Bx - Ax) * (Cz - Az);
- z = (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax);
- r=Math.sqrt(x*x+y*y+z*z);
- if(r<0.000001){r=0.000001;}
- r=1/r;
- x*=r;y*=r;z*=r;
- append(shopnormals,[
-	    x,y,z, x,y,z, x,y,z
-            ]);
- } 
-   //var ibuff=ibuff1;
-   gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexNormalBuffer[ibuff1]);
-   gl.bufferData(gl.ARRAY_BUFFER, (shopnormals), gl.STATIC_DRAW);
-   shopVertexNormalBuffer[ibuff1].itemSize = 3;
-   shopVertexNormalBuffer[ibuff1].numItems = index/3;
    //ibuff=ibuff0;
 }
 function setroadnormals(){
@@ -11714,16 +11568,6 @@ function updatebuffer2(){
    gl.bufferData(gl.ARRAY_BUFFER, (housetextureCoords), gl.STATIC_DRAW);
    houseVertexTextureCoordBuffer[ibuff1].itemSize = 2;
    houseVertexTextureCoordBuffer[ibuff1].numItems = itexthouse/2;
-   
-   gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff1]);
-   gl.bufferData(gl.ARRAY_BUFFER, (shopvertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
-   shopVertexPositionBuffer[ibuff1].itemSize = 3;
-   shopVertexPositionBuffer[ibuff1].numItems = indexshop/3;
-	
-   gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexTextureCoordBuffer[ibuff1]);
-   gl.bufferData(gl.ARRAY_BUFFER, (shoptextureCoords), gl.STATIC_DRAW);
-   shopVertexTextureCoordBuffer[ibuff1].itemSize = 2;
-   shopVertexTextureCoordBuffer[ibuff1].numItems = itextshop/2;
    
    gl.bindBuffer(gl.ARRAY_BUFFER, treeVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (treevertices), gl.STATIC_DRAW);
@@ -12843,12 +12687,10 @@ if(wayname=="tour eiffel"){h=4;return;}
 if(wayname.indexOf("pyramid of khufu")>=0){h=1;return}//gizah
 if(wayname.indexOf("united states capitol")==0){h=1;}
 if(isNaN(h)){h=5;}
-//tmarket=1;
-if(amenity=="place_of_worship"){h=Math.max(3.1,h);tmarket=0;}
+if(amenity=="place_of_worship"){h=Math.max(3.1,h);}
 var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
-auxvar3=nmarket;
 if(tmarket==1){var r=3,g=15,b=3;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 if(trailstation==1){var r=3,g=3,b=15;icolor=parseInt(20000+(r*256+g*16+b)*256);}
 var dty=0;if(icolor>19999){dty=icolor;}
@@ -12863,13 +12705,9 @@ if(h0>3 || hmin>0.1){//tower
    h-=hmin;if(h<0.1){h=0.1;}
    zmid+=hmin;
    zz=zmid;zzz=zz;
-   var hshop=0,stt=0,st=0;
-   if(larg<10 && larg>5){tmarket=1;}
-   if(tmarket==1){hshop=1;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
    var yymin=ymid+999999,yymax=ymid-999999;
-   var kdr=0;
    for(var j=0;j<=jmax;j++){
      var inode=way.nodes[j];
 	 if(latnodes[inode]){
@@ -12884,33 +12722,18 @@ if(h0>3 || hmin>0.1){//tower
 	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
 	   }else{//context.lineTo(xx,yy);
 	        dxx=xx-xxx;dyy=yy-yyy;
-			if(kdr==0){kdr=1;if(dxx*(yy-ymid)+dyy*(xmid-xx)>0){kdr=-kdr;}}
-			dr=kdr*Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
 		if(amenity!="place_of_worship"){
-		   if(h>0.01){
 			index=indextower;
 		    append(towervertices,[
-              xxx,yyy,zzz+hshop,
+              xxx,yyy,zzz,
 			  xxx,yyy,zzz+h,
-			  xx,yy,zz+hshop,
+			  xx,yy,zz,
 			  xxx,yyy,zzz+h,
 			  xx,yy,zz+h,
-			  xx,yy,zz+hshop
-            ]);
-			indextower=index;
-		   }
-		   if(hshop>0.01){
-			index=indexshop;
-		    append(shopvertices,[
-              xxx,yyy,zzz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz+hshop,
 			  xx,yy,zz
             ]);
-			indexshop=index;
-		   }
+			indextower=index;
 		}else{
 			index=indexchurch;
 		    append(churchvertices,[
@@ -12929,7 +12752,6 @@ if(h0>3 || hmin>0.1){//tower
 			var s0=(parseInt(h0*10.5)%10)*400;
 			if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
 			else{s=s0+1+parseInt(h*2);tt=t;t+=dr;}
-			var sshop=0;if(hshop>0.01){sshop=1;stt=st;st+=dr*0.115;}
 			//s=s0+(s-s0)/2;t=tt+(t-tt)/1.5;//immeuble.jpg
 			if(amenity=="place_of_worship"){
 			   s0=0;//(parseInt(h0*20)%2)*400;//white,gray
@@ -12940,31 +12762,16 @@ if(h0>3 || hmin>0.1){//tower
 			else if(dty>19999){s+=-s0+dty;s0+=-s0+dty;}
 			else if(amenity!=""){s0+=10000;s+=10000;}
         if(amenity!="place_of_worship"){
-		   if(h>0.01){
 			index=itexttower;
 		    append(towertextureCoords,[
-			  tt,s0+sshop,
+			  tt,s0,
 			  tt,s,
-			  t,s0+sshop,
+			  t,s0,
 			  tt,s,
 			  t,s,
-			  t,s0+sshop
+			  t,s0
             ]);
 			itexttower=index;
-		   }
-		   if(hshop>0.01){
-		    var ss0=-0.8;
-			index=itextshop;
-		    append(shoptextureCoords,[
-			  stt,ss0,
-			  stt,sshop,
-			  st,ss0,
-			  stt,sshop,
-			  st,sshop,
-			  st,ss0
-            ]);
-			itextshop=index;
-		   }
 		}else{
 			index=itextchurch;
 		    append(churchtextureCoords,[
@@ -13032,13 +12839,9 @@ if(h0>3 || hmin>0.1){//tower
 	}}
 }else if(larg>12*h0){//commercial 
    if(h00==0){h=Math.max(0.5,Math.min(3,larg/12));}
-   var hshop=0,stt=0,st=0;
-   if(larg<10 && larg>5){tmarket=1;}
-   if(tmarket==1){hshop=1.2;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
    var yymin=ymid+999999,yymax=ymid-999999;
-   var kdr=0;
    for(var j=0;j<=jmax;j++){
      var inode=way.nodes[j];
 	 if(latnodes[inode]){
@@ -13049,69 +12852,38 @@ if(h0>3 || hmin>0.1){//tower
 	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
 	   }else{//context.lineTo(xx,yy);
 	        dxx=xx-xxx;dyy=yy-yyy;
-			if(kdr==0){kdr=1;if(dxx*(yy-ymid)+dyy*(xmid-xx)>0){kdr=-kdr;}}
-			dr=kdr*Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
-		   if(h>0.01){
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
 			index=indextower;
 		    append(towervertices,[
-              xxx,yyy,zzz+hshop,
+              xxx,yyy,zzz,
 			  xxx,yyy,zzz+h,
-			  xx,yy,zz+hshop,
+			  xx,yy,zz,
 			  xxx,yyy,zzz+h,
 			  xx,yy,zz+h,
-			  xx,yy,zz+hshop
-            ]);
-			indextower=index;
-		   }
-		   if(hshop>0.01){
-			index=indexshop;
-		    append(shopvertices,[
-              xxx,yyy,zzz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz+hshop,
 			  xx,yy,zz
             ]);
-			indexshop=index;
-		   }
+			indextower=index;
 			wallx[iwall]=xxx;wally[iwall]=yyy;wallh[iwall]=zzz+h;
 			wallco1[iwall]=dxx/dr;wallsi1[iwall]=dyy/dr;walll[iwall]=dr;
 			iwall+=1;
 			var s0=(parseInt(h0*10.5)%10)*400;
 			if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr/3.5;}
 			else{s=s0+1+parseInt(h*2);tt=t;t+=dr/3.5;}
-			var sshop=0;if(hshop>0.01){sshop=1;stt=st;st+=dr*0.113;}
 			//s=s0+(s-s0)/2;t=tt+(t-tt)/1.5;//immeuble.jpg
 			if(amenity=="place_of_worship"){
 			   s=s0+1+10000;s0+=10000;}
 			else if(dty>19999){s+=-s0+dty;s0+=-s0+dty;}
 			else if(amenity!=""){s0+=10000;s+=10000;}
-		   if(h>0.01){
 			index=itexttower;
 		    append(towertextureCoords,[
-			  tt,s0+sshop,
+			  tt,s0,
 			  tt,s,
-			  t,s0+sshop,
+			  t,s0,
 			  tt,s,
 			  t,s,
-			  t,s0+sshop
+			  t,s0
             ]);
 			itexttower=index;
-		   }
-		   if(hshop>0.01){
-		    var ss0=-0.7;
-			index=itextshop;
-		    append(shoptextureCoords,[
-			  stt,ss0,
-			  stt,sshop,
-			  st,ss0,
-			  stt,sshop,
-			  st,sshop,
-			  st,ss0
-            ]);
-			itextshop=index;
-		   }
 		   }
 	 }  
    }
@@ -13164,13 +12936,9 @@ if(h0>3 || hmin>0.1){//tower
      h=Math.max(h0,Math.min(3,h0*12*h0/larg));
      h=Math.max(h0,Math.min(2.5*larg,h));
    }
-   if(larg>5 && larg<10){tmarket=1;}
-   var hshop=0,stt=0,st=0;//tmarket=1;
-   if(tmarket==1){hshop=1;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
    var yymin=ymid+999999,yymax=ymid-999999;
-   var kdr=0;
    for(var j=0;j<=jmax;j++){
      var inode=way.nodes[j];
 	 if(latnodes[inode]){
@@ -13185,32 +12953,17 @@ if(h0>3 || hmin>0.1){//tower
 	   if(jstart==0){jstart=1;//context.moveTo(xx,yy);
 	   }else{//context.lineTo(xx,yy);
 	        dxx=xx-xxx;dyy=yy-yyy;
-			if(kdr==0){kdr=1;if(dxx*(yy-ymid)+dyy*(xmid-xx)>0){kdr=-kdr;}}
-			dr=kdr*Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
-		   if(h>0.01){
+			dr=Math.max(0.00001,Math.sqrt(dxx*dxx+dyy*dyy));
 			index=indexhouse;
 		    append(housevertices,[
-              xxx,yyy,zzz+hshop,
+              xxx,yyy,zzz,
 			  xxx,yyy,zzz+h,
-			  xx,yy,zz+hshop,
+			  xx,yy,zz,
 			  xxx,yyy,zzz+h,
 			  xx,yy,zz+h,
-			  xx,yy,zz+hshop
-            ]);
-			indexhouse=index;
-		   }
-		   if(hshop>0.01){
-			index=indexshop;
-		    append(shopvertices,[
-              xxx,yyy,zzz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz,
-			  xxx,yyy,zzz+hshop,
-			  xx,yy,zz+hshop,
 			  xx,yy,zz
             ]);
-			indexshop=index;
-		   }
+			indexhouse=index;
 			wallx[iwall]=xxx;wally[iwall]=yyy;wallh[iwall]=zzz+h;
 			wallco1[iwall]=dxx/dr;wallsi1[iwall]=dyy/dr;walll[iwall]=dr;
 			iwall+=1;
@@ -13221,7 +12974,6 @@ if(h0>3 || hmin>0.1){//tower
 			//if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
 			if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=1.3*dr;}
 			else{s=s0+1+parseInt(h*2);tt=t;t+=dr;}
-			var sshop=0;if(hshop>0.01){sshop=1;stt=st;st+=dr*0.113;}
 			/*var s0=(parseInt(h0*10.5)%10)*200;
 			//if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
 			if(h0<=3){s=s0+1+parseInt(h);tt=t;t+=0.331*dr;}
@@ -13230,31 +12982,16 @@ if(h0>3 || hmin>0.1){//tower
 			   s=s0+1+10000;s0+=10000;}
 			else if(dty>19999){s+=-s0+dty;s0+=-s0+dty;}
 			else if(amenity!=""){s0+=10000;s+=10000;}
-		   if(h>0.01){
 			index=itexthouse;
 		    append(housetextureCoords,[
-			  tt,s0+sshop,
+			  tt,s0,
 			  tt,s,
-			  t,s0+sshop,
+			  t,s0,
 			  tt,s,
 			  t,s,
-			  t,s0+sshop
+			  t,s0
             ]);
 			itexthouse=index;
-		   }
-		   if(hshop>0.01){
-		    var ss0=-0.8;
-			index=itextshop;
-		    append(shoptextureCoords,[
-			  stt,ss0,
-			  stt,sshop,
-			  st,ss0,
-			  stt,sshop,
-			  st,sshop,
-			  st,ss0
-            ]);
-			itextshop=index;
-		   }
 		   }
 	 }  
    }
@@ -14586,12 +14323,10 @@ loadstreetviewstorage();
 }
 var ntri=0,ndraw=0;
 function gl_drawArrays(glTRIANGLES, x0, numItems){
-if(numItems>=3 && tinit>1){
-  ndraw+=1;ntri+=numItems/3;gl.drawArrays(glTRIANGLES, x0, numItems);}
+ndraw+=1;ntri+=numItems/3;gl.drawArrays(glTRIANGLES, x0, numItems);
 }
 function gl_drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0){
-if(numItems>=3 && tinit>1){
-ndraw+=1;ntri+=numItems/3;gl.drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0);}
+ndraw+=1;ntri+=numItems/3;gl.drawElements(glTRIANGLES, numItems, glUNSIGNED_SHORT, x0);
 }
 function showosmmapurl(){
 var dlat=0.001,dlon=0.001*klon;
