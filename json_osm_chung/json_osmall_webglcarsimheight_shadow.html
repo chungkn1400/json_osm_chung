@@ -4102,13 +4102,6 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         }
         roofTexture.image.src = "roof.jpg";
 
-        shopTexture = gl.createTexture();
-        shopTexture.image = new Image();
-        shopTexture.image.onload = function () {
-			handleLoadedTexture(shopTexture);
-        }
-        shopTexture.image.src = "vitrines2.jpg";
-
         solTexture0 = gl.createTexture();
         solTexture0.image = new Image();
         solTexture0.image.onload = function () {
@@ -4490,6 +4483,13 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 
         flowerTexture.image.src = "flowerblue.jpg";
         
+        shopTexture = gl.createTexture();
+        shopTexture.image = new Image();
+        shopTexture.image.onload = function () {
+			handleLoadedTexture(shopTexture);
+        }
+        shopTexture.image.src = "vitrines2.jpg";
+
 		arrowgreenforward=new Image();
 		arrowgreenforward.src="arrowgreenforward.png";
 		arrowgreenleft=new Image();
