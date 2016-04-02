@@ -1038,11 +1038,11 @@ function waycallback(r){//alert(r);
   ways=[];
   //if(tilat==1 || tinit<2){iiways+=1};if(iiways>4){iiways=0;}
   iiways=0;
-  var latxx0=latx+sin1*dxmax/scale;
-  var lngxx0=lngx+cos1*dxmax*klon/scale;
+  //var latxx0=latx+sin1*dxmax/scale;
+  //var lngxx0=lngx+cos1*dxmax*klon/scale;
   var dist0=0,dist2=2.5*2.5*Math.max(200*200,5*dxmax*5*dxmax);
-  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latxx0)*scale*dlat/(dlat/2+iwaydlat[i]);
-                        var dy=(Math.abs(iwaylng[i]-lngxx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
+  for(var i=0;i<=4;i++){var dx=Math.abs(iwaylat[i]-latx0)*scale*dlat/(dlat/2+iwaydlat[i]);
+                        var dy=(Math.abs(iwaylng[i]-lngx0)/klon)*scale*dlon/(dlon/2+iwaydlng[i]);
                         var dist=dx*dx+dy*dy;
 						if(dist>dist2 && iwaylat[i]<90){
 						   iwaylat[i]=91;iwaydlat[i]=0;iways[i]=[];inodes[i]=[];}
@@ -11460,7 +11460,7 @@ for(var i=0;i<iway2.length;i++){
 	}
     }  
     if(way.nodes){
-     if(indexhouse<(maxvertice*3-1) && indextower<(maxvertice2*3-1)){
+     if(indexhouse<(maxvertice*3-31) && indextower<(maxvertice2*3-31)){
 		addtower(way);}else{break;}}
 }}
 function settowernormals(){
@@ -12808,7 +12808,7 @@ function addtower(way){
        larg=Math.max(Math.abs(xx-xxx),Math.abs(yy-yyy));
 	   xmid=(xx+xxx)/2;
 	   ymid=(yy+yyy)/2;
-	   if((xmid-x)*(xmid-x)+(ymid-y)*(ymid-y)>Math.max(200*200,5*dxmax*5*dxmax)){return;}
+	   //if(((xmid-x)*(xmid-x)+(ymid-y)*(ymid-y))>4*Math.max(200*200,5*dxmax*5*dxmax)){return;}
 	   zmid=Math.min(getterrainheight(lonnodes[i0],latnodes[i0]),
 	        getterrainheight(lonnodes[ilarg],latnodes[ilarg]));
 	   ztree=(latnodes[i0]+lonnodes[i0])*1000000;
@@ -12830,7 +12830,7 @@ function addtower(way){
 	   xmid=(xx+xxx)/2;
 	   ymid=(yy+yyy)/2;
 	   zmid=99999;
-	   if((xmid-x)*(xmid-x)+(ymid-y)*(ymid-y)>Math.max(200*200,5*dxmax*5*dxmax)){return;}
+	   //if(((xmid-x)*(xmid-x)+(ymid-y)*(ymid-y))>4*Math.max(200*200,5*dxmax*5*dxmax)){return;}
       }
 	   zmid=Math.min(zmid,getterrainheight(lonnodes[i0],latnodes[i0]));
 	   zmid=Math.min(zmid,getterrainheight(lonnodes[ilarg],latnodes[ilarg]));
