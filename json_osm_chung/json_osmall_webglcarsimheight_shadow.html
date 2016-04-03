@@ -1319,10 +1319,10 @@ var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
 if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;
-            //if(tinit==0){cos1=0;sin1=-1;};
-            //if(tinit==1){cos1=0;sin1=1;};
-            //if(tinit==2){cos1=1;sin1=0;};
-            //if(tinit==3){cos1=-1;sin1=0;};
+            if(tinit==0){cos1=0;sin1=-1;};
+            if(tinit==1){cos1=0;sin1=1;};
+            if(tinit==2){cos1=1;sin1=0;};
+            if(tinit==3){cos1=-1;sin1=0;};
 			if(tinit>=2){tinit+=1;};}
 //if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
 //else if(k>kdxmax){kdxmax+=0.25;}
