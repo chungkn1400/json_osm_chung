@@ -1083,7 +1083,7 @@ function waycallback(r){//alert(r);
   //if(nnode<7000){setTimeout("getways2();",20);}
   //else{ways2=[];waylat2=lat;waylon2=lng;setTimeout("getnodes();",t300*2);}
 }
-var wayjson2,ways2=[],nnode2=0;
+/*var wayjson2,ways2=[],nnode2=0;
 function waycallback2(r){//alert(r);
   //msgload("ok");
   wayjson2=JSON.parse(r);
@@ -1103,13 +1103,13 @@ function waycallback2(r){//alert(r);
    /*for(var j=0;j<way.nodes.length;j++){
       //if(i<2){msg+="/"+way.nodes[j];};
 	  nnode+=1;
-	  }*/
+	  }
    //if(ways2[i].nodes){nnode2+=ways2[i].nodes.length;}
    //}}
   //alert("nnode2="+nnode2+" "+msg);
   //alert("ways2="+ways2.length)
   setTimeout("getnodes();",t300);
-}
+}*/
 var nodesignal=[];
 var iinodes=0,inodes=[];
 inodes[0]=[];inodes[1]=[];inodes[2]=[];inodes[3]=[];inodes[4]=[];inodes[5]=[];inodes[6]=[];
@@ -1192,7 +1192,7 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  if(inode3>0){setTimeout('getnodes3();',20);}
+  if(inode3>0 && loading==1){setTimeout('getnodes3();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
 var nodejson3,nodes3=[];
@@ -1215,7 +1215,7 @@ function nodecallback3(r){//alert(r);
 	 }
   //alert(msg);
   
-  if(inode31>0){setTimeout('getnodes31();',20);}
+  if(inode31>0 && loading==1){setTimeout('getnodes31();',20);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
   //tdraw=2;loading=1.75;//drawgl(0);;	 
 }
@@ -1239,7 +1239,7 @@ function nodecallback31(r){//alert(r);
 	 }
   //alert(msg);
   
-  tdraw=2;loading=1.75;//drawgl(0);;	 
+  if(loading==1){tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
 var nodejson4,nodes4=[];
 function nodecallback4(r){//alert(r);
@@ -1300,7 +1300,7 @@ context.fillText(text,20,40);
 }
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
 var trygetways=0,dtweb=0;
-var ilat=0,ilng=0,tilat=0,tautopilot0=0; 
+var ilat=0,ilng=0,tilat=0,tautopilot0=0,icos1=1,isin1=0; 
 function getways(){
 trygetways=1;
 if(tframe<dtgetways){return;}
@@ -1319,10 +1319,10 @@ var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
 if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;
-            if(tinit==0){cos1=0;sin1=-1;};
-            if(tinit==1){cos1=0;sin1=1;};
-            if(tinit==2){cos1=1;sin1=0;};
-            if(tinit==3){cos1=-1;sin1=0;};
+            //if(tinit==0){cos1=0;sin1=-1;};
+            //if(tinit==1){cos1=0;sin1=1;};
+            //if(tinit==2){cos1=1;sin1=0;};
+            //if(tinit==3){cos1=-1;sin1=0;};
 			if(tinit>=2){tinit+=1;};}
 //if(k<kdxmax || dtweb>5900){kdxmax-=0.25;}
 //else if(k>kdxmax){kdxmax+=0.25;}
@@ -1374,7 +1374,7 @@ if(tilat==1){
  lat2+=sin1*dlat/1.75;
  lon2+=cos1*dlon/1.75;
 }
-auxvar=tilat;
+auxvar=tilat;icos1=cos1;isin1=sin1;
 var latlon2="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 kx=0.040;
 //lat1=lat-kx;lon1=lng-kx*klon;
@@ -1457,10 +1457,10 @@ lat=latx0;lng=lngx0;
 lat1=lat-dlat/2;lon1=lng-dlon/2;
 lat2=lat+dlat/2;lon2=lng+dlon/2;
 if(tilat==1){
- lat1+=sin1*dlat/1.75;
- lon1+=cos1*dlon/1.75;
- lat2+=sin1*dlat/1.75;
- lon2+=cos1*dlon/1.75;
+ lat1+=isin1*dlat/1.75;
+ lon1+=icos1*dlon/1.75;
+ lat2+=isin1*dlat/1.75;
+ lon2+=icos1*dlon/1.75;
 }
 //nodeurl=http+overpass+"interpreter?data=[out:json];"+nodekey+"%3Bout%20skel%209999%3B";
 var dx=0.001;
@@ -9083,11 +9083,11 @@ function updatebuffersol(){
 
         towerVertexPositionBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexPositionBuffer[ibuff]);
-        if(ibuff==0){towervertices = new Float32Array(3*maxvertice2);
+        if(ibuff==0){towervertices = new Float32Array(3*maxvertice);
 		}
 		//var px=0,py=0,pz=0;
 		index=0;
-		for(var i=0;i<maxvertice2;i++){
+		for(var i=0;i<maxvertice;i++){
 		   append(towervertices,[
              px,py,pz
             ]);
@@ -9095,29 +9095,29 @@ function updatebuffersol(){
 		}		
         gl.bufferData(gl.ARRAY_BUFFER, (towervertices), gl.STATIC_DRAW);
         towerVertexPositionBuffer[ibuff].itemSize = 3;
-        towerVertexPositionBuffer[ibuff].numItems = maxvertice2;
+        towerVertexPositionBuffer[ibuff].numItems = maxvertice;
 	
         towerVertexTextureCoordBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexTextureCoordBuffer[ibuff]);
-        if(ibuff==0){towertextureCoords = new Float32Array(2*maxvertice2);
+        if(ibuff==0){towertextureCoords = new Float32Array(2*maxvertice);
 		}
 		index=0;
-		for (var i=0;i<maxvertice2;i++) {
+		for (var i=0;i<maxvertice;i++) {
 		   append(towertextureCoords,[
              0,0        
 			 ]);
 		}	
         gl.bufferData(gl.ARRAY_BUFFER, (towertextureCoords), gl.STATIC_DRAW);
         towerVertexTextureCoordBuffer[ibuff].itemSize = 2;
-        towerVertexTextureCoordBuffer[ibuff].numItems = maxvertice2;//24;
+        towerVertexTextureCoordBuffer[ibuff].numItems = maxvertice;//24;
 
         towerVertexNormalBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, towerVertexNormalBuffer[ibuff]);
-        if(ibuff==0){towernormals = new Float32Array(3*maxvertice2);
+        if(ibuff==0){towernormals = new Float32Array(3*maxvertice);
 		}
 		//var px=0,py=0,pz=0;
 		index=0;
-		for(var i=0;i<maxvertice2;i++){
+		for(var i=0;i<maxvertice;i++){
 		   append(towernormals,[
              px,py,pz
             ]);
@@ -9125,12 +9125,12 @@ function updatebuffersol(){
 		}		
         gl.bufferData(gl.ARRAY_BUFFER, (towernormals), gl.STATIC_DRAW);
         towerVertexNormalBuffer[ibuff].itemSize = 3;
-        towerVertexNormalBuffer[ibuff].numItems = maxvertice2;
+        towerVertexNormalBuffer[ibuff].numItems = maxvertice;
 
         tower0VertexNormalBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
 		index=0;
-		for(var i=0;i<maxvertice2;i++){
+		for(var i=0;i<maxvertice;i++){
 		   append(towernormals,[
              0,0,1
             ]);
@@ -9138,7 +9138,7 @@ function updatebuffersol(){
 		}		
         gl.bufferData(gl.ARRAY_BUFFER, (towernormals), gl.STATIC_DRAW);
         tower0VertexNormalBuffer[ibuff].itemSize = 3;
-        tower0VertexNormalBuffer[ibuff].numItems = maxvertice2;
+        tower0VertexNormalBuffer[ibuff].numItems = maxvertice;
 
         churchVertexPositionBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, churchVertexPositionBuffer[ibuff]);
@@ -10591,7 +10591,7 @@ for(var i=0;i<ways2.length;i++){
    */  
    //auxvar3=inode2+inode3+inode31;
    if(inode2==9990){tdraw=2;loading=1.75;}
-   else{setTimeout("getnodes2();",20);}
+   else if(loading==1){setTimeout("getnodes2();",20);}
 }		
 function drawglroad(iway){
 lat=latx0;lng=lngx0;
@@ -10897,7 +10897,7 @@ if(way.nodes){
    test=1;
    if(building=="hospital" || amenity=="hospital" || amenity=="clinic"){addhospital(way);}
    if(waytype=="building"){
-     if(indexhouse<(maxvertice*3-1) && indextower<(maxvertice2*3-1)){
+     if(indexhouse<(maxvertice*3-1) || indextower<(maxvertice*3-1)){
 		if(way.nodes.length>0){
 		 if(latnodes[way.nodes[0]]){addtower(way);}}
 		}
@@ -11460,7 +11460,7 @@ for(var i=0;i<iway2.length;i++){
 	}
     }  
     if(way.nodes){
-     if(indexhouse<(maxvertice*3-31) && indextower<(maxvertice2*3-31)){
+     if(indexhouse<(maxvertice*3-1) && indextower<(maxvertice*3-1)){
 		addtower(way);}else{break;}}
 }}
 function settowernormals(){
@@ -12878,6 +12878,7 @@ if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
 			   ntrottoir+=1;}
 var droofmax=120;
 if(h0>3 || hmin>0.1){//tower
+   if(indextower>=(maxvertice*3-1)){return;}
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
    h-=hmin;if(h<0.1){h=0.1;}
@@ -12885,6 +12886,7 @@ if(h0>3 || hmin>0.1){//tower
    zz=zmid;zzz=zz;
    var hshop=0,stt=0,st=0;
    if(larg<10 && larg>5){tmarket=1;}
+   if(indexshop>=(maxvertice*3-1)){tmarket=0;}
    if(tmarket==1){hshop=1;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
@@ -13051,9 +13053,12 @@ if(h0>3 || hmin>0.1){//tower
 		}}
 	}}
 }else if(larg>12*h0){//commercial 
+   if(indextower>=(maxvertice*3-1)){return;}
    if(h00==0){h=Math.max(0.5,Math.min(3,larg/12));}
    var hshop=0,stt=0,st=0;
    if(larg<10 && larg>5){tmarket=1;}
+   if(larg<10 && larg>2.5 && tsequoia>0){tmarket=1;}
+   if(indexshop>=(maxvertice*3-1)){tmarket=0;}
    if(tmarket==1){hshop=1.2;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
@@ -13180,12 +13185,14 @@ if(h0>3 || hmin>0.1){//tower
 		}}
 	}}
 }else if(ttower==0){//house
+   if(indexhouse>(maxvertice*3-31)){return;}
    if(larg>1.5 && h00==0){
      h=Math.max(h0,Math.min(3,h0*12*h0/larg));
      h=Math.max(h0,Math.min(2.5*larg,h));
    }
    if(larg>5 && larg<10 && tsequoia==0){tmarket=1;}
    var hshop=0,stt=0,st=0;//tmarket=1;
+   if(indexshop>=(maxvertice*3-1)){tmarket=0;}
    if(tmarket==1){hshop=1;if(h<hshop){hshop=h;h=0;};if(hshop<0.011){hshop=0;};}
    var jstart=0;
    var xxmin=xmid+999999,xxmax=xmid-999999;
