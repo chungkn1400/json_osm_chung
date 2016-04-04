@@ -10190,9 +10190,16 @@ if(pautoroad>=0){
    j=pautoroad;
    //if(typecar==0 && vcar>road0r[j]*0.12){vrun+=(0.1-vrun)*Math.min(1,dtime*0.002);
    //			          vcar=Math.max(vcar-vcar*dtime*0.0003,0.03);}
-   dxyroad0=dxyroad;
-   dxyroad=dx*road0si1[j]-dy*road0co1[j];
    //var dxxroad=dx*road0co1[j]+dy*road0si1[j];
+   var dxyroad1=dx*road0si1[j]-dy*road0co1[j];
+   if(road0oneway[j]==1){if((sin1*road0co1[j]-cos1*road0si1[j])*dxyroad1>0.1){
+     if(dxyroad1>0){o1pilot=o1-3;}else{o1pilot=o1+3;}
+     if(vcar>0.025){vrun=0.2;}
+	 vcar=Math.max(vcar-vcar*dtime*0.001,0.05);
+	 return;
+	  }}	
+   dxyroad0=dxyroad;
+   dxyroad=dxyroad1;//dx*road0si1[j]-dy*road0co1[j];
    var dxx=dx*cos1+dy*sin1;
    //var dyy=dx*sin1-dy*cos1;
    if(Math.abs(dxyroad)>Math.abs(dxyroad0) && dxx<0.5){
@@ -10217,7 +10224,7 @@ if(pautoroad>=0){
 		 }else{o1pilot=o1+3*sign(dxxx*dxyroad);//dyyy);
 		}}
 	}
-   if(road0oneway[j]==1){if((cos1*road0co1[j]+sin1*road0si1[j])<-0.83){o1pilot=o1-3;}}	
+   //if(road0oneway[j]==1){if((cos1*road0co1[j]+sin1*road0si1[j])<-0.83){o1pilot=o1-3;}}	
    return;}
 //o1pilot=o1;
 if(pautoroad00>=0 && tframe<tpautoroad00+1 && typecar==0){return;}
@@ -10236,9 +10243,10 @@ if(pautoroad0>=0){
 r=3;//5
 px-=sin1*0.3;py+=cos1*0.3;
 iautoroad=-1;
-if(tautopilot==2 && typecar==0){
+//if(tautopilot==2 && typecar==0){
 if(typecar==0){
-var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
+var dxyauto=0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4,kdxy=0;
+  if(tautopilot==2 && typecar==0){dxyauto=0.7;kdxy0=0,kdxy=0.5;}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i];
 	if(Math.abs(dx)<r){
@@ -10250,14 +10258,14 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	 if(Math.abs(dy)<r){
 	 if(Math.abs(dy-dxy*cos1)<r){
        var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5-(sin2/2)*road0l[i]-z);
-       if(dx*cos1+dy*sin1<0 && dxxh>0){
+       if(dx*cos1+dy*sin1<-kdxy && dxxh>0){
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0.7){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i]-road0l[i]*road0co1[i];
@@ -10270,14 +10278,14 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	 if(Math.abs(dy)<r){
 	 if(Math.abs(dy-dxy*cos1)<r){
        var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]-sin2/2)*road0l[i]-z);
-	   if(dx*cos1+dy*sin1<0 && dxxh>0){
+	   if(dx*cos1+dy*sin1<-kdxy && dxxh>0){
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0.7){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i]-road0l[i]*road0co1[i]/2;
@@ -10290,24 +10298,25 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
 	 if(Math.abs(dy)<r){
 	 if(Math.abs(dy-dxy*cos1)<r){
        var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]/2-sin2/2)*road0l[i]-z);
-	   if(dx*cos1+dy*sin1<0 && dxxh>0){
+	   if(dx*cos1+dy*sin1<-kdxy && dxxh>0){
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=0.7){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   if(idxyauto>=0 && (auto==1 || iautoroad<0)){pautoroad=idxyauto;return;}
   if(iautoroad>=0){
     var i=parseInt(Math.random()*(iautoroad+0.99));
 	pautoroad=autoroad[i];return;
 	}
-}}
+}//}
 r=5;
 iautoroad=-1;
-var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
+var dxyauto=0.05,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
+  if(tautopilot==2 && typecar==0){dxyauto=0.5;kdxy0=2;}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i];
 	if(Math.abs(dx)<r){
@@ -10325,7 +10334,8 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  //if(dxy0<0){if(tautopilot!=2 || typecar!=0){
+	      //           dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   for(var i=0;i<iroad0;i++){
@@ -10345,7 +10355,8 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  //if(dxy0<0){if(tautopilot!=2 || typecar!=0){
+	      //           dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   for(var i=0;i<iroad0;i++){
@@ -10361,11 +10372,12 @@ var dxyauto=-0.5,idxyauto=-1,dxy0=0,kdxy0=0.5+4;
        var dxxh=0.37-cos2*Math.abs(road0z[i]+0.5+(road0tan2[i]/2-sin2/2)*road0l[i]-z);
 	   if(dx*cos1+dy*sin1<0 && dxxh>0){
 	    if(iautoroad<nautoroad && i!=pautoroad0){
-		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
+		  dxy0=(cos1*road0co1[i]+sin1*road0si1[i]);
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
 		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  //if(dxy0<0){if(tautopilot!=2 || typecar!=0){
+	      //           dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}}
 		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}}}
   if(idxyauto>=0 && (auto==1 || iautoroad<0)){pautoroad=idxyauto;return;}
@@ -10387,10 +10399,10 @@ iautoroad=-1;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);//-1.05
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=-10){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i]-road0l[i]*road0co1[i];
@@ -10402,10 +10414,10 @@ iautoroad=-1;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);//-1.05
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=-10){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}
   for(var i=0;i<iroad0;i++){
     dx=px-road0x[i]-road0l[i]*road0co1[i]/2;
@@ -10417,10 +10429,10 @@ iautoroad=-1;
 	    if(iautoroad<nautoroad && i!=pautoroad0){
 		  dxy0=cos1*road0co1[i]+sin1*road0si1[i];
           if(road0oneway[i]==0){dxy0=Math.abs(dxy0);}
-		  dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);//-1.05
+		  if(dxy0>0){dxy0+=Math.max(0,(road0r[i]-0.85)*kdxy0);}//1.05
 		  if(dxy0>dxyauto){dxyauto=dxy0;idxyauto=i;}
-		  if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
-		  if(dxy0>=0){iautoroad+=1;autoroad[iautoroad]=i;}
+		  //if(dxy0<0){dxy0+=sign(-dx*road0co1[i]-dy*road0si1[i])*0.5;}
+		  if(dxy0>=-10){iautoroad+=1;autoroad[iautoroad]=i;}
 	   }}}}}
   if(idxyauto>=0 && (auto==1 || iautoroad<0)){pautoroad=idxyauto;return;}
   if(iautoroad>=0){
