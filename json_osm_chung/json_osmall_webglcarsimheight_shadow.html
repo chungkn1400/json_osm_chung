@@ -2371,7 +2371,7 @@ if(tframe>timejoy){timejoy=tframe+50;testjoystick();
 tmove=0;trot=0;
 //var vcar0=vcar;
 var oo10=o1;
-var testx=0,v=0.00000010*dtime,vv=0.00000015*200;
+var testx=0,v=0.00000006*dtime,vv=0.00000015*200;
 if(keys[vk_k] || b(4)){tfoot+=1;if(tfoot>1.1){tfoot=0;o2=0;o3=0;};
                        testzoom();resetkeys();reseto3volant();}
 if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();resetkeys();}
@@ -13957,6 +13957,9 @@ function readcookie(){
 var mycookie=document.cookie+";";
 //alert("mycookie="+mycookie);
 var pref="jsonosmwebglchung2=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
 var i=mycookie.indexOf(pref,0);
 if(i<0){return;}
 i+=pref.length;
@@ -13974,12 +13977,18 @@ savecitypanel();
 mycookie+=searchtxt;
 //alert(mycookie);  
 var pref="jsonosmwebglchung2=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
 mycookie =pref+mycookie+"; expires=Fri, 3 Aug 2100 20:47:11 UTC; path=/";
 if(mycookie.length>(3900-cookie0.length)){alert("could not save, cookie too long");return;}
 document.cookie=mycookie;
 }
 function deletecookie(){
 var pref="jsonosmwebglchung2=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
 document.cookie =pref+";expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/";
 }
 function subcookie(){
