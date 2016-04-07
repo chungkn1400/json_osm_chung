@@ -2411,7 +2411,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
          x=((lngx-lng0)/klon)*scale;
          y=(latx-lat0)*scale;
          zsol=getterrainheightcar(lngx,latx,-999);}
-	var testwater=twater;
+	testwater=twater;
 	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;
 	             lastlatx=latx;lastlngx=lngx;}
 	if(troad==0 && troadprev==1 && ttunnelprev>=1 && lastlatx<99){
@@ -4900,7 +4900,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 		else{gl.uniform1i(solProgram.tshadow,1);}
     }
    function getterrainheightwater(px,py,pz){
-        twater=1;
+        testwater=1;
         var mx=parseInt((x-xsol)/6)*6+xsol;
         var my=parseInt((y-ysol)/6)*6+ysol;
 	    var xx=(px-mx)/scxsol;
@@ -5096,8 +5096,8 @@ var tshadownight=0;
 		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
    		gl.useProgram(shader2Program);
-		if(iview==1 && tfoot==0 && twater==0){drawcarobj2();}
-		else if(tfoot==0 && twater==0){drawcarobj2();}//drawcar2();}
+		if(iview==1 && tfoot==0 && testwater==0){drawcarobj2();}
+		else if(tfoot==0 && testwater==0){drawcarobj2();}//drawcar2();}
 		drawncarobj2();
    		//gl.useProgram(shaderProgram);
 		//drawcloud22();
@@ -8156,7 +8156,7 @@ function getterrainheight2(px,py){
  var latpy=(py/scale)+lat0;
  return getterrainheight(lngpx,latpy);
 }
-var twater=0;
+var twater=0,testwater=0;
 function getterrainheight(lngpx,latpy){
 	//var scx=(dlngsol/klon)*scale;
 	//var scy=dlatsol*scale;
