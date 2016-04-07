@@ -779,7 +779,7 @@ float decodefloatrgb( vec3 rgb ) {
     uniform mat4 uMVMatrix2;
     uniform mat4 uPMatrix2;
 	uniform float sunco1,sunsi1,cloudx;
-	uniform float mx,my,wavez,time,cos1,sin1;
+	uniform float mx,my,wavez,time,cos1,sin1,wavetx,wavety;
 
     varying vec2 vTextureCoord;
     varying vec2 vTextureCoord2;
@@ -795,10 +795,11 @@ float decodefloatrgb( vec3 rgb ) {
 	    float x0=aVertexPosition.x;
 		float y0=aVertexPosition.y;
 		float zz=aVertexPosition.z;
+		float d=999.0;
 		if(zz<-0.04){
 	     float xx=x0-mx;
 		 float yy=y0-my;
-		 float d=max(abs(xx),abs(yy))*240.0;
+		 d=max(abs(xx),abs(yy))*240.0;
 		 if(d<30.0){
 		   float sc=(d+10.0)/(d+20.0);
 		   float xxx=xx*cos1-yy*sin1;
@@ -819,8 +820,10 @@ float decodefloatrgb( vec3 rgb ) {
 	    else if(aVertexPosition.z<0.039){
 		     color3=0.15;}
 		else{color3=0.0;}
-		vTextureCoord2.x=aVertexPosition.x*130.0/2.0;//25.0 /2.5;
-		vTextureCoord2.y=aVertexPosition.y*130.0/2.0;//25.0 /2.5;
+		//vTextureCoord2.x=aVertexPosition.x*130.0/2.0;//25.0 /2.5;
+		//vTextureCoord2.y=aVertexPosition.y*130.0/2.0;//25.0 /2.5;
+		vTextureCoord2=aVertexPosition.xy*130.0/2.0;//25.0 /2.5;
+		if(d<30.0){vTextureCoord2+=vec2(wavetx,wavety);}
 		//vTextureCoord3.x=aVertexPosition.x*30.0;// /2.5;
 		//vTextureCoord3.y=aVertexPosition.y*30.0;// /2.5;
 		vec4 xyz=uMVMatrix2*vec4(aVertexPosition, 1.0);
@@ -830,7 +833,7 @@ float decodefloatrgb( vec3 rgb ) {
 		else if(xyz.y<-14.0){xyz.y=xyz.y*0.5-7.0;}
 		vec4 pxyz=uPMatrix2*xyz;
 		z=-xyz.z;
-		if(z<1.0){z=0.0;}
+		if(z<1.0 || d<30.0){z=0.0;}
 		//z=floor(z*20.0)/20.0;
 		z=z*z/5000.0;
  		float px=pxyz.x*0.5+0.5; 
@@ -2408,7 +2411,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
          x=((lngx-lng0)/klon)*scale;
          y=(latx-lat0)*scale;
          zsol=getterrainheightcar(lngx,latx,-999);}
-	var testwater=twater;
+	testwater=twater;
 	if(troad==1){lastcos1road=cos1road;lastsin1road=sin1road;lastxroad=xroad;lastyroad=yroad;
 	             lastlatx=latx;lastlngx=lngx;}
 	if(troad==0 && troadprev==1 && ttunnelprev>=1 && lastlatx<99){
@@ -3844,6 +3847,8 @@ function initGL(canvasgl){
         solProgram.time = gl.getUniformLocation(solProgram, "time");
         solProgram.cos1 = gl.getUniformLocation(solProgram, "cos1");
         solProgram.sin1 = gl.getUniformLocation(solProgram, "sin1");
+        solProgram.wavetx = gl.getUniformLocation(solProgram, "wavetx");
+        solProgram.wavety = gl.getUniformLocation(solProgram, "wavety");
         solProgram.tshadow = gl.getUniformLocation(solProgram, "tshadow");
         solProgram.lightUniform = gl.getUniformLocation(solProgram, "tlight");
 
@@ -4863,7 +4868,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 		else{gl.uniform1f(treeProgram.lightUniform,0);}
         gl.uniform1f(treeProgram.fog,fog);
     }
-	var ksea=0,tlight=1,cloudx0=0,wavez=0.35,zwater=0;
+	var ksea=0,tlight=1,cloudx0=0,wavez=0.35,zwater=0,wavetx=0,wavety=0,wavevx=0,timewave=0;
     function setMatrixUniformssol() {
         gl.uniformMatrix4fv(solProgram.pMatrixUniform, false, pMatrix);
         gl.uniformMatrix4fv(solProgram.mvMatrixUniform, false, mvMatrix);
@@ -4888,11 +4893,14 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 		var kwave=(wind+60)/(wind+40);
         gl.uniform1f(solProgram.cos1,kwave*Math.cos(degtorad(-o1+40)));
         gl.uniform1f(solProgram.sin1,kwave*Math.sin(degtorad(-o1+40)));
+		timewave-=dtime*0.00035*wavevx;if(timewave<-1){timewave+=1;}
+        gl.uniform1f(solProgram.wavetx,wavetx*timewave);
+        gl.uniform1f(solProgram.wavety,wavety*timewave);
         if(noshadow>=2){gl.uniform1i(solProgram.tshadow,0);}
 		else{gl.uniform1i(solProgram.tshadow,1);}
     }
    function getterrainheightwater(px,py,pz){
-        twater=1;
+        testwater=1;
         var mx=parseInt((x-xsol)/6)*6+xsol;
         var my=parseInt((y-ysol)/6)*6+ysol;
 	    var xx=(px-mx)/scxsol;
@@ -5088,8 +5096,8 @@ var tshadownight=0;
 		if(noshadow>=2){noshadow+=1;tshadow=0;return;}
 		if(hour<4 || hour>21){tshadow=0;return;}
    		gl.useProgram(shader2Program);
-		if(iview==1 && tfoot==0){drawcarobj2();}
-		else if(tfoot==0){drawcarobj2();}//drawcar2();}
+		if(iview==1 && tfoot==0 && testwater==0){drawcarobj2();}
+		else if(tfoot==0 && testwater==0){drawcarobj2();}//drawcar2();}
 		drawncarobj2();
    		//gl.useProgram(shaderProgram);
 		//drawcloud22();
@@ -8148,7 +8156,7 @@ function getterrainheight2(px,py){
  var latpy=(py/scale)+lat0;
  return getterrainheight(lngpx,latpy);
 }
-var twater=0;
+var twater=0,testwater=0;
 function getterrainheight(lngpx,latpy){
 	//var scx=(dlngsol/klon)*scale;
 	//var scy=dlatsol*scale;
@@ -8278,6 +8286,9 @@ if(Math.abs(px-pxwater0)<1 && Math.abs(py-pywater0)<1){return kwater0;}
 pxwater0=px;pywater0=py;
 kwater0=setwavez0(px,py);
 kwater0=kwater0*kwater0;
+setwavetx(px,py,20);
+if(wavevx<0.001){setwavetx(px,py,35);}
+if(wavevx<0.001){setwavetx(px,py,50);}
 return kwater0;
 }
 function setwavez0(px,py){
@@ -8295,6 +8306,23 @@ for(var j=1;j<=4;j++){
    if(getterrainheightfast(px-i,py-i)>zwater){return j*0.2;}
 }
 return 1;
+}
+function setwavetx(px,py,dist){
+var zwater=-0.04;
+   var tx=0,ty=0,test=0;
+   var i=dist;
+   if(getterrainheightfast(px+i,py)>zwater){tx+=1;test=1;}
+   if(getterrainheightfast(px-i,py)>zwater){tx-=1;test=1;}
+   if(getterrainheightfast(px+i,py+i)>zwater){tx+=1;ty+=1;test=1;}
+   if(getterrainheightfast(px,py+i)>zwater){ty+=1;test=1;}
+   if(getterrainheightfast(px-i,py+i)>zwater){tx-=1;ty+=1;test=1;}
+   if(getterrainheightfast(px+i,py-i)>zwater){tx+=1;ty-=1;test=1;}
+   if(getterrainheightfast(px,py-i)>zwater){ty-=1;test=1;}
+   if(getterrainheightfast(px-i,py-i)>zwater){tx-=1;ty-=1;test=1;}
+   if(test==0){wavetx=0;wavety=0;wavevx=0;return;}
+   var d=Math.sqrt(0.01+tx*tx+ty*ty);
+   if(d<1){wavetx=0;wavety=0;wavevx=0.011;}
+   else{wavetx=tx/d;wavety=ty/d;wavevx=(12/9)*d*d/(d*d+3);}
 }
 function setterrainheight(lngpx,latpy,co1,si1,tan2,zz){
 	//var scx=(dlngsol/klon)*scale;
