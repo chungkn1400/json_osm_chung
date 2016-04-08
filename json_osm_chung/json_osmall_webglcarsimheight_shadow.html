@@ -2851,10 +2851,10 @@ if(keys[vk_m]){
    else if(tmap==1){tmap=3;}
    //else if(tmap==3){tmap=5;substreetview2();}
    //else if(tmap==5){tmap=4;quitstreetview();showmap();map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();}
-   else if(tmap==3){tmap=4;showmap();map.setZoom(20);
+   else if(tmap==3){tmap=4;showmap();map.setZoom(20-testwater*6);
                     map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();
 					scrollTo(0,4000);}
-   else if(tmap==4){tmap=6;showmap();map.setZoom(14);
+   else if(tmap==4){tmap=6;showmap();map.setZoom(14-testwater);
                     map.setCenter(new google.maps.LatLng(latx,lngx));updatemarker();
 					scrollTo(0,4000);}
    //else if(tmap==4){tmap=5;substreetview2();}
@@ -6841,6 +6841,8 @@ function movesailship(){
 	if(sailshipz>-0.0399){
 	   sailshipx=xx;sailshipy=yy;sailshipz=zz;
 	}
+	var dxx=dx*sailshipco1+dy*sailshipsi1;
+	var dyy=-dx*sailshipsi1+dy*sailshipco1;
     var do1=0;
 	var dh1=getterrainheightfast(sailshipx+10*sailshipco1-5*sailshipsi1,sailshipy+10*sailshipsi1+5*sailshipco1);
 	if(dh1>0){
@@ -6848,11 +6850,14 @@ function movesailship(){
     }else{
       var dh2=getterrainheightfast(sailshipx+10*sailshipco1+5*sailshipsi1,sailshipy+10*sailshipsi1-5*sailshipco1);
 	  if(dh2>0){do1=0.01*dtime*(1+Math.random());}
+	  else if(itime%10==1){
+	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
+							 if(dyy>Math.max(0,dxx*0.3+5)){do1=3}
+							 else if(dyy<-Math.max(0,dxx*0.3+5)){do1=-3;}
+					      }}
     }
     //if(sailshipx<(xmin+100) || sailshipx>(xmax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
     //if(sailshipy<(ymin+100) || sailshipy>(ymax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
-	var dxx=dx*sailshipco1+dy*sailshipsi1;
-	var dyy=-dx*sailshipsi1+dy*sailshipco1;
 	if(Math.abs(do1)>0.0001){
 	  sailshipo1+=do1;
 	}
