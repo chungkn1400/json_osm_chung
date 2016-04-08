@@ -6829,40 +6829,42 @@ function movesailship(){
 	if(sailshipy<(y-distmax)){sailshipy=y+0.99*distmax;}
 	if(sailshipy>(y+distmax)){sailshipy=y-0.99*distmax;}	
     var xx=sailshipx,yy=sailshipy,zz=sailshipz;
-    if(zz>-0.04 && zsol<-0.04){	
+    if(zz>-0.04){	
 	  sailshipx+=10*sailshipco1;
       sailshipy+=10*sailshipsi1;
 	}else{
 	  sailshipx+=dtime*0.001*sailshipco1;
       sailshipy+=dtime*0.001*sailshipsi1;
 	}
-	sailshipz=getterrainheightfast(sailshipx,sailshipy);
+	sailshipz=getterrainheight2(sailshipx,sailshipy);
 	if(zz>-0.0401){return;}
-	if(sailshipz>-0.0399){
-	   sailshipx=xx;sailshipy=yy;sailshipz=zz;
+    var do1=0;
+	if(sailshipz>-0.0399 && zz<-0.04){
+	   if(Math.random()>0.00001*dtime){sailshipx=xx;sailshipy=yy;sailshipz=zz;}
+       do1=-0.01*dtime*(1+Math.random());
 	}
 	var dxx=dx*sailshipco1+dy*sailshipsi1;
 	var dyy=-dx*sailshipsi1+dy*sailshipco1;
-    var do1=0;
-	var dh1=getterrainheightfast(sailshipx+10*sailshipco1-5*sailshipsi1,sailshipy+10*sailshipsi1+5*sailshipco1);
-	if(dh1>0){
+	var dh1=getterrainheightfast(sailshipx+7*sailshipco1-3*sailshipsi1,sailshipy+7*sailshipsi1+3*sailshipco1);
+	if(Math.abs(do1)<0.00001){
+	 if(dh1>0){
 	  do1=-0.01*dtime*(1+Math.random());
-    }else{
-      var dh2=getterrainheightfast(sailshipx+10*sailshipco1+5*sailshipsi1,sailshipy+10*sailshipsi1-5*sailshipco1);
+     }else{
+      var dh2=getterrainheightfast(sailshipx+7*sailshipco1+3*sailshipsi1,sailshipy+7*sailshipsi1-3*sailshipco1);
 	  if(dh2>0){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
 							 if(dyy>Math.max(0,dxx*0.3+5)){do1=3}
 							 else if(dyy<-Math.max(0,dxx*0.3+5)){do1=-3;}
 					      }}
-    }
+    }}
     //if(sailshipx<(xmin+100) || sailshipx>(xmax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
     //if(sailshipy<(ymin+100) || sailshipy>(ymax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
-	if(Math.abs(do1)>0.0001){
+	if(Math.abs(do1)>0.00001){
 	  sailshipo1+=do1;
 	}
 	if(dxx>-2.7 && dxx<1.2 && dyy>-0.7 && dyy<0.7){
-	   if(Math.abs(do1)<0.0001){
+	   if(Math.abs(do1)<0.00001){
 	    if(keys[vk_1]){do1=dtime*0.01;}
 	    if(keys[vk_2]){do1=-dtime*0.01;}
 		sailshipo1+=do1;
@@ -6880,7 +6882,7 @@ function movesailship(){
 	   latx=lat0+y/scale;
 	   o1+=do1;o1save+=do1;
 	   myisailship=isailship;mysailshipo1=sailshipo1;mysailshipdxx=dxx;
-	}else if(Math.abs(do1)>0.0001){
+	}else if(Math.abs(do1)>0.00001){
 	   sailshipco1=Math.cos(degtorad(sailshipo1));
 	   sailshipsi1=Math.sin(degtorad(sailshipo1));
 	}
