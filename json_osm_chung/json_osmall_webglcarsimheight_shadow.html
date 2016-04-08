@@ -99,6 +99,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="base64binary.js"></script>
 <script src="vk_keys.js"></script>
 <script src="watermp3.js"></script>
+<script src="oceanmp3.js"></script>
 <script src="pneump3.js"></script>
 <script src="carmp3.js"></script>
 <script src="rainmp3.js"></script>
@@ -2941,6 +2942,7 @@ y=(latx-lat0)*scale;
 	 if(troad==0 && tfly==0){
 	  if(zsol<-0.04 || testwater==1){soundwater();}}
 	}
+	if(zsol<0.2 && testwater==1){soundocean();};
 
 testx=0;
 if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
@@ -6729,7 +6731,7 @@ function drawc150obj2(){return;//if(tfoot==1 || iview!=1){return;}
 	mvPopMatrix();
 }
 var nsailship=5;
-var psailshipx=new Array(nsailship);
+var psailshipx=new Array(nsailship),psailshipdo1=new Array(nsailship);
 var psailshipy=new Array(nsailship),psailshipz=new Array(nsailship);
 var psailshipo1=new Array(nsailship),psailshipco1=new Array(nsailship),psailshipsi1=new Array(nsailship);
 var tpsailshipo1=new Array(nsailship),psailshipvie=new Array(nsailship);
@@ -6745,6 +6747,7 @@ function getpsailship(i){
    sailshipsi1=psailshipsi1[i]; 
    tsailshipo1=tpsailshipo1[i]; 
    sailshipvie=psailshipvie[i];
+   sailshipdo1=psailshipdo1[i]; 
 }	 
 function setpsailship(i){
    psailshipx[i]=sailshipx; 
@@ -6757,6 +6760,7 @@ function setpsailship(i){
    psailshipsi1[i]=sailshipsi1; 
    tpsailshipo1[i]=tsailshipo1; 
    psailshipvie[i]=sailshipvie;
+   psailshipdo1[i]=sailshipdo1; 
 }
 function resetsailships(){
   for(var i=0;i<nsailship;i++){
@@ -6786,7 +6790,7 @@ function drawsailships(){
 var sailshipx=(Math.random())*1000;
 var sailshipy=0.7*ymax+Math.random()*300,sailshipz=0;
 var sailshipo1=Math.random()*40-20,sailshipco1=1,sailshipsi1=0;
-var tsailshipo1=0,sailshipvie=100,sailshipo2=0,sailshipo3=0;
+var tsailshipo1=0,sailshipvie=100,sailshipo2=0,sailshipo3=0,sailshipdo1=0;
 for(var i=0;i<nsailship;i++){
     sailshipx+=50*Math.random();
 	sailshipy+=50*Math.random();setpsailship(i);}
@@ -6860,15 +6864,13 @@ function movesailship(){
     }}
     //if(sailshipx<(xmin+100) || sailshipx>(xmax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
     //if(sailshipy<(ymin+100) || sailshipy>(ymax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
-	if(Math.abs(do1)>0.00001){
-	  sailshipo1+=do1;
-	}
 	if(dxx>-2.7 && dxx<1.2 && dyy>-0.7 && dyy<0.7){
 	   if(Math.abs(do1)<0.00001){
 	    if(keys[vk_1]){do1=dtime*0.01;}
 	    if(keys[vk_2]){do1=-dtime*0.01;}
-		sailshipo1+=do1;
 	   }
+	   sailshipdo1+=(do1-sailshipdo1)*Math.min(1,dtime*0.003)+0.00001;
+	   sailshipo1+=sailshipdo1;
 	   if(sailshipo1>180){sailshipo1-=360;}
 	   if(sailshipo1<-180){sailshipo1+=360;}
 	   sailshipco1=Math.cos(degtorad(sailshipo1));
@@ -6883,6 +6885,7 @@ function movesailship(){
 	   o1+=do1;o1save+=do1;
 	   myisailship=isailship;mysailshipo1=sailshipo1;mysailshipdxx=dxx;
 	}else if(Math.abs(do1)>0.00001){
+	   sailshipo1+=do1;
 	   sailshipco1=Math.cos(degtorad(sailshipo1));
 	   sailshipsi1=Math.sin(degtorad(sailshipo1));
 	}
@@ -14087,6 +14090,21 @@ function soundwater(){
    playsound(myaudiowater);
    vcar=vcar*0.5+0.0001;
  }else{planedo2+=Math.min(350,(350-Math.abs(tframe-tsoundwater-350)))/500;
+ }} 
+var myaudioocean = audioctx.createBufferSource();
+myaudioocean.volume=0;
+loadsound64(myaudioocean,oceanmp3);
+myaudioocean.onload=function(){
+ //setTimeout("playsound(myaudioocean);",900);
+ setTimeout("setvol(myaudioocean,0.4);",800);
+ setTimeout("setspeed(myaudioocean,1.0);",800);
+ }
+var tsoundocean=0;
+function soundocean(){
+ if(tframe>tsoundocean+13500){
+   tsoundocean=tframe;
+   setvol(myaudioocean,0.4);
+   playsound(myaudioocean);
  }} 
 var myaudiopneu = audioctx.createBufferSource();
 //audiosrc=folder+"pneu."+wav;
