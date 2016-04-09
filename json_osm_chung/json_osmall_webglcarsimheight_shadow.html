@@ -6734,7 +6734,7 @@ var nsailship=5;
 var psailshipx=new Array(nsailship),psailshipdo1=new Array(nsailship);
 var psailshipy=new Array(nsailship),psailshipz=new Array(nsailship);
 var psailshipo1=new Array(nsailship),psailshipco1=new Array(nsailship),psailshipsi1=new Array(nsailship);
-var tpsailshipo1=new Array(nsailship),psailshipvie=new Array(nsailship);
+var tpsailshipo1=new Array(nsailship),psailshipv=new Array(nsailship);
 var psailshipo2=new Array(nsailship),psailshipo3=new Array(nsailship);
 var psailshipdo2=new Array(nsailship),psailshipdo3=new Array(nsailship);
 function getpsailship(i){
@@ -6747,7 +6747,7 @@ function getpsailship(i){
    sailshipco1=psailshipco1[i]; 
    sailshipsi1=psailshipsi1[i]; 
    tsailshipo1=tpsailshipo1[i]; 
-   sailshipvie=psailshipvie[i];
+   sailshipv=psailshipv[i];
    sailshipdo1=psailshipdo1[i]; 
    sailshipdo2=psailshipdo2[i]; 
    sailshipdo3=psailshipdo3[i]; 
@@ -6762,7 +6762,7 @@ function setpsailship(i){
    psailshipco1[i]=sailshipco1; 
    psailshipsi1[i]=sailshipsi1; 
    tpsailshipo1[i]=tsailshipo1; 
-   psailshipvie[i]=sailshipvie;
+   psailshipv[i]=sailshipv;
    psailshipdo1[i]=sailshipdo1; 
    psailshipdo2[i]=sailshipdo2; 
    psailshipdo3[i]=sailshipdo3; 
@@ -6795,7 +6795,7 @@ function drawsailships(){
 var sailshipx=(Math.random())*1000;
 var sailshipy=0.7*ymax+Math.random()*300,sailshipz=0;
 var sailshipo1=Math.random()*40-20,sailshipco1=1,sailshipsi1=0;
-var tsailshipo1=0,sailshipvie=100,sailshipo2=0,sailshipo3=0;
+var tsailshipo1=0,sailshipv=1,sailshipo2=0,sailshipo3=0;
 var sailshipdo1=0,sailshipdo2=0,sailshipdo3=0;
 for(var i=0;i<nsailship;i++){
     sailshipx+=50*Math.random();
@@ -6830,8 +6830,6 @@ function resetsailship(){
   }
 }
 function movesailship(){
-    //if(sailshipvie<100){sailshipvie+=Math.random()*dtime*0.0004;};
-    //if(sailshipvie<-100){sailshipvie=-99;}
 	var distmax=250;
 	var dx=x-sailshipx,dy=y-sailshipy;
 	if(sailshipx<(x-distmax)){sailshipx=x+0.99*distmax;}
@@ -6843,8 +6841,10 @@ function movesailship(){
 	  sailshipx+=10*sailshipco1;
       sailshipy+=10*sailshipsi1;
 	}else{
-	  sailshipx+=dtime*0.001*sailshipco1;
-      sailshipy+=dtime*0.001*sailshipsi1;
+	  var sailshipsi2=Math.sin(degtorad(sailshipo2));
+	  sailshipv+=(1-sailshipsi2-sailshipv)*Math.min(1,dtime*0.003);
+	  sailshipx+=dtime*0.001*sailshipco1*sailshipv;
+      sailshipy+=dtime*0.001*sailshipsi1*sailshipv;
 	}
 	sailshipz=getterrainheight2(sailshipx,sailshipy);
 	if(zz>-0.0401){return;}
@@ -6904,7 +6904,6 @@ function drawsailship(){
 		//if(getterrainheight2(sailshipx,sailshipy)>0){
 		   //if(sailshipx>xmin && sailshipx<xmax && sailshipy>ymin && sailshipy<ymax){
 		//      return;};//}
-     	//if(sailshipvie<0 && Math.random()<dtime*0.0025){addsmoke(sailshipx,sailshipy,sailshipz+1.4,3.5,1);}
 		if(rotavion(sailshipx-x,sailshipy-y,sailshipz-z,12)){
         var sailshipo22=0,sailshipo33=0;		
         if(Math.abs(dx)<40 && Math.abs(dy)<40){
