@@ -4318,7 +4318,7 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
         rainTexture.image.onload = function () {
             handleLoadedTexture(rainTexture);
         }
-        rainTexture.image.src = "rain.jpg";
+        rainTexture.image.src = "rain2.jpg";
 
         greenTexture = gl.createTexture();
         greenTexture.image = new Image();
@@ -5764,6 +5764,42 @@ var texscalex1=1,texscaley1=1,textdx1=0,textdy1=0;
 var texscalex2=1,texscaley2=1,textdx2=0,textdy2=0;
 var trainfog=0,fog0=0.45,fogweather=-1;
 function drawrain(){
+    var fog00=fog0*(1-0.55*Math.abs(12-hour)/12)*0.3;
+	if(fogweather>=0 && tfog>=0.1 && tframe>trainfog+5000){fog00=fogweather*tfog;}
+    if(fog<fog00){fog+=(fog00-fog)*dtime*0.0003;}else{fog=fog00;}
+    if(tframe<trainfog+5000){
+         fog0=Math.max(tfog*0.1,(0.55+tfog*0.15)*(trainfog+5000-tframe)/5000);fog=fog00;}
+	else{fog0=tfog*0.45;}
+	if(tframe>timerain){
+      timerain=tframe+20000+Math.random()*40000;
+      var dtcloud=((wclouds/50)+1)*0.035*(1+testwater)/2.0;
+      if(Math.random()<dtcloud && humidity>-80){train=1;}else{train=0;}}
+    if(train==0 && train1==0 && train2==0 || ttunnel>=1){stopsoundrain();return;}
+	soundrain();trainfog=tframe;
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.ONE);
+	gl.activeTexture(gl.TEXTURE10);
+    gl.bindTexture(gl.TEXTURE_2D,  rainTexture);
+    gl.uniform1i(program2d.samplerUniform, 10);
+	dx2d=0;dy2d=0;
+    texscalex=windx/windy;texscaley=1;
+	if(tframe>timerain2){
+	        timerain2=tframe+70*(Math.random()+1)
+			textdx=Math.random();textdy=Math.random();}
+	if(tframe>timerain1){
+	    train1=train;
+	    timerain1=tframe+(Math.random()+2)*3000;}		
+    var c=0;
+    colorr=c;colorg=c;colorb=c;colora=1;
+	drawcarre2D();
+
+	colorr=1;colorg=1;colorb=1;colora=1;
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+}
+function drawrain0(){
     var fog00=fog0*(1-0.55*Math.abs(12-hour)/12);
 	if(fogweather>=0 && tfog>=0.1 && tframe>trainfog+5000){fog00=fogweather*tfog;}
     if(fog<fog00){fog+=(fog00-fog)*dtime*0.0003;}else{fog=fog00;}
