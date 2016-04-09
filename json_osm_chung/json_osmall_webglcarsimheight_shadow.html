@@ -4899,7 +4899,7 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(solProgram.cloudx,cloudx0*400.0/(300.0*distcloud));
         gl.uniform1f(solProgram.mx,parseInt((x-xsol)/6)*6/scxsol);
         gl.uniform1f(solProgram.my,parseInt((y-ysol)/6)*6/scysol);
-		wavez=wind*0.01;wavez=1.2*wavez/(0.58+wavez);
+		wavez=wind*0.01;wavez=1.99*wavez/(0.55+wavez);
 		wavez*=setwavez(x,y);
         gl.uniform1f(solProgram.wavez,wavez);
         gl.uniform1f(solProgram.time,tframe%314160);
@@ -6736,6 +6736,7 @@ var psailshipy=new Array(nsailship),psailshipz=new Array(nsailship);
 var psailshipo1=new Array(nsailship),psailshipco1=new Array(nsailship),psailshipsi1=new Array(nsailship);
 var tpsailshipo1=new Array(nsailship),psailshipvie=new Array(nsailship);
 var psailshipo2=new Array(nsailship),psailshipo3=new Array(nsailship);
+var psailshipdo2=new Array(nsailship),psailshipdo3=new Array(nsailship);
 function getpsailship(i){
    sailshipx=psailshipx[i]; 
    sailshipy=psailshipy[i]; 
@@ -6748,6 +6749,8 @@ function getpsailship(i){
    tsailshipo1=tpsailshipo1[i]; 
    sailshipvie=psailshipvie[i];
    sailshipdo1=psailshipdo1[i]; 
+   sailshipdo2=psailshipdo2[i]; 
+   sailshipdo3=psailshipdo3[i]; 
 }	 
 function setpsailship(i){
    psailshipx[i]=sailshipx; 
@@ -6761,6 +6764,8 @@ function setpsailship(i){
    tpsailshipo1[i]=tsailshipo1; 
    psailshipvie[i]=sailshipvie;
    psailshipdo1[i]=sailshipdo1; 
+   psailshipdo2[i]=sailshipdo2; 
+   psailshipdo3[i]=sailshipdo3; 
 }
 function resetsailships(){
   for(var i=0;i<nsailship;i++){
@@ -6790,7 +6795,8 @@ function drawsailships(){
 var sailshipx=(Math.random())*1000;
 var sailshipy=0.7*ymax+Math.random()*300,sailshipz=0;
 var sailshipo1=Math.random()*40-20,sailshipco1=1,sailshipsi1=0;
-var tsailshipo1=0,sailshipvie=100,sailshipo2=0,sailshipo3=0,sailshipdo1=0;
+var tsailshipo1=0,sailshipvie=100,sailshipo2=0,sailshipo3=0;
+var sailshipdo1=0,sailshipdo2=0,sailshipdo3=0;
 for(var i=0;i<nsailship;i++){
     sailshipx+=50*Math.random();
 	sailshipy+=50*Math.random();setpsailship(i);}
@@ -6906,11 +6912,15 @@ function drawsailship(){
 		 var dh1=getterrainheightwater(sailshipx+sailshipco1*dxx,sailshipy+sailshipsi1*dxx);
 		 var dh2=getterrainheightwater(sailshipx-sailshipsi1*dyy,sailshipy+sailshipco1*dyy);
 		 var dh3=getterrainheightwater(sailshipx+sailshipsi1*dyy,sailshipy-sailshipco1*dyy);
-		 sailshipo22=diro1(dxx*4,dh1-(dh2+dh3)*0.5);
-		 sailshipo33=diro1(dyy*8,(dh3-dh2));
+		 sailshipo22=diro1(dxx,dh1-(dh2+dh3)*0.5);
+		 sailshipo33=diro1(dyy*2,(dh3-dh2));
 		}
-		sailshipo2+=(sailshipo22-sailshipo2)*Math.min(1,dtime*0.0008);
-		sailshipo3+=(sailshipo33-sailshipo3)*Math.min(1,dtime*0.0008);
+		var kdt=Math.min(1,dtime*0.003);
+		sailshipdo2+=(sailshipo22-sailshipo2-sailshipdo2)*kdt;
+		sailshipdo3+=(sailshipo33-sailshipo3-sailshipdo3)*kdt;
+		kdt=Math.min(1,dtime*0.00114);
+		sailshipo2+=sailshipdo2*kdt;
+		sailshipo3+=sailshipdo3*kdt;
 		mvPushMatrix();
 		mat4.translate(mvMatrix, [sailshipx,sailshipy,sailshipz-0.1]);
         mat4.rotate(mvMatrix, degtorad(sailshipo1), [0, 0, 1]);
@@ -13014,7 +13024,7 @@ if(tgirlimage==2){tgirlimage=1;var i=w/4,j=h/4;
 else{tgirlimage=2;var i=w/2.5,j=h/2.5;
        context.drawImage(girlimage3,i,j,girlimage3.width-i-i,girlimage3.height-j-j, ix,jx,di,dj);}
 }
-function subtest(){
+function subtest(){subwind();return;
 if(tupdatesoltexture==0){
  tupdatesoltexture=2;loading=66;
  updatesoltexture();
@@ -13951,6 +13961,11 @@ if(k){k=Math.max(0.25,Math.min(2.0,k));}
 if(k>=0.25 && k<=2.0){kscalex=k;scale=kscalex*scale0;
                       if(loading==0 || loading==1.4){drawgl(0);}else{trygetways=1;}
    } 
+}
+function subwind(){
+var k0=parseInt(100*wind)/100;
+var k=prompt("wind : enter a number 0.0 - 200.0 last="+k0+" km/h")
+if(k){k=Math.max(0.0,Math.min(200.0,k));wind=k;}
 }
 var geolocation="";
 function geolocate(){
