@@ -5342,8 +5342,11 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 				   fog=fogsave;}
 				}
     fogsave=fog;fog=0;
+	if(tmap==0 && tinit>2){
+		      gl.useProgram(shaderProgram);
+	          drawsailships();}
 	if(tfoot==0 && tmap==0){
-		   if(iview==0){drawcarcockpit();}
+		   if(iview==0){gl.useProgram(shader0Program);drawcarcockpit();}
 		   else if(iview==1){
 		      gl.useProgram(shaderaProgram);
 		      drawcarobj();
@@ -5353,11 +5356,11 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 			  //drawtexture(solTexture);
 		      gl.useProgram(shaderProgram);
               drawminimap();}}
-		else if(tminimap2==1 && tmap==0){gl.useProgram(shaderProgram);drawminimap();}   
+		else if(tminimap2==1 && tmap==0){gl.useProgram(shaderProgram);drawminimap();};   
 		if(tmap==0){
 		   gl.useProgram(shaderProgram);
-		   if(tinit>2){drawsailships();}
-		   drawbouss();}
+		   drawbouss();
+		   }
 
 		if(tfoot==0 && tcollideon==1 && tautopilot==0){
 		  //gl.useProgram(shaderaProgram);
@@ -6341,6 +6344,9 @@ if(tlogan==1){drawloganobj();return;}
     gl.bindBuffer(gl.ARRAY_BUFFER, carVertexPositionBuffer);
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, carVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
     if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
@@ -6438,6 +6444,9 @@ function drawloganobj(){
     gl.bindBuffer(gl.ARRAY_BUFFER, loganVertexPositionBuffer);
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, loganVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
     if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
@@ -6514,6 +6523,9 @@ function drawc150obj(){
     gl.bindBuffer(gl.ARRAY_BUFFER, c150VertexPositionBuffer);
     gl.vertexAttribPointer(shaderaProgram.vertexPositionAttribute, c150VertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderaProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
     var typcar=1+typecar%5;if(typecar==0){typcar=0;}
 	if(typcar==0){colorr=1;colorg=1;colorb=1;colora=1;}
     if(typcar==1){colorr=1;colorg=0.1;colorb=0;colora=0;}
@@ -6521,7 +6533,6 @@ function drawc150obj(){
     if(typcar==3){colorr=1;colorg=1;colorb=0;colora=0;}
     if(typcar==4){colorr=0.2;colorg=1;colorb=1;colora=0;}
     if(typcar==5){colorr=1;colorg=0.1;colorb=1;colora=0;}
-	mvPushMatrix();
     mat4.rotate(mvMatrix, degtorad(-90), [0, 0, 1]);
 	setMatrixUniformsa();
 	colorr=1;colorg=1;colorb=1;colora=1;
@@ -6936,6 +6947,9 @@ function drawsailship(){
     gl.bindBuffer(gl.ARRAY_BUFFER, sailshipVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, sailshipVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
     
+    gl.bindBuffer(gl.ARRAY_BUFFER, tower0VertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, tower0VertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
     setMatrixUniforms(); 
     gl.drawArrays(gl.TRIANGLES, 0, sailshipVertexPositionBuffer.numItems);
 		
