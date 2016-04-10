@@ -8084,7 +8084,7 @@ while(boeingo1<-180){boeingo1+=360;}
 var airportxx=0,airportyy=0,distairportxx=1,distboeing=999999;
 function drawboeing(){
 distboeing=999999;
-aiportxx=(airportx-lng0)*scale/klon;
+airportxx=(airportx-lng0)*scale/klon;
 airportyy=(airporty-lat0)*scale;
 distairportxx=17+Math.max(Math.abs(airportxx-x),Math.abs(airportyy-y));
     var d720=Math.max(360,Math.min(720,720*distairportxx/200));
@@ -10237,7 +10237,7 @@ function testaddphotopanel(){
     var xxx=xx*klon/scale+lng0;
 	var yyy=yy/scale+lat0;
 	var test=0;
-    if(road0cross[i]>0 && airportx<999){
+    if(road0cross[i]>0 && airportx<998){
 	   test=testaddairportpanel(xxx,yyy,i);}
 	if((parseInt(Math.abs(xxx+yyy)*99999)%100)==1 && test==0){
      if(Math.max(Math.abs(xx-x),Math.abs(yy-y))>50){
@@ -11203,7 +11203,7 @@ itextshop=0;
 indextree=0;indextree2=0;
 indexline=0;indexlinetext=0;
 indexcross=0;
-tairport=0;airportx=999999;airportname="";distairport1=999999;distairport2=999999;
+tairport=0;airportx=999;airportname="";distairport1=999999;distairport2=999999;
 ntrottoir=0;
 //resettree2();
 //resettree22();
@@ -11825,13 +11825,14 @@ if(way.nodes){
 	 }  
    }
    if(nairport1>0.1){airportx1/=nairport1;airporty1/=nairport1;
-      var dist=Math.max(Math.abs(airportx1-lngx)/klon,Math.abs(airporty1-latx));
+      var dist=scale*Math.max(Math.abs(airportx1-lngx)/klon,Math.abs(airporty1-latx));
 	  if(dist<distairport1){
 	     distairport1=dist;
 	     airportx=airportx1;airporty=airporty1;
-	  }
-	  if(dist<distairport2){
+	  //}
+	  //if(dist<distairport2){
 	     if(way.tags.name){distairport2=dist;airportname=way.tags.name;}
+		 else{airportname="";}
 	  }
 	  }
 }//(way.nodes)
