@@ -2364,7 +2364,9 @@ if(winwidth!=window.innerWidth || winheight!=window.innerHeight){
 	}
 }
 if(tmsg<(tframe-150)){tmsg=tframe;
- var xx=Math.round(x),yy=Math.round(y),zz=Math.round(z*10)/10,oo1=Math.round(o1),vv=Math.round(vcar*3000)/10;
+ var xx=Math.round(x),yy=Math.round(y),zz=Math.round(z*10)/10,oo1=Math.round(o1);
+ var vv=Math.round(vcar*3000)/10;
+ if(myisailship>=0){vv=Math.round(psailshipv[myisailship]*300)/10;}
  var pp=Math.round(vrun*1000)/10,oo2=Math.round(o2*10)/10,ff=Math.round(fps*10)/10,oo3=Math.round(o3*10)/10;
  var msg="x="+xx+"  y="+yy+"  z="+zz+"  v="+vv+"  prop="+pp
  if(test==1){msg+="  o1="+oo1+" o2="+oo2+" o3="+oo3;};
@@ -5360,6 +5362,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		if(tmap==0){
 		   gl.useProgram(shaderProgram);
 		   drawbouss();
+		   //if(myisailship>=0){drawbouss2();}
 		   }
 
 		if(tfoot==0 && tcollideon==1 && tautopilot==0){
@@ -5915,6 +5918,35 @@ function drawbouss(){
     gl.bindTexture(gl.TEXTURE_2D,  boussTexture);
     gl.uniform1i(shaderProgram.samplerUniform, 0);
     
+    drawcarre();
+
+		mvPopMatrix();
+    gl.enable(gl.DEPTH_TEST);
+    //gl.disable(gl.BLEND);
+}
+var o1wind=Math.random()*360;
+function drawbouss2(){
+    if(Math.random()<dtime*0.004){
+	   o1wind+=(Math.random()-0.5)*5;
+	   if(o1wind>360){o1wind-=360;}
+	   if(o1wind<-360){o1wind+=360;}}
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.DEPTH_TEST);
+    //gl.enable(gl.BLEND);
+    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        mvPushMatrix();
+		mat4.identity(mvMatrix);
+		//windx=canvas.width;
+		//windy=canvas.height;
+		//mat4.translate(mvMatrix, [230*windx/windy,-220,-600]);//boussx
+		//mat4.translate(mvMatrix, [(cssscale/cssscaley)*234*windx/windy,220,-600]);//boussx
+		mat4.translate(mvMatrix, [(cssscale/cssscaley)*234*windx/windy,160,-600]);//boussx
+		mat4.rotate(mvMatrix, degtorad(o1wind-o1), [0, 0, 1]);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  boussTexture);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+    
+	mat4.scale(mvMatrix,[0.65,0.65,1]);
     drawcarre();
 
 		mvPopMatrix();
@@ -6887,27 +6919,33 @@ function movesailship(){
     if(zz>-0.04){	
 	  sailshipx+=10*sailshipco1;
       sailshipy+=10*sailshipsi1;
+	  sailshipz=getterrainheight2(sailshipx,sailshipy);
+	  return;
 	}else{
 	  var sailshipsi2=Math.sin(degtorad(sailshipo2));
+	  //var co1=Math.cos(degtorad(sailshipo1-o1wind));
+	  //var pwind=Math.min(1,Math.max(-1,(wind/30)*((1+co1)/2+1-co1*co1)-sailshipv*co1*co1));
+	  //sailshipv+=(1-sailshipsi2+pwind*0.3-sailshipv)*Math.min(1,dtime*0.003);
 	  sailshipv+=(1-sailshipsi2-sailshipv)*Math.min(1,dtime*0.003);
 	  sailshipx+=dtime*0.001*sailshipco1*sailshipv;
       sailshipy+=dtime*0.001*sailshipsi1*sailshipv;
 	}
 	sailshipz=getterrainheight2(sailshipx,sailshipy);
-	if(zz>-0.0401){return;}
     var do1=0;
-	if(sailshipz>-0.0399 && zz<-0.04){
-	   if(Math.random()>0.00001*dtime){sailshipx=xx;sailshipy=yy;sailshipz=zz;}
+	if(sailshipz>-0.0401 && zz<-0.04){
+	   if(Math.random()<0.00005*dtime && sailshipo1<-360-180){sailshipo1+=360;return;}
+	   else{sailshipx=xx;sailshipy=yy;sailshipz=zz;}
        do1=-0.01*dtime*(1+Math.random());
-	}
+	}else if(sailshipo1<-180){sailshipo1+=360;
+	}else if(sailshipo1>180){sailshipo1-=360;}
 	var dxx=dx*sailshipco1+dy*sailshipsi1;
 	var dyy=-dx*sailshipsi1+dy*sailshipco1;
-	var dh1=getterrainheightfast(sailshipx+7*sailshipco1-3*sailshipsi1,sailshipy+7*sailshipsi1+3*sailshipco1);
 	if(Math.abs(do1)<0.00001){
+     var dh1=getterrainheightfast(sailshipx+5*sailshipco1-3*sailshipsi1,sailshipy+5*sailshipsi1+3*sailshipco1);
 	 if(dh1>0){
 	  do1=-0.01*dtime*(1+Math.random());
      }else{
-      var dh2=getterrainheightfast(sailshipx+7*sailshipco1+3*sailshipsi1,sailshipy+7*sailshipsi1-3*sailshipco1);
+      var dh2=getterrainheightfast(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
 	  if(dh2>0){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
@@ -6925,8 +6963,6 @@ function movesailship(){
 	   }
 	   sailshipdo1+=(do1-sailshipdo1)*Math.min(1,dtime*0.003)+0.00001;
 	   sailshipo1+=sailshipdo1;
-	   if(sailshipo1>180){sailshipo1-=360;}
-	   if(sailshipo1<-180){sailshipo1+=360;}
 	   sailshipco1=Math.cos(degtorad(sailshipo1));
 	   sailshipsi1=Math.sin(degtorad(sailshipo1));
 	   x=sailshipx+dxx*sailshipco1-dyy*sailshipsi1;
@@ -6973,6 +7009,11 @@ function drawsailship(){
         mat4.rotate(mvMatrix, degtorad(sailshipo1), [0, 0, 1]);
 		mat4.rotate(mvMatrix, degtorad(sailshipo2), [0, -1, 0]);
         mat4.rotate(mvMatrix, degtorad(sailshipo3), [-1, 0, 0]);
+		/*var ddo1=sailshipo1-o1wind;
+		while(ddo1>180){ddo1-=360;}
+		while(ddo1<-180){ddo1+=360;}
+		if(ddo1>0){mat4.scale(mvMatrix,[0.05,0.05,0.05]);}
+		else{mat4.scale(mvMatrix,[0.05,-0.05,0.05]);}*/
 		mat4.scale(mvMatrix,[0.05,0.05,0.05]);
  	gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,  sailshipTexture);
