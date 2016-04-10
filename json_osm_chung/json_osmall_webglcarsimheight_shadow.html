@@ -1339,7 +1339,7 @@ else if(avgfps>9){dxmax2=Math.min(25,dxmax2+2);}
 var k=(700/(10+iways[iiways].length));
 k=Math.min(k,7000/(10+inodes[iinodes].length+nodes2.length+nodes3.length));
 //k=Math.max(0.70,Math.min(3,Math.sqrt(k)));
-if(tinit<4){k=1;kdxmax=0.75;dxmax2=13;avgfps=1;
+if(tinit<4){k=1;kdxmax=0.75+testwater;dxmax2=13;avgfps=1;
             if(tinit==0){cos1=0;sin1=-1;};
             if(tinit==1){cos1=0;sin1=1;};
             if(tinit==2){cos1=1;sin1=0;};
@@ -6911,8 +6911,9 @@ function movesailship(){
 	  if(dh2>0){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
-							 if(dyy>Math.max(0,dxx*0.3+5)){do1=3}
-							 else if(dyy<-Math.max(0,dxx*0.3+5)){do1=-3;}
+							 if(dx*dx+dy*dy<36){do1=-sign(dyy)*(3.5-Math.random());}
+							 else if(dyy>Math.max(0,dxx*0.3+5)){do1=3.5-Math.random();}
+							 else if(dyy<-Math.max(0,dxx*0.3+5)){do1=-3.5+Math.random();}
 					      }}
     }}
     //if(sailshipx<(xmin+100) || sailshipx>(xmax-100)){sailshipo1=diro1(pistex-sailshipx,pistey-sailshipy);}
