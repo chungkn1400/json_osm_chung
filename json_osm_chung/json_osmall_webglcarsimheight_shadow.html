@@ -5773,7 +5773,7 @@ function drawrain(){
 	if(tframe>timerain){
       timerain=tframe+20000+Math.random()*40000;
       var dtcloud=((wclouds/50)+1)*0.035*(1+testwater)/2.0;
-      if(Math.random()<dtcloud && humidity>-80){train=1;}else{train=0;}}
+      if(Math.random()<dtcloud && humidity>=80){train=1;}else{train=0;}}
     if(train==0 && train1==0 && train2==0 || ttunnel>=1){stopsoundrain();return;}
 	soundrain();trainfog=tframe;
     gl.disable(gl.CULL_FACE);
