@@ -814,7 +814,7 @@ float decodefloatrgb( vec3 rgb ) {
         xyz0z=xyzt.z;
 		gl_Position = (uPMatrix * xyzt);
         vTextureCoord = aTextureCoord+vec2(0.007,-0.007);
-		if(aVertexPosition.z<-0.01){
+		if(aVertexPosition.z<-0.025){//-0.01){
 		     color=0.0;}
 		else{color=1.0;}
 	    if(aVertexPosition.z<-0.39 || vTextureCoord.y<-1.0){
@@ -6931,6 +6931,7 @@ function resetsailship(){
 	if(sailshipy<y-200){sailshipy+=(400);}
   }
 }
+var tsailshipskip=0;
 function movesailship(){
 	var distmax=250;
 	var dx=x-sailshipx,dy=y-sailshipy;
@@ -6939,7 +6940,8 @@ function movesailship(){
 	if(sailshipy<(y-distmax)){sailshipy=y+0.99*distmax;}
 	if(sailshipy>(y+distmax)){sailshipy=y-0.99*distmax;}	
     var xx=sailshipx,yy=sailshipy,zz=sailshipz;
-    if(zz>0.03){	
+	var zwater=-0.001;
+    if(zz>zwater){//0.03){	
 	  sailshipx+=10*sailshipco1;
       sailshipy+=10*sailshipsi1;
 	  sailshipz=getterrainheight2(sailshipx,sailshipy);
@@ -6955,12 +6957,12 @@ function movesailship(){
 	}
 	sailshipz=getterrainheight2(sailshipx,sailshipy);
     var do1=0;
-	if(sailshipz>0.029-0.0001 && zz<0.029 && sailshipz<0.03){
+	if(sailshipz>zwater-0.0011 && zz<zwater-0.001 && sailshipz<zwater){
        if(Math.random()<0.00005*dtime && sailshipo1<-360-180){
 	      sailshipo1+=360;if(sailshipo1<-360-180){sailshipo1+=360;};return;}
 	   else{sailshipx=xx;sailshipy=yy;sailshipz=zz;}
        do1=-0.01*dtime*(1+Math.random());}
-    else if(sailshipz>0.03-0.0001 && zz<0.03){
+    else if(sailshipz>zwater-0.0001 && zz<zwater){
 	   if(Math.random()<0.00005*dtime && sailshipo1<-720-180){sailshipo1+=720;return;}
 	   else{sailshipx=xx;sailshipy=yy;sailshipz=zz;}
        do1=-0.01*dtime*(1+Math.random());
@@ -6970,11 +6972,11 @@ function movesailship(){
 	var dyy=-dx*sailshipsi1+dy*sailshipco1;
 	if(Math.abs(do1)<0.00001){
      var dh1=getterrainheightfast(sailshipx+5*sailshipco1-3*sailshipsi1,sailshipy+5*sailshipsi1+3*sailshipco1);
-	 if(dh1>0.03){
+	 if(dh1>zwater){
 	  do1=-0.01*dtime*(1+Math.random());
      }else{
       var dh2=getterrainheightfast(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
-	  if(dh2>0.03){do1=0.01*dtime*(1+Math.random());}
+	  if(dh2>zwater){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
 							 if(dx*dx+dy*dy<36){do1=-sign(dyy)*(3.5-Math.random());}
@@ -6991,11 +6993,16 @@ function movesailship(){
 	   if(Math.abs(do1)<0.00001){do1=do11;}
 	   else if((do1<0 && do11>0)||(do1>0 && do11<0)){
 	      do1=do11*0.5;
-	      var xx=sailshipx+15*sailshipco1;
-          var yy=sailshipy+15*sailshipsi1;
-	      var zz=getterrainheight2(xx,yy);
-		  if(zz<0.029-0.0001){sailshipx=xx;sailshipy=yy;sailshipz=zz;}
-		  }
+		  tsailshipskip+=dtime;
+		  if(tsailshipskip>6000){
+		    for(var k=0.5;k<15;k+=0.5){
+	          var xx=sailshipx+k*sailshipco1;
+              var yy=sailshipy+k*sailshipsi1;
+	          var zz=getterrainheight2(xx,yy);
+		      if(zz<zwater-0.0011){sailshipx=xx;sailshipy=yy;sailshipz=zz;break;}
+			  }
+		  }}
+	   else{tsailshipskip=0;}
 	   sailshipdo1+=(do1-sailshipdo1)*Math.min(1,dtime*0.003)+0.00001;
 	   sailshipo1+=sailshipdo1;
 	   sailshipco1=Math.cos(degtorad(sailshipo1));
@@ -8685,7 +8692,7 @@ var zwater=-0.04;
 }
 var tfindwater=0;
 function findwater(){if(myisailship<0){return;}
-var zwater=0.0011,px=x,py=y;
+var zwater=-0.0251,px=x,py=y;
 //if(getterrainheight2(px,py)<zwater){return;}
 for(var j=0;j<150;j++){
    var i=15*j;
@@ -9267,13 +9274,15 @@ function initgmap(){
         for(var j=0;j<n;j++){
 		   ij=i*n+j;
 		   h=height[ij];
+		   var zwater=-0.025;
 		   //if(height0[i*n+j]<0){height[i*n+j]=Math.min(zsolmin2,height1[i*n+j]-0.2);}
-		   if(height0[ij]<-2 && h>-0.04){
+		   if(height0[ij]<0 && h>zwater){height0[ij]=0;}
+		   else if(height0[ij]<-2 && h>-0.04){
 		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
 		      //height[i*n+j]=Math.max(zsolmin2,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/5)*5-0.1);
 		      var h1=height1[(i+nsol2)*n22+j+nsol2];
-			  if(h1>1){height[ij]=Math.max(-0.4,testsrtm*h1);}
-			  else{height[ij]=Math.max(-0.4,Math.min(0.001,testsrtm*h1));}
+			  if(h1>1){height[ij]=Math.max(-0.045,testsrtm*h1);}
+			  else{height[ij]=Math.max(-0.045,Math.min(0.001,testsrtm*h1));}
 			  }
         }}//}
 
