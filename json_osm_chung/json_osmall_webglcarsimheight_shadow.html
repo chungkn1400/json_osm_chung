@@ -9275,12 +9275,14 @@ function initgmap(){
 		   ij=i*n+j;
 		   h=height[ij];
 		   var zwater=-0.025;
+		   var h0=height0[ij];
+		   var h1=height1[(i+nsol2)*n22+j+nsol2];
 		   //if(height0[i*n+j]<0){height[i*n+j]=Math.min(zsolmin2,height1[i*n+j]-0.2);}
-		   if(height0[ij]<0 && h>zwater){height0[ij]=0;}
-		   else if(height0[ij]<-2 && h>-0.04){
+		   if(h0<0 && h>zwater && h1<1.2){height0[ij]=0;}
+		   else if(h0<0 && h0>=-2 && h>-0.025){height0[ij]=0;}
+		   else if(h0<-2 && h>-0.04){
 		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
 		      //height[i*n+j]=Math.max(zsolmin2,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/5)*5-0.1);
-		      var h1=height1[(i+nsol2)*n22+j+nsol2];
 			  if(h1>1){height[ij]=Math.max(-0.045,testsrtm*h1);}
 			  else{height[ij]=Math.max(-0.045,Math.min(0.001,testsrtm*h1));}
 			  }
