@@ -804,8 +804,8 @@ float decodefloatrgb( vec3 rgb ) {
 		 d=max(abs(xx),abs(yy))*240.0;
 		 if(d<30.0){
 		   float sc=(d+10.0)/(d+20.0);
-		   float xxx=xx*cos1-yy*sin1;
-		   float yyy=xx*sin1+yy*cos1;
+		   float xxx=xx*cos1+yy*sin1;
+		   float yyy=-xx*sin1+yy*cos1;
 		   zz+=((zz+0.04)/(zz-0.1))*(-0.75+cos(xxx*240.0*129.0+time*0.0009)*cos(yyy*240.0*129.0-time*0.0010))*wavez;
            x0=mx+sc*xx;y0=my+sc*yy;
         }}
@@ -2945,7 +2945,7 @@ y=(latx-lat0)*scale;
        tmove=1;x0=x;y0=y;tmovertt=1;}
 	if(Math.abs(o1-oo10)>0.001*dt){trot=1;}
 	if(tmove==1 || trot==1){
-	 if(troad==0 && tfly==0 && myisailship<0){
+	 if(troad==0 && tfly==0){
 	  if(zsol<-0.04 || testwater==1){soundwater();}}
 	}
 	if(zsol<0.2 && testwater==1){soundocean();};
@@ -4927,8 +4927,8 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
         gl.uniform1f(solProgram.time,tframe%314160);
 		var kwave=(wind+60)/(wind+40);
 		if(Math.abs(waveo1-o1)<0.002*dtime){waveo10=o1;};waveo1=o1;
-        gl.uniform1f(solProgram.cos1,kwave*Math.cos(degtorad(-waveo10+40)));
-        gl.uniform1f(solProgram.sin1,kwave*Math.sin(degtorad(-waveo10+40)));
+        gl.uniform1f(solProgram.cos1,kwave*Math.cos(degtorad(waveo10-40)));
+        gl.uniform1f(solProgram.sin1,kwave*Math.sin(degtorad(waveo10-40)));
 		timewave-=dtime*0.00035*wavevx;if(timewave<-1){timewave+=1;}
         gl.uniform1f(solProgram.wavetx,wavetx*timewave);
         gl.uniform1f(solProgram.wavety,wavety*timewave);
@@ -4945,10 +4945,10 @@ return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zo
 		//if(d<30.0 && zz<-0.04){
 		//if(pz>=-0.04){return pz;}
 		var kwave=(wind+60)/(wind+40);
-        var co1=kwave*Math.cos(degtorad(-o1+40));
-        var si1=kwave*Math.sin(degtorad(-o1+40));
-		var xxx=sc*(xx*co1-yy*si1);
-		var yyy=sc*(xx*si1+yy*co1);
+        var co1=kwave*Math.cos(degtorad(o1-40));
+        var si1=kwave*Math.sin(degtorad(o1-40));
+		var xxx=sc*(xx*co1+yy*si1);
+		var yyy=sc*(-xx*si1+yy*co1);
 		var time=tframe%31416;
 		var zz;
 		if(tfoot==1){zz=-0.041+0.2+0.6*(-1.0+Math.cos(xxx*240.0*129.0+time*0.0009)*Math.cos(yyy*240.0*129.0-time*0.0010))*wavez;}
@@ -7054,7 +7054,6 @@ function drawsailship(){
 		kdt=Math.min(1,dtime*0.00114);
 		sailshipo2+=sailshipdo2*kdt;
 		sailshipo3+=sailshipdo3*kdt;
-		if(myisailship==isailship){soundwater();}
 		mvPushMatrix();
 		mat4.translate(mvMatrix, [sailshipx,sailshipy,sailshipz-0.1]);
         mat4.rotate(mvMatrix, degtorad(sailshipo1), [0, 0, 1]);
