@@ -7056,7 +7056,9 @@ function drawsailship(){
 		 var dh3=getterrainheightwater(sailshipx+sailshipsi1*dyy,sailshipy-sailshipco1*dyy);
 		 sailshipo22=diro1(dxx,dh1-(dh2+dh3)*0.5);
 		 sailshipo33=diro1(dyy*2,(dh3-dh2));
-		 if(ddo1>0){sailshipo33-=7.8*wind/(12+wind);}else{sailshipo33+=7.8*wind/(12+wind);}
+		 var kwind=(1.2+Math.abs(Math.sin(degtorad(ddo1))))*0.46;
+		 if(ddo1>0){sailshipo33-=kwind*7.8*wind/(12+wind);}
+		 else{sailshipo33+=kwind*7.8*wind/(12+wind);}
 		 var sailshipzwater00=sailshipzwater;
 		 sailshipzwater+=(((dh2+dh3)/2-(-0.041+0.2))*0.25+0.03+sailshipz-sailshipzwater0-sailshipzwater)*Math.min(1,dtime*0.001);
 	     sailshipzwater0+=(sailshipzwater)*Math.min(1,dtime*0.003);
@@ -14164,6 +14166,7 @@ function subwind(){
 var k0=parseInt(100*wind)/100;
 var k=prompt("wind : enter a number 0.0 - 200.0 last="+k0+" km/h")
 if(k){k=Math.max(0.0,Math.min(200.0,evaln(k)));wind2=k;wind=k;msgload("");}
+if(wind<0.01){trygetways=1;trygetweather=1;}
 }
 var geolocation="";
 function geolocate(){
@@ -14297,10 +14300,14 @@ var planedo2=0,planedo3=0;
 var tsoundwater=0;
 function soundwater(){
  if(tframe>tsoundwater+700){
+   var dtvol=(tframe-tsoundwater-700);
    tsoundwater=tframe;
    //if(myisailship>=0){tsoundwater+=200+Math.random()*100-220+440/(1+psailshipv[myisailship]);}
-   if(myisailship>=0){tsoundwater+=250;}//+Math.random()*100;}
-   setvol(myaudiowater,0.4);
+   if(myisailship>=0){
+       tsoundwater+=250;//+Math.random()*100;}
+       var kvol=Math.max(0.1,Math.min(1,0.37+sailshipv*(0.3+0.33*dtvol/500)));
+       setvol(myaudiowater,0.4*kvol);}
+   else{setvol(myaudiowater,0.4);}
    playsound(myaudiowater);
    vcar=vcar*0.5+0.0001;
  }else{planedo2+=Math.min(350,(350-Math.abs(tframe-tsoundwater-350)))/500;
