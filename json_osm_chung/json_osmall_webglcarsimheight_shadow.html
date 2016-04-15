@@ -6979,7 +6979,7 @@ function movesailship(){
       var dh2=getterrainheightfast(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
 	  if(dh2>zwater){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
-	          if(testwater==1 && isailship!=myisailship && Math.random()<dtime*0.001){
+	          if(testwater==1 && isailship!=myisailship0 && Math.random()<dtime*0.001){
 							 if(dx*dx+dy*dy<36){do1=-sign(dyy)*(3.5-Math.random());}
 							 else if(dyy>Math.max(0,dxx*0.3+5)){do1=3.5-Math.random();}
 							 else if(dyy<-Math.max(0,dxx*0.3+5)){do1=-3.5+Math.random();}
