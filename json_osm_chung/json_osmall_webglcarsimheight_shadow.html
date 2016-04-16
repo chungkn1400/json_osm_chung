@@ -7046,7 +7046,8 @@ function drawsailship(){
 		 var dh3=getterrainheightwater(sailshipx+sailshipsi1*dyy,sailshipy-sailshipco1*dyy);
 		 sailshipo22=diro1(dxx,dh1-(dh2+dh3)*0.5);
 		 sailshipo33=diro1(dyy*2,(dh3-dh2));
-		 if(ddo1>0){sailshipo33-=7.8*wind/(12+wind);}else{sailshipo33+=7.8*wind/(12+wind);}
+		 var wind1=wind*(1+0.5*Math.abs(Math.sin(degtorad(ddo1))));
+		 if(ddo1>0){sailshipo33-=7.8*wind1/(12+wind1);}else{sailshipo33+=7.8*wind1/(12+wind1);}
 		}
 		var kdt=Math.min(1,dtime*0.003);
 		sailshipdo2+=(sailshipo22-sailshipo2-sailshipdo2)*kdt;
@@ -14145,7 +14146,8 @@ var wind2=0;
 function subwind(){
 var k0=parseInt(100*wind)/100;
 var k=prompt("wind : enter a number 0.0 - 200.0 last="+k0+" km/h")
-if(k){k=Math.max(0.0,Math.min(200.0,evaln(k)));wind2=k;wind=k;msgload("");}
+if(k){k=Math.max(0,Math.min(200.0,evaln(k)));wind2=k;wind=k;msgload("");}
+if(wind2<=0.01){trygetways=1;trygetweather=1;}
 }
 var geolocation="";
 function geolocate(){
