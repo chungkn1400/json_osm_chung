@@ -107,6 +107,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="cricketmp3.js"></script>
 <script src="naturemp3.js"></script>
 <script src="jet4mp3.js"></script>
+<script src="anchormp3.js"></script>
 <!--script src="jscompile_chung.js"></script-->
 <script src="carobjtxt.js"></script>
 <script src="carwheelobjtxt.js"></script>
@@ -2121,7 +2122,7 @@ msg+="shift+R => srtm relief(on/off/scale)"+crlf;
 msg+="shift+L => link url  /  L => light"+crlf;
 msg+="shift+C => collide  /  C => clouds(on/off)"+crlf;
 msg+="P => auto pilot   /   F => fog"+crlf;
-msg+="A => ascend (climb walls,foot mode)"+crlf;
+msg+="A => ascend (climb walls,foot mode) / anchor ship"+crlf;
 msg+="Z => climb road"+crlf;
 msg+="7 => change season"+crlf;
 msg+="shift+X => scalex"+crlf;
@@ -2384,7 +2385,8 @@ if(tmsg<(tframe-150)){tmsg=tframe;
               if(tfly==1){msg+=" fly";}
               else if(tautopilot==1){msg+=" auto";}
 			  else if(tautopilot==2){msg+=" auto1";}}
- if(tfoot==1){if(tfly==1){msg+=" fly";};if(tascend==1){msg+=" ascend"}}
+ if(tfoot==1){if(tfly==1){msg+=" fly";};if(tascend==1){msg+=" ascend"};}
+ if(myisailship>=0 && ianchorship==myisailship){msg+=" anchor";tascend=0;}
  if(tmap>=1){msg="lat="+lat+" lng="+lng+"  "+srtmfile;}
  document.getElementById('msg').value=msg;
  if(tmap==4 || tmap==6){document.getElementById('msgmap').value=msg;
@@ -2461,7 +2463,11 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 			    }
      vcar=0;landing=1;vrun=0;o3=0;
 	 tcar=0;
-	 if(keys[vk_a]){if(tascend==0){tascend=1;}else{tascend=0;};resetkeys();}
+	 if(keys[vk_a]){
+	   if(myisailship<0){if(tascend==0){tascend=1;}else{tascend=0;};resetkeys();}
+	   else{soundanchor();tascend=0;
+	        if(ianchorship!=myisailship){ianchorship=myisailship;}else{ianchorship=-1;}
+	        sleep(300);resetkeys();}}
 	 if(tcollide==1){latx-=sin1*vv/4;lngx-=cos1*klon*vv/4;testx=1;tcollide=0;if(o2<-20){o2+=20;};}
 	 if (keys[vk_left] || mouseleft || keys[vk_a] || joyx<-0.5 || button[5] || keys[58]) {o1+=dt*0.07;if(o1>180){o1-=360;o10-=360;};}
      if (keys[vk_right] || mouseright || keys[vk_e] || joyx>0.5 || button[7] || keys[60]) {o1-=dt*0.07;if(o1<-180){o1+=360;o10+=360;};}	  
@@ -3000,6 +3006,11 @@ loadstreetviewmsg();
 if(streetviewmsg=="quit"){quitstreetview();}
 }
 var tilat1=0;
+function resetiiways(){
+for(var i=0;i<=6;i++){iwaylat[i]=91;iwaydlat[i]=0;}
+iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];iways[5]=[];iways[6]=[];
+inodes[0]=[];inodes[1]=[];inodes[2]=[];inodes[3]=[];inodes[4]=[];inodes[5]=[];inodes[6]=[];
+}
 function testiiways(){
 //if(Math.abs(ilat-lat)<dlat/2 && Math.abs(ilng-lng)<dlon/2){tilat=1;}
 //if(tilat==0){
@@ -3236,7 +3247,7 @@ if(twebaudio==1 && tradio==0){
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
         if(tinit<3){dtautopilot=tframe+3000;vcar=0;vrun=0;vmx=0;vmy=0;vmz=0;}
-		if(tinit==1){tinit=2;trygetways=1;latsol0=99;wind2=0;//loading=1;tupdatebuffer=1;
+		if(tinit==1){tinit=2;trygetways=1;latsol0=99;wind2=0;resetiiways();
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
                             if(trygetweather==1){trygetweather=0;getweather();}
@@ -6884,7 +6895,7 @@ function movesailships(){
 }
 var mysailshipz=-99,isailship=0,myisailship=-1,mysailshipo1=0,mysailshipdxx=0,myisailship0=-1;
 function drawsailships(){
-  if(tinit<=3){return;}
+  if(tinit<=3){mysailshipz=-99;return;}
   mysailshipz=-99;myisailship0=myisailship;
   myisailship=-1;
   for(var i=0;i<nsailship;i++){
@@ -6903,6 +6914,18 @@ for(var i=0;i<nsailship;i++){
     sailshipx+=50*Math.random();
 	sailshipy+=50*Math.random();setpsailship(i);}
 function resetsailship(){
+  if(isailship==ianchorship){
+     sailshipo1=mysailshipo1;
+     sailshipco1=Math.cos(degtorad(sailshipo1));
+     sailshipsi1=Math.sin(degtorad(sailshipo1));
+	 sailshipx=(lnganchor-lng0)*scale/klon;
+	 sailshipy=(latanchor-lat0)*scale;
+     sailshipz=getterrainheight2(sailshipx,sailshipy);
+	 sailshipv=0;
+	 sailshipo2=0;
+	 if(Math.max(Math.abs(x-sailshipx),Math.abs(y-sailshipy))<40 || myisailship!=ianchorship){
+	    return;}
+  }
   if(isailship==myisailship){
      sailshipo1=mysailshipo1;
      sailshipco1=Math.cos(degtorad(sailshipo1));
@@ -6935,12 +6958,14 @@ function resetsailship(){
 }
 var tsailshipskip=0;
 function movesailship(){
-	var distmax=250;
+	var distmax=250,test=0;
+	if(isailship==ianchorship){distmax=350;}
 	var dx=x-sailshipx,dy=y-sailshipy;
-	if(sailshipx<(x-distmax)){sailshipx=x+0.99*distmax;}
-	if(sailshipx>(x+distmax)){sailshipx=x-0.99*distmax;}
-	if(sailshipy<(y-distmax)){sailshipy=y+0.99*distmax;}
-	if(sailshipy>(y+distmax)){sailshipy=y-0.99*distmax;}	
+	if(sailshipx<(x-distmax)){sailshipx=x+0.99*distmax;test=1;}
+	if(sailshipx>(x+distmax)){sailshipx=x-0.99*distmax;test=1;}
+	if(sailshipy<(y-distmax)){sailshipy=y+0.99*distmax;test=1;}
+	if(sailshipy>(y+distmax)){sailshipy=y-0.99*distmax;test=1;}
+    if(isailship==ianchorship && test==1){ianchorship=-1;}	
     var xx=sailshipx,yy=sailshipy,zz=sailshipz;
 	var zwater=-0.001;
     if(zz>zwater){//0.03){	
@@ -6948,7 +6973,7 @@ function movesailship(){
       sailshipy+=10*sailshipsi1;
 	  sailshipz=getterrainheight2(sailshipx,sailshipy);
 	  return;
-	}else{
+	}else if(isailship!=ianchorship){
 	  var sailshipsi2=Math.sin(degtorad(sailshipo2));
 	  var co1=Math.cos(degtorad(sailshipo1-o1wind));
 	  if(wind2>0.0001){wind=wind2;}
@@ -6958,8 +6983,10 @@ function movesailship(){
       sailshipy+=dtime*0.001*sailshipsi1*sailshipv;
 	}
 	sailshipz=getterrainheight2(sailshipx,sailshipy);
+	if(isailship==ianchorship){latanchor=lat0+sailshipy/scale;
+	                           lnganchor=lng0+sailshipx*klon/scale;}
     var do1=0;
-	if(sailshipz>zwater-0.0011 && zz<zwater-0.001 && sailshipz<zwater){
+	if(sailshipz>zwater-0.0012 && zz<zwater-0.001 && sailshipz<zwater){
        if(Math.random()<0.00005*dtime && sailshipo1<-360-180){
 	      sailshipo1+=360;if(sailshipo1<-360-180){sailshipo1+=360;};return;}
 	   else{sailshipx=xx;sailshipy=yy;sailshipz=zz;}
@@ -6968,17 +6995,23 @@ function movesailship(){
 	   if(Math.random()<0.00005*dtime && sailshipo1<-720-180){sailshipo1+=720;return;}
 	   else{sailshipx=xx;sailshipy=yy;sailshipz=zz;}
        do1=-0.01*dtime*(1+Math.random());
-	}else if(sailshipo1<-180 && sailshipz<zwater){sailshipo1+=360;
-	}else if(sailshipo1>180 && sailshipz<zwater){sailshipo1-=360;}
+	}else if(sailshipo1<-180 && sailshipz<zwater-0.0012){sailshipo1+=360;
+	}else if(sailshipo1>180 && sailshipz<zwater-0.0012){sailshipo1-=360;}
 	var dxx=dx*sailshipco1+dy*sailshipsi1;
 	var dyy=-dx*sailshipsi1+dy*sailshipco1;
+	if(Math.abs(do1)<0.00001 && isailship==ianchorship){
+	    var ddo1=sailshipo1-o1wind;
+	    while(ddo1>180){ddo1-=360;}
+	    while(ddo1<-180){ddo1+=360;};
+	    if(ddo1<170 && ddo1>0){do1=dtime*0.005;}
+	    if(ddo1>-170 && ddo1<0){do1=-dtime*0.005;}}
 	if(Math.abs(do1)<0.00001){
      var dh1=getterrainheightfast(sailshipx+5*sailshipco1-3*sailshipsi1,sailshipy+5*sailshipsi1+3*sailshipco1);
-	 if(dh1>zwater){
+	 if(dh1>=zwater){
 	  do1=-0.01*dtime*(1+Math.random());
      }else{
       var dh2=getterrainheightfast(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
-	  if(dh2>zwater){do1=0.01*dtime*(1+Math.random());}
+	  if(dh2>=zwater){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship0 && Math.random()<dtime*0.001){
 							 if(dx*dx+dy*dy<36){do1=-sign(dyy)*(3.5-Math.random());}
@@ -6996,7 +7029,7 @@ function movesailship(){
 	   else if((do1<0 && do11>0)||(do1>0 && do11<0)){
 	      do1=do11*0.5;
 		  tsailshipskip+=dtime;
-		  if(tsailshipskip>6000){
+		  if(tsailshipskip>6000 && isailship!=ianchorship){
 		    for(var k=0.5;k<15;k+=0.5){
 	          var xx=sailshipx+k*sailshipco1;
               var yy=sailshipy+k*sailshipsi1;
@@ -7039,7 +7072,7 @@ function drawsailship(){
         var sailshipo22=0,sailshipo33=0;		
 		var ddo1=sailshipo1-o1wind;
 		while(ddo1>180){ddo1-=360;}
-		while(ddo1<-180){ddo1+=360;}
+		while(ddo1<-180){ddo1+=360;};
         if(Math.abs(dx)<40 && Math.abs(dy)<40){
 		 var dxx=1.7,dyy=0.3;
 		 var dh1=getterrainheightwater(sailshipx+sailshipco1*dxx,sailshipy+sailshipsi1*dxx);
@@ -14405,6 +14438,22 @@ myaudiojet.onload=function(){
  setTimeout("setvol(myaudiojet,0.003);",320);
  setTimeout("setspeed(myaudiojet,1.14);",320);
  }
+var myaudioanchor = audioctx.createBufferSource();
+//audiosrc=folder+"anchor."+wav;
+myaudioanchor.volume=0;
+loadsound64(myaudioanchor,anchormp3);
+myaudioanchor.onload=function(){
+ //setTimeout("playsound(myaudioanchor);",500);
+ setTimeout("setvol(myaudioanchor,0.042);",500);
+ setTimeout("setspeed(myaudioanchor,1.0);",500);
+ }
+var tsoundanchor=0,ianchorship=-1;
+function soundanchor(){
+ if(tframe>tsoundanchor+3500){
+   tsoundanchor=tframe;
+   playsound(myaudioanchor);
+ }
+} 
 //var myaudiomusic = audioctx.createBufferSource();
 //audiosrc=folder+"music."+wav;
 /*myaudiomusic.volume=0;
@@ -14445,6 +14494,7 @@ function addparm(parm){
    searchtxt+=(parseInt(parm*1000)/1000)+"&";
 }
 var tsea=0,tinitcombo=0,latinit=0,lnginit=0,hash0="";
+var latanchor=0,lnganchor=0,latinitanchor=0,lnginitanchor=0;
 function initparms(){
   hash0=document.location.search;//parent.location.hash;
   if(hash0.indexOf("reset",0)>=0 || hash0.indexOf("nocook",0)>=0){hash0="";
@@ -14454,6 +14504,9 @@ function initparms(){
   latinit/=100;
   lnginit/=100;
   latx=latinit;lngx=lnginit;
+  latinitanchor/=100;
+  lnginitanchor/=100;
+  latanchor=latinitanchor;lnganchor=lnginitanchor;
   if(kscalex>=0.25 && kscalex<=2.0){scale=scale0*kscalex;}
   if(noshadow>=2){noshadow=2;}
   ncar2=Math.max(1,Math.min(ncar,ncar2));
@@ -14497,6 +14550,9 @@ function getparms(hash){
     myisailship=evaln(parms[i]);i+=1;if(i>=n){return;}
     mysailshipo1=evaln(parms[i]);i+=1;if(i>=n){return;}
     mysailshipdxx=evaln(parms[i]);i+=1;if(i>=n){return;}
+    ianchorship=evaln(parms[i]);i+=1;if(i>=n){return;}
+    latinitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
+    lnginitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 function setlink(){
@@ -14508,6 +14564,7 @@ function setlink(){
 }
 function setsearchtxt(){
 latinit=latx*100;lnginit=lngx*100;
+latinitanchor=latanchor*100;lnginitanchor=lnganchor*100;
 if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   var text=formatname(locationname);
   if(text!=""){//alert(text);
@@ -14545,6 +14602,9 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(myisailship);
   addparm(mysailshipo1);
   addparm(mysailshipdxx);
+  addparm(ianchorship);
+  addparm(latinitanchor);
+  addparm(lnginitanchor);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
