@@ -6969,9 +6969,10 @@ function movesailship(){
     var xx=sailshipx,yy=sailshipy,zz=sailshipz;
 	var zwater=-0.001;
     if(zz>zwater){//0.03){	
-	  sailshipx+=10*sailshipco1;
-      sailshipy+=10*sailshipsi1;
-	  sailshipz=getterrainheight2(sailshipx,sailshipy);
+	  if(loading<=1.01){
+	   sailshipx+=10*sailshipco1;
+       sailshipy+=10*sailshipsi1;}
+      sailshipz=getterrainheight2(sailshipx,sailshipy);
 	  return;
 	}else if(isailship!=ianchorship){
 	  var sailshipsi2=Math.sin(degtorad(sailshipo2));
@@ -7006,11 +7007,11 @@ function movesailship(){
 	    if(ddo1<170 && ddo1>0){do1=dtime*0.005;}
 	    if(ddo1>-170 && ddo1<0){do1=-dtime*0.005;}}
 	if(Math.abs(do1)<0.00001){
-     var dh1=getterrainheightfast(sailshipx+5*sailshipco1-3*sailshipsi1,sailshipy+5*sailshipsi1+3*sailshipco1);
+     var dh1=getterrainheight2(sailshipx+5*sailshipco1-3*sailshipsi1,sailshipy+5*sailshipsi1+3*sailshipco1);
 	 if(dh1>=zwater){
 	  do1=-0.01*dtime*(1+Math.random());
      }else{
-      var dh2=getterrainheightfast(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
+      var dh2=getterrainheight2(sailshipx+5*sailshipco1+3*sailshipsi1,sailshipy+5*sailshipsi1-3*sailshipco1);
 	  if(dh2>=zwater){do1=0.01*dtime*(1+Math.random());}
 	  else if(itime%10==1){
 	          if(testwater==1 && isailship!=myisailship0 && Math.random()<dtime*0.001){
