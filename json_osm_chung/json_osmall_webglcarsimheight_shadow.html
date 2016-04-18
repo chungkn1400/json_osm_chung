@@ -1087,6 +1087,7 @@ var iiways=0,iways=[];
 iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];iways[5]=[];iways[6]=[];
 var iwaylat=[],iwaylng=[];for(var i=0;i<=6;i++){iwaylat[i]=91;iwaylng[i]=0;};
 var iwaydlat=[],iwaydlng=[];for(var i=0;i<=6;i++){iwaydlat[i]=0;iwaydlng[i]=0;};
+var t100=50;
 function waycallback(r){//alert(r);
   //msgload("");
   wayjson=JSON.parse(r);
@@ -1136,7 +1137,7 @@ function waycallback(r){//alert(r);
    }}
   //alert("nnode="+nnode+" "+msg);
   dtweb=timer()-dtweb;
-  setTimeout("getnodes();",t300);
+  setTimeout("getnodes();",t300+t100);
   //if(nnode<7000){setTimeout("getways2();",20);}
   //else{ways2=[];waylat2=lat;waylon2=lng;setTimeout("getnodes();",t300*2);}
 }
@@ -1249,7 +1250,7 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  if(inode3>0 && loading==1){setTimeout('getnodes3();',30);}
+  if(inode3>0 && loading==1){setTimeout('getnodes3();',t100);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
 var nodejson3,nodes3=[];
@@ -1272,7 +1273,7 @@ function nodecallback3(r){//alert(r);
 	 }
   //alert(msg);
   
-  if(inode31>0 && loading==1){setTimeout('getnodes31();',30);}
+  if(inode31>0 && loading==1){setTimeout('getnodes31();',t100);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
   //tdraw=2;loading=1.75;//drawgl(0);;	 
 }
@@ -1331,7 +1332,7 @@ function nodecallback4(r){//alert(r);
 	  if(nodes4[i].tags.layer){layernode[nodes4[i].id]=nodes4[i].tags.layer;nlayer+=1;}
 	 }}
   //alert(msg+"/"+ntown+"/layer="+nlayer);
-  if(Math.abs(loading-1.4)<0.001){loading=0;msgload("");}
+  if(Math.abs(loading-1.4)<0.001){setTimeout("loading=0;",t100);msgload("");}
   tupdatetown=2;
   
   //tdraw=2;loading=1.75;//drawgl(0);;	 
@@ -3354,7 +3355,7 @@ if(twebaudio==1 && tradio==0){
 		   resetfindroad();
 		   for(var i=0;i<=10;i++){oldx[i]+=nextdx;oldy[i]+=nextdy;}
 		   tmovertt=1;
-           loading=0;dtloading=tframe;
+           setTimeout("loading=0;dtloading=tframe;",t100);
 		   nextdx=0;nextdy=0;
 		   if(tinit==0){tinit=1;dtinit=tframe+8000;tsequoia0=0;tsequoia=0;}
 		   msgload("");
@@ -3479,7 +3480,7 @@ latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinittree22=1;
 z=-1;tloadingreverse=timer()+1100;locx=99999;
 tinitgmap=2;x00=999999;trygetways=1;tinit=0;
 }
-var xmlhttp;
+var xmlhttp,httpstatus=0;
 function httpGet(url,callback) 
 {
   xmlhttp=null;
@@ -3503,9 +3504,11 @@ function httpGet(url,callback)
   }
 	xmlhttp.onreadystatechange=function()
     {
-        if (xmlhttp.readyState==4 && xmlhttp.status==200)
-        {callback(xmlhttp.responseText);
-        }
+		if(xmlhttp.readyState==4){httpstatus=xmlhttp.status;
+		    if(httpstatus>400){
+			   if(loading==1){
+			      setTimeout("if(loading==1 && httpstatus>400){loading=0;};",8000);}}}
+        if(xmlhttp.readyState==4 && xmlhttp.status==200){callback(xmlhttp.responseText);}
     }	
     //xmlhttp.open("GET", theUrl, false);
     xmlhttp.send();    
@@ -6243,7 +6246,7 @@ function drawcarreshadow(){
 	setMatrixUniforms2();
     gl_drawArrays(gl.TRIANGLES, 0, boussVertexPositionBuffer.numItems);
 }
-var skydomeo1=Math.random()*360;
+var skydomeo1=Math.random()*360,hour2=0;
 function drawsky(){
         skydomeo1+=dtime*0.00034;if(skydomeo1>360){skydomeo1-=360;}
         gl.bindBuffer(gl.ARRAY_BUFFER, bouss2VertexTextureCoordBuffer);
@@ -6274,9 +6277,9 @@ function drawsky(){
     gl.bindTexture(gl.TEXTURE_2D,  skydomeTexture);
     gl.uniform1i(shader0Program.samplerUniform, 4);
     
-	var aux=1-0.945*Math.abs(12-hour)/12;
-    var aux2=1-0.93*Math.abs(12-hour)/12;
-    var aux3=1-0.62*Math.abs(12-hour)/12;
+	var aux=1-0.945*Math.abs(12-hour2)/12;
+    var aux2=1-0.93*Math.abs(12-hour2)/12;
+    var aux3=1-0.62*Math.abs(12-hour2)/12;
     colorr=1.0*aux3;colorg=1.0*aux;colorb=1.0*aux2;colora=1.0;
     drawcarre2sh0();
 	colorr=1;colorg=1;colorb=1;colora=1;
@@ -7199,7 +7202,7 @@ tupdatesun=tframe+60000*5;
 		var kmonth=(month-3)/3;
 		if(month>6){kmonth=(9-month)/3;}
 		kmonth=(1-klat*kmonth)/2;
-    	var hour2=12+(hour-12)*2*(1+kmonth)/2;
+    	hour2=12+(hour-12)*2*(1+kmonth)/2;
 		var h6=6+3*kmonth-3,h18=18-3*kmonth+3;
 		if(hour2<h6){hour2=h6+(hour2-h6)/3;}
 		if(hour2>h18){hour2=h18+(hour2-h18)/3;}
@@ -11225,7 +11228,7 @@ for(var i=0;i<ways2.length;i++){
    */  
    //auxvar3=inode2+inode3+inode31;
    if(inode2==9990){tdraw=2;loading=1.75;}
-   else if(loading==1){setTimeout("getnodes2();",20);}
+   else if(loading==1){setTimeout("getnodes2();",t100);}
 }		
 function drawglroad(iway){
 lat=latx0;lng=lngx0;
