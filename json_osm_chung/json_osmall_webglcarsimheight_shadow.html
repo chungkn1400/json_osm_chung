@@ -999,9 +999,45 @@ if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //http="http:";
 var overpass="//overpass.osm.rambler.ru/cgi/";
+//overpass="//overpass-api.de/api/";
+//overpass="//api.openstreetmap.fr/oapi/";
 if(http=="https:"){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
 var overpass2="//overpass-api.de/api/";
+//overpass2=overpass1;;
+if(http=="https:"){overpass2="//overpass-api.de/api/";}
+var ioverpass=0;
+function suboverpass(tprompt){
+var crlf=String.fromCharCode(13)+String.fromCharCode(10);
+var overpass01="//overpass.osm.rambler.ru/cgi/";
+var overpass02="//overpass-api.de/api/";
+var overpass03="//api.openstreetmap.fr/oapi/";
+var msg="0 => 1+2"+crlf;
+msg+="1 => "+overpass01+crlf;
+msg+="2 => "+overpass02+crlf;
+msg+="3 => "+overpass03+crlf+crlf;
+loadioverpass(); 
+if(tprompt==1){
+ var s=prompt("osm server enter a number"+crlf+crlf+msg,ioverpass);
+ if(s!=null){
+  s=Math.max(0,Math.min(3,parseInt(s)));
+  ioverpass=s;
+  saveioverpass();
+ }}
+  if(ioverpass==0){overpass1=overpass01;overpass2=overpass02;}
+  else if(ioverpass==1){overpass1=overpass01;overpass2=overpass01;}
+  else if(ioverpass==2){overpass1=overpass02;overpass2=overpass02;}
+  else if(ioverpass==3){overpass1=overpass03;overpass2=overpass03;}
+  else{overpass1=overpass02;overpass2=overpass02;}
+}
+function loadioverpass(){
+if(localStorage){var aux=localStorage.getItem("json_osm_chung_ioverpass");
+                 if(aux){ioverpass=parseInt(aux);}}
+}
+function saveioverpass(){
+if(localStorage){localStorage.setItem("json_osm_chung_ioverpass",ioverpass);}
+}
+suboverpass(0);
 var toverpass=0;
 var url=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%2850.746%2C7.154%2C50.78%2C7.27%29%3Bout%20skel%203%3B";
 //url=http+"//overpass-api.de/api/xapi?map?bbox=7.012854,51.450317,7.016477,51.452105";
@@ -1052,7 +1088,7 @@ iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];iways[5]=[];iways[6]
 var iwaylat=[],iwaylng=[];for(var i=0;i<=6;i++){iwaylat[i]=91;iwaylng[i]=0;};
 var iwaydlat=[],iwaydlng=[];for(var i=0;i<=6;i++){iwaydlat[i]=0;iwaydlng[i]=0;};
 function waycallback(r){//alert(r);
-  //msgload("ok");
+  //msgload("");
   wayjson=JSON.parse(r);
   var msg="",ntower=0;
   nnode=0;
@@ -1099,8 +1135,8 @@ function waycallback(r){//alert(r);
    if(ways[i].nodes){nnode+=ways[i].nodes.length;}
    }}
   //alert("nnode="+nnode+" "+msg);
-  setTimeout("getnodes();",t300);
   dtweb=timer()-dtweb;
+  setTimeout("getnodes();",t300);
   //if(nnode<7000){setTimeout("getways2();",20);}
   //else{ways2=[];waylat2=lat;waylon2=lng;setTimeout("getnodes();",t300*2);}
 }
@@ -1135,7 +1171,7 @@ var nodesignal=[];
 var iinodes=0,inodes=[];
 inodes[0]=[];inodes[1]=[];inodes[2]=[];inodes[3]=[];inodes[4]=[];inodes[5]=[];inodes[6]=[];
 function nodecallback(r){//alert(r);
-  //msgload("ok");
+  //msgload("");
   nodejson=JSON.parse(r);
   var msg="";
   nodes=[];
@@ -1170,7 +1206,7 @@ function nodecallback(r){//alert(r);
 var nmarket=0,marketlon=[],marketlat=[];
 var nodejson2,nodes2=[];
 function nodecallback2(r){//alert(r);
-  //msgload("ok");
+  //msgload("");
   nodejson2=JSON.parse(r);
   //var msg="";
   nodes2=[];nstation=0;nhospital=0;nrailstation=0;nmarket=0;
@@ -1213,12 +1249,12 @@ function nodecallback2(r){//alert(r);
      }
 	 }
   //alert(msg);
-  if(inode3>0 && loading==1){setTimeout('getnodes3();',20);}
+  if(inode3>0 && loading==1){setTimeout('getnodes3();',30);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
 }
 var nodejson3,nodes3=[];
 function nodecallback3(r){//alert(r);
-  //msgload("ok");
+  //msgload("");
   nodejson3=JSON.parse(r);
   //var msg="";
   nodes3=[];
@@ -1236,13 +1272,13 @@ function nodecallback3(r){//alert(r);
 	 }
   //alert(msg);
   
-  if(inode31>0 && loading==1){setTimeout('getnodes31();',20);}
+  if(inode31>0 && loading==1){setTimeout('getnodes31();',30);}
   else{tdraw=2;loading=1.75;}//drawgl(0);;	 
   //tdraw=2;loading=1.75;//drawgl(0);;	 
 }
 var nodejson31,nodes31=[];
 function nodecallback31(r){//alert(r);
-  //msgload("ok");
+  //msgload("");
   nodejson31=JSON.parse(r);
   //var msg="";
   nodes31=[];
@@ -1320,7 +1356,9 @@ context.font = "12pt Arial";
 context.fillStyle = '#ff0000';
 context.fillText(text,20,40);
 if(myisailship>=0 && text=="" && tinit>2){context.fillText("wind="+parseInt(wind)+" km/h",20,40);}
-if(myisailship>=0 && text!="" && tinit>2){context.fillText("wind="+parseInt(wind)+" km/h",20,60);}
+else if(myisailship>=0 && text!="" && tinit>2){context.fillText("wind="+parseInt(wind)+" km/h",20,60);}
+else if(ianchorship>=0 && text=="" && tinit>2){context.fillText("wind="+parseInt(wind)+" km/h",20,40);}
+else if(ianchorship>=0 && text!="" && tinit>2){context.fillText("wind="+parseInt(wind)+" km/h",20,60);}
 }
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
 var trygetways=0,dtweb=0;
@@ -1332,7 +1370,7 @@ dtgetways=timer()+4000;
 //resetkeys();
 dtloading=timer();
 if(loading>=1){return;}
-if(tfoot==1){t300=20;}else{t300=Math.min(30,parseInt(1+tfps));}
+if(tfoot==1){t300=20;}else{t300=Math.min(90,parseInt(1+tfps));}
 trygetways=0;
 loading=1;
 if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overpass2;}
@@ -2102,7 +2140,7 @@ function subhelp(){
 var crlf=String.fromCharCode(13)+String.fromCharCode(10);
 var msg="H => help"+crlf;
 msg+="shift+H => shadow(on/double/off)"+crlf;
-msg+="esc => quit"+crlf;
+msg+="esc => quit   /   shift+O => select osm server"+crlf;
 msg+="3 => fullscreen"+crlf;
 msg+="4 => cssscale (lowerres/faster)"+crlf;
 msg+="1,2 => cockpit height / turn sailship"+crlf;
@@ -2838,6 +2876,7 @@ if(tfoot==0){
  if(keys[vk_2]){cockpith-=1;resetkeys();if(cockpith<-20){cockpith=-20;};}
 }
 if(keys[vk_9]){subtest();resetkeys();}
+if(keys[vk_o]){suboverpass(1);resetkeys();}
 if(keys[vk_x] & keys[vk_shift]){subscalex();resetkeys();}
 if(keys[vk_0]){subgirlimage();sleep(200);resetkeys();}
 if(keys[169]){subtgirlimage();sleep(200);resetkeys();}//')'
@@ -5395,7 +5434,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		if(tmap==0){
 		   gl.useProgram(shaderProgram);
 		   drawbouss();
-		   if(myisailship>=0 && tinit>2){drawbouss2();}
+		   if((myisailship>=0 || ianchorship>=0) && tinit>2){drawbouss2();}
 		   }
 
 		if(tfoot==0 && tcollideon==1 && tautopilot==0){
