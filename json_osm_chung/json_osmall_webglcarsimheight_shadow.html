@@ -2994,7 +2994,7 @@ y=(latx-lat0)*scale;
 	 if(troad==0 && tfly==0){
 	  if(zsol<-0.04 || testwater==1){soundwater();}}
 	}
-	if(zsol<0.2 && testwater==1){soundocean();};
+	if(zsol<0.2 && testwater==1 && troad==0){soundocean();};
 
 testx=0;
 if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
@@ -9357,8 +9357,10 @@ function initgmap(){
 		   var h0=height0[ij];
 		   var h1=height1[(i+nsol2)*n22+j+nsol2];
 		   //if(height0[i*n+j]<0){height[i*n+j]=Math.min(zsolmin2,height1[i*n+j]-0.2);}
-		   if(h0<0 && h>zwater && h1<1.2){height0[ij]=0;}
-		   else if(h0<0 && h0>=-2 && h>-0.025){height0[ij]=0;}
+		   if(h0<0 && h>zwater && h1<1.2){height0[ij]=0;
+		      height[ij]=Math.max(0.01,testsrtm*h1);}
+		   else if(h0<0 && h0>=-2 && h>-0.025){height0[ij]=0;
+		      height[ij]=Math.max(0.01,testsrtm*h1);}
 		   else if(h0<-2 && h>-0.04){
 		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
 		      //height[i*n+j]=Math.max(zsolmin2,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/5)*5-0.1);
