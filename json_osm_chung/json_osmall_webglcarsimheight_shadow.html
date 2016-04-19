@@ -9365,7 +9365,8 @@ function initgmap(){
 		      //height[i*n+j]=Math.max(-0.4,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/3)*3-1);
 		      //height[i*n+j]=Math.max(zsolmin2,parseInt(testsrtm*height1[(i+nsol2)*n22+j+nsol2]/5)*5-0.1);
 			  if(h1>1){height[ij]=Math.max(-0.045,testsrtm*h1);}
-			  else{height[ij]=Math.max(-0.045,Math.min(0.001,testsrtm*h1));}
+			  else{height[ij]=Math.max(-0.4,Math.min(0.1,testsrtm*h1));}
+			  //else{height[ij]=Math.max(-0.045,Math.min(0.001,testsrtm*h1));}
 			  }
         }}//}
 
