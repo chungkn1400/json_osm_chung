@@ -2500,7 +2500,7 @@ if(keys[vk_7]){month+=3.3;if(month>12.5){month-=12;};snowlat=9999;setsnow();rese
 	if(tfoot==1){if(tfly==0){z=Math.min(zsol+5,z);z=Math.max(z-0.03,zsol+0.58);}
 	             if(tascend==1){if(testcollide2(x,y,0.2)){z=Math.max(z,wallheight+0.25);}
 			    }
-     vcar=0;landing=1;vrun=0;o3=0;
+     vcar=0;landing=1;vrun=0;//o3=0;
 	 tcar=0;
 	 if(keys[vk_a]){
 	   if(myisailship<0){if(tascend==0){tascend=1;}else{tascend=0;};resetkeys();}
@@ -2693,7 +2693,7 @@ if(tfly==1){
 	 if(landing==1 || tfly==1){
       if (joyy<-0.5 && vcar<0.1) {latx-=joyy*v*sin1/3;lngx-=joyy*v*cos1*klon/3;testx=1;}
       if (joyy>0.5) {latx-=joyy*v*sin1/4;lngx-=joyy*v*cos1*klon/4;testx=1;}	  
-      if(Math.abs(o3volant)<40 || tfly==0){
+      if(Math.abs(o3volant)<10 || tfly==0){//40
 	   if(o3volant>0.1){o3volant=Math.max(0.0,o3volant-dt*0.05/(1+tfly));}
 	   if(o3volant<-0.1){o3volant=Math.min(0.0,o3volant+dt*0.05/(1+tfly));}
 	  }
@@ -2701,8 +2701,10 @@ if(tfly==1){
 	if(tmouse3move==1){
 	  if (keys[vk_left] || mouseleft || keys[vk_a] || button[5] || keys[58]) {mouse3dx-=dtime*0.01;if(mouse3dx<-10){mouse3dx=-10;}}
       else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {mouse3dx+=dtime*0.01;if(mouse3dx>10){mouse3dx=10;}}
-	  else if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);if(o3volant>64){o3volant=64;};}
-      else if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);if(o3volant<-64){o3volant=-64;};}
+	  else if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);
+	                         if(o3volant>64+tfly*40){o3volant=64+tfly*40;};}
+      else if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);
+	                         if(o3volant<-64-tfly*40){o3volant=-64-tfly*40;};}
 	  if(Math.abs(joyx)>0.15){tjoyx=tframe;}
 	  if(tframe<tjoyx+900){o3volant+=(-80*joyx-o3volant)*Math.min(1,ko3v*dt*0.003/(1+tfly));
 	                       o3volant=Math.max(-64,Math.min(64,o3volant));}
@@ -2713,9 +2715,11 @@ if(tfly==1){
        else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {o1head=-65;}
        else if (keys[vk_down] || mousedown) {o1head=170;};
 	  }else{
-	   if (keys[vk_left] || mouseleft || keys[vk_a] || button[5] || keys[58]) {o3volant+=ko3v*dt*0.18/(1+tfly);if(o3volant>64){o3volant=64;};pautoroad=-1;pautoroad0=-1;
+	   if (keys[vk_left] || mouseleft || keys[vk_a] || button[5] || keys[58]) {o3volant+=ko3v*dt*0.18/(1+tfly);
+	                     if(o3volant>64+tfly*40){o3volant=64+tfly*40;};pautoroad=-1;pautoroad0=-1;
 	                                                dtautopilot=tframe+3000;}
-       else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {o3volant-=ko3v*dt*0.18/(1+tfly);if(o3volant<-64){o3volant=-64;};pautoroad=-1;pautoroad0=-1;
+       else if (keys[vk_right] || mouseright || keys[vk_e] || button[7] || keys[60]) {o3volant-=ko3v*dt*0.18/(1+tfly);
+	                     if(o3volant<-64-tfly*40){o3volant=-64-tfly*40;};pautoroad=-1;pautoroad0=-1;
 	                                                dtautopilot=tframe+3000;}												
 	  else if (piloto1>0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);if(o3volant>64){o3volant=64;};}
       else if (piloto1<-0.1) {o3volant+=piloto1*ko3v*dt*0.18/(1+tfly);if(o3volant<-64){o3volant=-64;};}
@@ -2724,8 +2728,8 @@ if(tfly==1){
 	                       o3volant=Math.max(-64,Math.min(64,o3volant));}
 	}}
 	  var o3volant2=o3volant;
-	  if(tfly==1){o3=o3volant/1.5;o3volant2=o3volant/4}
-	  if(Math.abs(o3volant)>0.2){
+	  if(tfly==1){o3=o3volant/1.5;o3volant2=o3volant/4;}
+	  if(Math.abs(o3volant)>0.01){//0.2
 	     var vcar3=vcar*0.5/(0.5+Math.abs(vcar));
 		 var do13=0;
 	     if(tframe<tjoyx+900){do13=0.00078*o3volant2*(vcar3+sign(vcar+0.001)*0.02)/(0.045+Math.abs(vcar));
@@ -2935,7 +2939,7 @@ if(keys[vk_c]){
                resetkeys();}
 //x=((lngx-lng0)/klon)*scale;
 //y=(latx-lat0)*scale;
-   
+    
     if(o2>85){o2=85;}//o1=180+o1-o3;o3=180;};
     if(o2<-85){o2=-85}//;o1=180+o1+o3;o3=0;};
 	while(o1>180){o1-=360;} 
@@ -3286,7 +3290,10 @@ if(twebaudio==1 && tradio==0){
         gl.clearColor(1,1,1, 1.0);//auxvar2=loading;//auxvar2=tinitgmap;
         if(tskip==0 && tmap<3){drawScene();}
 		//if(tinitgmap==1){tinitgmap=0;initgmap();}
-        if(tinit<3){dtautopilot=tframe+3000;vcar=0;vrun=0;vmx=0;vmy=0;vmz=0;}
+        if(tinit<3){dtautopilot=tframe+3000;
+		            if(tfly==0){vcar=0;vrun=0;vmx=0;vmy=0;vmz=0;}
+		            else{z=zsol+12;vcar=0.5;vrun=1;}
+				   }
 		if(tinit==1){tinit=2;trygetways=1;latsol0=99;wind2=0;resetiiways();
 		             setTimeout("trygetways=1;",10000);}
 		if(trygetways==1 && loading==0){
@@ -14599,6 +14606,7 @@ function getparms(hash){
     ianchorship=evaln(parms[i]);i+=1;if(i>=n){return;}
     latinitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
     lnginitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
+    tfly=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 function setlink(){
@@ -14651,6 +14659,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(ianchorship);
   addparm(latinitanchor);
   addparm(lnginitanchor);
+  addparm(tfly);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
