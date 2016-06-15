@@ -87,6 +87,7 @@ openstreetmap roads to html5 array -->
 <button id="zoom"  onclick="subzoom();">zoom</button>
 </div>
 <script>
+try{if(localStorage){};}catch(e){localStorage=null;alert("localStorage is not supported");};
 var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 //put here your google static map apikey (=> https://developers.google.com/maps/documentation/static-maps/get-api-key)
 //to get more than per ip apiusage quota (some thousands to 20 thousands per day) (its free)
@@ -14318,7 +14319,7 @@ function setspeed(source,speed){
   if(source.playbackRate){source.playbackRate.value=speed;}
 }
 function playloop(source){source.loop=true;source.start(0);}
-function playsound(source) {if(!source.gainNode){return;}
+function playsound(source){if(!source.gainNode){return;}
   var sourcex = audioctx.createBufferSource(); // creates a sound source
   sourcex.buffer = source.buffer;  // tell the source which sound to play
   sourcex.loop=false;
@@ -15361,6 +15362,7 @@ var osmmapsrc="https://www.openstreetmap.org/export/embed.html?bbox="+lng1+"%2C"
 //document.location.href=osmmapsrc;
 return osmmapsrc;
 }
+
 var thour=0;
 var hour=new Date().getHours()+new Date().getMinutes()/60.0+ thour;
 while(hour>24){hour-=24;}
