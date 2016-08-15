@@ -2166,6 +2166,7 @@ msg+="A => ascend (climb walls,foot mode) / anchor ship"+crlf;
 msg+="Z => climb road"+crlf;
 msg+="7 => change season"+crlf;
 msg+="shift+X => scalex"+crlf;
+msg+="shift+Z => default scaleh"+crlf;
 msg+="space+arrows => turn head"+crlf;
 msg+="shift+E => change cockpit"+crlf;
 msg+="shift+N => number of cars"+crlf;
@@ -2565,7 +2566,7 @@ if(tfly==1){
         var xx=((lngx-lng0)/klon)*scale;
         var yy=(latx-lat0)*scale;
 	    //troad=testroadcar(xx,yy,lastz,lat0,lng0,0.5);//}
-	    if(keys[vk_z]==1){troad=testroad(xx,yy,lat0,lng0,0.5);
+	    if(keys[vk_z]==1 && keys[vk_shift]==0){troad=testroad(xx,yy,lat0,lng0,0.5);
 	       if(troad==1){z=Math.max(zsol+3,zroad+3);o2road=0;}
 		   resetkeys();
 		}
@@ -2883,6 +2884,7 @@ if(tfoot==0){
 }
 if(keys[vk_9]){subtest();resetkeys();}
 if(keys[vk_o]){suboverpass(1);resetkeys();}
+if(keys[vk_z] & keys[vk_shift]){subscaleh();resetkeys();}
 if(keys[vk_x] & keys[vk_shift]){subscalex();resetkeys();}
 if(keys[vk_0]){subgirlimage();sleep(200);resetkeys();}
 if(keys[169]){subtgirlimage();sleep(200);resetkeys();}//')'
@@ -13408,11 +13410,12 @@ if(citypanelr[i]>0.001){
    }}
 
 }
+var scaleh=1.8;
 function addtower(way){
    var xx=0,xxx=0,yy=0,yyy=0,r=1,dr=1;
    var dxx=0,dyy=0,zz=0,zzz=0;
    var s=0,t=0,tt=0;
-   var h=1,amenity="",building="",hmin=0,h00=0,tmarket=0,trailstation=0;
+   var h=scaleh,amenity="",building="",hmin=0,h00=0,tmarket=0,trailstation=0;
    if(way.tags){
     if(way.tags.height){h00=way.tags.height/6;
 	        }
@@ -14230,6 +14233,14 @@ if(k>=0.25 && k<=2.0){kscalex=k;scale=kscalex*scale0;
                       if(loading==0 || loading==1.4){drawgl(0);}else{trygetways=1;}
    } 
 }
+function subscaleh(){
+var k0=parseInt(100*scaleh)/100;
+var k=prompt("default scaleh : enter a number 0.5 - 2.0 last="+k0)
+if(k){k=Math.max(0.5,Math.min(2.0,k));}
+if(k>=0.5 && k<=2.0){scaleh=k;
+                      if(loading==0 || loading==1.4){drawgl(0);}else{trygetways=1;}
+   } 
+}
 var wind2=0;
 function subwind(){
 var k0=parseInt(100*wind)/100;
@@ -14608,6 +14619,7 @@ function getparms(hash){
     latinitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
     lnginitanchor=evaln(parms[i]);i+=1;if(i>=n){return;}
     tfly=evaln(parms[i]);i+=1;if(i>=n){return;}
+    scaleh=evaln(parms[i]);i+=1;if(i>=n){return;}
 	}
 }
 function setlink(){
@@ -14661,6 +14673,7 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
   addparm(latinitanchor);
   addparm(lnginitanchor);
   addparm(tfly);
+  addparm(scaleh);
 }
 function readcookie(){
 var mycookie=document.cookie+";";
