@@ -987,9 +987,13 @@ void main() {
 		} 		
 }
 </script>
+<!--script src="https://chungkn1400.github.io/mysrtm/srtm/w20n90/lngW5latN45.js"></script-->
 <script>
+//alert(lngW5latN45);
 var tcompile=0;tcompile=1;//
 var folderdrive="https://b3d8783ddc02a86af1ce60266a06c20f1a961f99.googledrive.com/host/0B6GM9ay7ImZLOXpiUkx5bFhacXc/";
+folderdrive="https://chungkn1400.github.io/mysrtm/";
+//  https://chungkn1400.github.io/mysrtm/srtm/e20n40/lngE20latN0.js"
 var windx=600,windy=400;
 var windx0=600,windy0=400;
 var cssscale=1/1,cssscaley=1/1;
@@ -14755,10 +14759,10 @@ if(lat5>=0){srtmfile+="latN"+lat5;}
 else{srtmfile+="latS"+(0-lat5);}
 lat50=-60+50*parseInt((lat1+110.0)/50);
 lng40=-180+40*parseInt((lng1+180.0)/40);
-if(lng40<=0){srtmfolder="W"+(0-lng40);}
-else{srtmfolder="E"+(lng40);}
-if(lat50>=0){srtmfolder+="N"+lat50;}
-else{srtmfolder+="S"+(0-lat50);}
+if(lng40<=0){srtmfolder="w"+(0-lng40);}
+else{srtmfolder="e"+(lng40);}
+if(lat50>=0){srtmfolder+="n"+lat50;}
+else{srtmfolder+="s"+(0-lat50);}
 srtmvar=srtmfile; 
 srtmfile=srtmfolder+"/"+srtmfile+".js";
 }
@@ -14841,7 +14845,7 @@ loading=55;
 //srtmfolder0='http://caper.ws/terrain-srtm30-plus/tms7/';//14/24.png;
 srtmfolder0='http://jaanga.github.io/terrain-srtm30-plus-data-tms-7plus/7plus/';
 var srtmfich=srtmfolder0+srtmfiles[iisrtm];
-alert("load "+srtmfolder0+srtmfiles[iisrtm]);
+//alert("load "+srtmfolder0+srtmfiles[iisrtm]);
 srtmimg.src=srtmfich;alert(srtmfich);
 }
 function loadsrtmfile(iisrtm){
