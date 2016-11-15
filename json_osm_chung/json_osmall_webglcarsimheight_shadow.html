@@ -109,6 +109,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="naturemp3.js"></script>
 <script src="jet4mp3.js"></script>
 <script src="anchormp3.js"></script>
+<script src="https://chungkn1400.github.io/json_osm_chung/json_osm_chung/voyagemp3.js"></script>
 <!--script src="jscompile_chung.js"></script-->
 <script src="carobjtxt.js"></script>
 <script src="carwheelobjtxt.js"></script>
@@ -2188,7 +2189,7 @@ document.getElementById('msg').focus();
 }
 var tradio=0,tradiocanal=0,tradioexpand=0;
 function subradio(){
- if(tradio==0){if(confirm("start radio ?")){tradio=1;
+ if(tradio==0){if(confirm("start radio ?")){tradio=1;stopsoundvoyage();
     //soundmusic();
 	//soundcaroff();
 	//var urlradio="https://chungswebsite.blogspot.fr/p/blog-page_20.html";
@@ -2235,7 +2236,7 @@ function subradio(){
 	setTimeout("document.getElementById('radiodiv1').setAttribute('style','top:0px;left:0px;width:119px;height:50px;z-index:499;' );",3000);
 	setTimeout("document.getElementById('radio').setAttribute('style','top:0px;left:0px;width:119px;height:50px;z-index:490;' );",3100);
 	}}
- else{if(confirm("stop radio ?")){tradio=0;
+ else{if(confirm("stop radio ?")){tradio=0;restartsoundvoyage();
     //stopsoundmusic();
 	//soundcaron();
 	document.getElementById('radio').src=""
@@ -3260,6 +3261,7 @@ if(twebaudio==1 && tradio==0){
 		sunxsave=sunx;sunysave=suny;sunzsave=sunz;
 		if(tshadownight==1){sunx=x-0.1*cos1*cos2;suny=y-0.1*sin1*cos2;sunz=z-0.1*sin2+0.051;}
 		itime+=1;if(itime>10000){itime=0;}
+		if(itime%8==1){testchurch();}
 		//tframe0=tframe;
 		//tframe=timer();
 		dtime=tframe-tframe0;
@@ -5786,6 +5788,22 @@ function drawchurchs2(){
     colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, churchVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
+}
+var itestchurch=0;
+function testchurch(){
+if(tframe<tsoundvoyage+295000 || tradio==1){return;}//4'53
+var dist=9.0,x2=x+x,y2=y+y;
+var ii=churchVertexPositionBuffer[ibuff].numItems*3;
+itestchurch+=18;if(itestchurch>=ii || itestchurch>=36){itestchurch=0;}
+for(var i=itestchurch;i<ii;i+=36){
+ if(Math.abs(churchvertices[i]-x2)<dist){
+  if(Math.abs(churchvertices[i+1]-y2)<dist){
+   var dist1=Math.max(Math.abs(churchvertices[i]-x2),Math.abs(churchvertices[i+1]-y2));
+   if(((churchvertices[i]-x2)*cos1+(churchvertices[i+1]-y2)*sin1)>dist1*0.6){
+      dist=dist1;
+ }}}
+}
+if(dist<8.99){soundvoyage();}
 }
 function drawhouses2(){
     gl.disable(gl.CULL_FACE);
@@ -14523,6 +14541,29 @@ function soundanchor(){
    playsound(myaudioanchor);
  }
 } 
+var myaudiovoyage = audioctx.createBufferSource();
+//audiosrc=folder+"voyage."+wav;
+myaudiovoyage.volume=0;
+loadsound64(myaudiovoyage,voyagemp3);
+myaudiovoyage.onload=function(){
+ //setTimeout("playsound(myaudiovoyage);",500);
+ setTimeout("setvol(myaudiovoyage,0.65);",500);
+ setTimeout("setspeed(myaudiovoyage,1.0);",500);
+ }
+var tsoundvoyage=0;
+function soundvoyage(){
+ if(tframe>tsoundvoyage+295000){//4'53
+   tsoundvoyage=tframe;
+   setvol(myaudiovoyage,0.65);
+   playsound(myaudiovoyage);
+ }else{setvol(myaudiovoyage,0.65);}
+} 
+function stopsoundvoyage(){
+   if(tframe<tsoundvoyage+295000){setvol(myaudiovoyage,0.002);}
+}
+function restartsoundvoyage(){
+   if(tframe<tsoundvoyage+295000){setvol(myaudiovoyage,0.65);}
+}
 //var myaudiomusic = audioctx.createBufferSource();
 //audiosrc=folder+"music."+wav;
 /*myaudiomusic.volume=0;
