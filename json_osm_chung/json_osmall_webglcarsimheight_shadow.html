@@ -4039,7 +4039,7 @@ function initGL(canvasgl){
 	var arrowgreenforward,arrowgreenleft,arrowgreenright;
 	var autumntreeTexture,autumntree2Texture,tree3Texture,trottoirTexture;
 	var stationTexture,girlimage,girlimage2,girlimage3,sequoiaTexture;
-	var grassTexture,flowerTexture,sailshipTexture,officialTexture;
+	var grassTexture,flowerTexture,sailshipTexture,officialTexture,hospitalTexture;
 	var rttFramebuffer,rttTexture,renderbuffer;
 	var rtt2Framebuffer,rtt2Texture,renderbuffer2;
 	var rtt3Framebuffer,rtt3Texture,renderbuffer3;
@@ -4623,6 +4623,14 @@ canvastext.drawImage(solTexture2.image, -20, -20,552,552);
 
         officialTexture.image.src = "official2.jpg";
 
+        hospitalTexture = gl.createTexture();
+        hospitalTexture.image = new Image();
+        hospitalTexture.image.onload = function () {
+            handleLoadedTexture(hospitalTexture);
+        }
+
+        hospitalTexture.image.src = "hospital2.jpg";
+
 		arrowgreenforward=new Image();
 		arrowgreenforward.src="arrowgreenforward.png";
 		arrowgreenleft=new Image();
@@ -5133,6 +5141,7 @@ var tshadownight=0;
 		drawchurchs2();
 		drawhouses2();
 		drawofficials2();
+		drawhospitals2();
 		drawroofs2();
 		drawshops2();
 		drawwoman2();
@@ -5373,6 +5382,7 @@ if(Math.random()<0.035*vcar*dtime){o333+=(Math.random()-0.5);}
 		drawchurchs();
 		drawhouses();
 		drawofficials();
+		drawhospitals();
 		drawroofs();
 		drawshops();
 
@@ -5694,6 +5704,33 @@ function drawofficials(){
     gl_drawArrays(gl.TRIANGLES, 0, officialVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
+function drawhospitals(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D,  hospitalTexture);
+    gl.uniform1i(shaderProgram.samplerUniform, 2);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexTextureCoordBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, hospitalVertexTextureCoordBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexPositionBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, hospitalVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexNormalBuffer[ibuff]);
+    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, hospitalVertexNormalBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=1;
+	setMatrixUniforms();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl_drawArrays(gl.TRIANGLES, 0, hospitalVertexPositionBuffer[ibuff].numItems);
+	mvPopMatrix();
+}
 function drawroofs(){
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
@@ -5885,6 +5922,30 @@ function drawofficials2(){
 	setMatrixUniforms22();
     colorr=1;colorg=1;colorb=1;colora=1;
     gl_drawArrays(gl.TRIANGLES, 0, officialVertexPositionBuffer[ibuff].numItems);
+	mvPopMatrix();
+}
+function drawhospitals2(){
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    mvPushMatrix();
+    //mat4.identity(mvMatrix);
+	mat4.translate(mvMatrix, [0,0,0]);
+    var sc=0.5;
+    mat4.scale(mvMatrix,[sc,sc,1]);
+	//mat4.multiply(pMatrix,mvMatrix,pvMatrix2);
+	//mat4.set(pMatrix,pMatrix2);
+	//mat4.set(mvMatrix,mvMatrix2);
+	gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,  hospitalTexture);
+    gl.uniform1i(shader22Program.samplerUniform, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexPositionBuffer[ibuff]);
+    gl.vertexAttribPointer(shader22Program.vertexPositionAttribute, hospitalVertexPositionBuffer[ibuff].itemSize, gl.FLOAT, false, 0, 0);
+
+    colorr=1;colorg=1;colorb=1;colora=0;
+	setMatrixUniforms22();
+    colorr=1;colorg=1;colorb=1;colora=1;
+    gl_drawArrays(gl.TRIANGLES, 0, hospitalVertexPositionBuffer[ibuff].numItems);
 	mvPopMatrix();
 }
 function drawroofs2(){
@@ -9141,6 +9202,7 @@ function drawtexture(texture){
 	var indexchurch=0,itextchurch=0;
 	var indexhouse=0,itexthouse=0;
 	var indexofficial=0,itextofficial=0;
+	var indexhospital=0,itexthospital=0;
 	var indexroof=0,itextroof=0;
 	var indexshop=0,itextshop=0;
 	var indextree=0,indexline=0,indexcross=0,indexcitypanel=0;
@@ -9186,6 +9248,11 @@ function drawtexture(texture){
 	var officialvertices,officialtextureCoords;
 	var officialVertexNormalBuffer=[];
 	var officialnormals;
+	var hospitalVertexPositionBuffer=[];
+	var hospitalVertexTextureCoordBuffer=[];
+	var hospitalvertices,hospitaltextureCoords;
+	var hospitalVertexNormalBuffer=[];
+	var hospitalnormals;
 	var roofVertexPositionBuffer=[];
 	var roofVertexTextureCoordBuffer=[];
 	var roofvertices,rooftextureCoords;
@@ -10003,6 +10070,52 @@ function updatebuffersol(){
         gl.bufferData(gl.ARRAY_BUFFER, (officialnormals), gl.STATIC_DRAW);
         officialVertexNormalBuffer[ibuff].itemSize = 3;
         officialVertexNormalBuffer[ibuff].numItems = maxvertice6;
+
+        hospitalVertexPositionBuffer[ibuff] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexPositionBuffer[ibuff]);
+        if(ibuff==0){hospitalvertices = new Float32Array(3*maxvertice6);
+		}
+		//var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice6;i++){
+		   append(hospitalvertices,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (hospitalvertices), gl.STATIC_DRAW);
+        hospitalVertexPositionBuffer[ibuff].itemSize = 3;
+        hospitalVertexPositionBuffer[ibuff].numItems = maxvertice6;
+	
+        hospitalVertexTextureCoordBuffer[ibuff] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexTextureCoordBuffer[ibuff]);
+        if(ibuff==0){hospitaltextureCoords = new Float32Array(2*maxvertice6);
+		}
+		index=0;
+		for (var i=0;i<maxvertice6;i++) {
+		   append(hospitaltextureCoords,[
+             0,0        
+			 ]);
+		}	
+        gl.bufferData(gl.ARRAY_BUFFER, (hospitaltextureCoords), gl.STATIC_DRAW);
+        hospitalVertexTextureCoordBuffer[ibuff].itemSize = 2;
+        hospitalVertexTextureCoordBuffer[ibuff].numItems = maxvertice6;//24;
+
+        hospitalVertexNormalBuffer[ibuff] = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexNormalBuffer[ibuff]);
+        if(ibuff==0){hospitalnormals = new Float32Array(3*maxvertice6);
+		}
+		//var px=0,py=0,pz=0;
+		index=0;
+		for(var i=0;i<maxvertice6;i++){
+		   append(hospitalnormals,[
+             px,py,pz
+            ]);
+		   
+		}		
+        gl.bufferData(gl.ARRAY_BUFFER, (hospitalnormals), gl.STATIC_DRAW);
+        hospitalVertexNormalBuffer[ibuff].itemSize = 3;
+        hospitalVertexNormalBuffer[ibuff].numItems = maxvertice6;
 
         shopVertexPositionBuffer[ibuff] = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff]);
@@ -11553,6 +11666,8 @@ indexhouse=0;
 itexthouse=0;
 indexofficial=0;
 itextofficial=0;
+indexhospital=0;
+itexthospital=0;
 indexroof=0;
 itextroof=0;
 indexshop=0;
@@ -12221,6 +12336,7 @@ if(way.nodes){
    setchurchnormals();
    sethousenormals();
    setofficialnormals();
+   sethospitalnormals();
    setshopnormals();
    //setroadnormals();
    //updatebuffersolheight();
@@ -12378,6 +12494,38 @@ for(var i=0;i<indexofficial;i++){
    gl.bufferData(gl.ARRAY_BUFFER, (officialnormals), gl.STATIC_DRAW);
    officialVertexNormalBuffer[ibuff1].itemSize = 3;
    officialVertexNormalBuffer[ibuff1].numItems = index/3;
+   //ibuff=ibuff0;
+}
+function sethospitalnormals(){
+var x,y,z,r;
+var Ax,Ay,Az,Bx,By,Bz,Cx,Cy,Cz;
+index=0;
+for(var i=0;i<indexhospital;i++){
+ Ax=hospitalvertices[i];i++;
+ Ay=hospitalvertices[i];i++;
+ Az=hospitalvertices[i];i++;
+ Bx=hospitalvertices[i];i++;
+ By=hospitalvertices[i];i++;
+ Bz=hospitalvertices[i];i++;
+ Cx=hospitalvertices[i];i++;
+ Cy=hospitalvertices[i];i++;
+ Cz=hospitalvertices[i];
+ x = (By - Ay) * (Cz - Az) - (Bz - Az) * (Cy - Ay);
+ y = (Bz - Az) * (Cx - Ax) - (Bx - Ax) * (Cz - Az);
+ z = (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax);
+ r=Math.sqrt(x*x+y*y+z*z);
+ if(r<0.000001){r=0.000001;}
+ r=1/r;
+ x*=r;y*=r;z*=r;
+ append(hospitalnormals,[
+	    x,y,z, x,y,z, x,y,z
+            ]);
+ } 
+   //var ibuff=ibuff1;
+   gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexNormalBuffer[ibuff1]);
+   gl.bufferData(gl.ARRAY_BUFFER, (hospitalnormals), gl.STATIC_DRAW);
+   hospitalVertexNormalBuffer[ibuff1].itemSize = 3;
+   hospitalVertexNormalBuffer[ibuff1].numItems = index/3;
    //ibuff=ibuff0;
 }
 function setshopnormals(){
@@ -12564,6 +12712,16 @@ function updatebuffer2(){
    gl.bufferData(gl.ARRAY_BUFFER, (officialtextureCoords), gl.STATIC_DRAW);
    officialVertexTextureCoordBuffer[ibuff1].itemSize = 2;
    officialVertexTextureCoordBuffer[ibuff1].numItems = itextofficial/2;
+   
+   gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexPositionBuffer[ibuff1]);
+   gl.bufferData(gl.ARRAY_BUFFER, (hospitalvertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
+   hospitalVertexPositionBuffer[ibuff1].itemSize = 3;
+   hospitalVertexPositionBuffer[ibuff1].numItems = indexhospital/3;
+	
+   gl.bindBuffer(gl.ARRAY_BUFFER, hospitalVertexTextureCoordBuffer[ibuff1]);
+   gl.bufferData(gl.ARRAY_BUFFER, (hospitaltextureCoords), gl.STATIC_DRAW);
+   hospitalVertexTextureCoordBuffer[ibuff1].itemSize = 2;
+   hospitalVertexTextureCoordBuffer[ibuff1].numItems = itexthospital/2;
    
    gl.bindBuffer(gl.ARRAY_BUFFER, shopVertexPositionBuffer[ibuff1]);
    gl.bufferData(gl.ARRAY_BUFFER, (shopvertices), gl.STATIC_DRAW);//DYNAMIC_DRAW
@@ -13596,6 +13754,7 @@ function addtower(way){
    var dxx=0,dyy=0,zz=0,zzz=0;
    var s=0,t=0,tt=0;
    var h=scaleh,amenity="",building="",hmin=0,h00=0,tmarket=0,trailstation=0,tofficial=0;
+   var thospital=0;
    if(way.tags){
     if(way.tags.height){h00=way.tags.height/6;
 	        }
@@ -13698,7 +13857,8 @@ if(wayname.indexOf("united states capitol")==0){h=1;}
 if(isNaN(h)){h=5;}
 //tmarket=1;
 if(amenity=="place_of_worship"){h=Math.max(3.1,h);tmarket=0;}
-else if(amenity!=""){h=Math.max(1.1,h);tmarket=0;tofficial=1;}
+else if(amenity!=""){h=Math.max(1.1,h);tmarket=0;tofficial=1;
+                     if(amenity=="hospital"){thospital=1;};}
 var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
@@ -13754,7 +13914,19 @@ if(h0>3 || hmin>0.1 || tofficial==1){//tower
             ]);
 			indextower=index;
 		   }
-		   if(h>0.01 && amenity!=""){
+		   if(h>0.01 && amenity=="hospital"){
+			index=indexhospital;
+		    append(hospitalvertices,[
+              xxx,yyy,zzz+hshop,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz+hshop,
+			  xxx,yyy,zzz+h,
+			  xx,yy,zz+h,
+			  xx,yy,zz+hshop
+            ]);
+			indexhospital=index;
+		   }
+		   else if(h>0.01 && amenity!=""){
 			index=indexofficial;
 		    append(officialvertices,[
               xxx,yyy,zzz+hshop,
@@ -13794,7 +13966,8 @@ if(h0>3 || hmin>0.1 || tofficial==1){//tower
 			wallco1[iwall]=dxx/dr;wallsi1[iwall]=dyy/dr;walll[iwall]=dr;
 			iwall+=1;
 			var s0=(parseInt(h0*10.5)%10)*400;
-			if(tofficial==1){s0=0;s=s0+1+parseInt(h);tt=t;t+=0.5*dr;}
+			if(thospital==1){s0=0;s=s0+1+parseInt(h*0.5);tt=t;t+=0.315*dr;}
+			else if(tofficial==1){s0=0;s=s0+1+parseInt(h);tt=t;t+=0.5*dr;}
 			else if(h0<=3){s=s0+1+parseInt(h*2);tt=t;t+=2*dr;}
 			else{s=s0+1+parseInt(h*2);tt=t;t+=dr;}
 			var sshop=0;if(hshop>0.01){sshop=1;stt=st;st+=dr*0.115;}
@@ -13821,7 +13994,19 @@ if(h0>3 || hmin>0.1 || tofficial==1){//tower
             ]);
 			itexttower=index;
 		   }
-		   if(h>0.01 && amenity!=""){
+		   if(h>0.01 && amenity=="hospital"){
+			index=itexthospital;
+		    append(hospitaltextureCoords,[
+			  tt,s0+sshop,
+			  tt,s,
+			  t,s0+sshop,
+			  tt,s,
+			  t,s,
+			  t,s0+sshop
+            ]);
+			itexthospital=index;
+		   }
+		   else if(h>0.01 && amenity!=""){
 			index=itextofficial;
 		    append(officialtextureCoords,[
 			  tt,s0+sshop,
