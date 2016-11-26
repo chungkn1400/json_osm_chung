@@ -1013,6 +1013,12 @@ var overpass2="//overpass-api.de/api/";
 //overpass2=overpass1;;
 if(http=="https:"){overpass2="//overpass-api.de/api/";}
 var ioverpass=0;
+function changeioverpass(){
+loadioverpass();
+ioverpass+=1;if(ioverpass>3){ioverpass=0;}
+saveioverpass();
+suboverpass(0);
+}
 function suboverpass(tprompt){
 var crlf=String.fromCharCode(13)+String.fromCharCode(10);
 var overpass01="//overpass.osm.rambler.ru/cgi/";
@@ -3010,7 +3016,7 @@ y=(latx-lat0)*scale;
 
 testx=0;
 if(loading==0){dtloading=Math.max(tframe-4000,Math.min(dtloading,tframe+4000));}
-if(tframe>dtloading+40000){dtloading=tframe;resetkeys();
+if(tframe>dtloading+40000){dtloading=tframe;resetkeys();changeioverpass();
 	      tloadsol=tframe+50000;
 		  tdrawsol=tframe+9900;
 		  tupdatesoltexture=2;loading=77;tdraw=0;tdraw2=0;
