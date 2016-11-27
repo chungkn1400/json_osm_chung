@@ -690,7 +690,7 @@ float r,g,b,color;
 		   else if(s<800.0){r=0.7;g=0.7;b=0.7;}
 		   else if(s<1200.0){r=0.4;g=0.4;b=0.4;}
 		   else if(s<1600.0){r=1.0;g=0.59;b=0.57;}//hospital r=1.0;g=0.4;b=0.4;
-		   else if(s<2000.0){r=0.7;g=0.7;b=1.5;}
+		   else if(s<2000.0){r=0.7;g=0.7;b=1.5;} 
 		   else if(s<2400.0){r=0.5;g=0.5;b=1.0;}
 		   else if(s<2800.0){r=1.0;g=1.0;b=0.5;}
 		   else if(s<3200.0){r=0.7;g=1.5;b=0.7;}
@@ -13869,14 +13869,15 @@ var h0=h;
 h+=0.5;
 //if(layer>0.9){hmin=1.2;}
 if(tmarket==1){var r=3,g=15,b=3;icolor=parseInt(20000+(r*256+g*16+b)*256);}
-if(trailstation==1){var r=3,g=3,b=15;icolor=parseInt(20000+(r*256+g*16+b)*256);}
+if(trailstation==1){var r=3+3,g=3+5,b=15;icolor=parseInt(20000+(r*256+g*16+b)*256);
+                    tofficial=1;amenity="hospital";thospital=1;}
 var dty=0;if(icolor>19999){dty=icolor;}
 if(latmid>-89){trottoirlat[ntrottoir]=(latmid+latmid2)/2;
                trottoirlon[ntrottoir]=(lonmid+lonmid2)/2;
 			   trottoirr[ntrottoir]=(Math.abs(latmid-latmid2)+Math.abs(lonmid-lonmid2)/klon)/2;
 			   ntrottoir+=1;}
 var droofmax=120;
-if(h0>3 || hmin>0.1 || tofficial==1){//tower
+if(h0>3 || hmin>0.1 || tofficial==1 || trailstation==1){//tower
    if(indextower>=(maxvertice*3-1)){return;}
    //if(h0>8){tairport=1;}
    if(hmin>0.1){zmid+=0.5;h-=0.5;}
