@@ -110,6 +110,7 @@ var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 <script src="jet4mp3.js"></script>
 <script src="anchormp3.js"></script>
 <script src="https://chungkn1400.github.io/json_osm_chung/json_osm_chung/voyagemp3.js"></script>
+<script src="https://chungkn1400.github.io/json_osm_chung/json_osm_chung/deerhuntermp3.js"></script>
 <!--script src="jscompile_chung.js"></script-->
 <script src="carobjtxt.js"></script>
 <script src="carwheelobjtxt.js"></script>
@@ -14928,19 +14929,50 @@ myaudiovoyage.onload=function(){
  setTimeout("setvol(myaudiovoyage,0.65);",500);
  setTimeout("setspeed(myaudiovoyage,1.0);",500);
  }
-var tsoundvoyage=0;
+var myaudiovoyage2 = audioctx.createBufferSource();
+//audiosrc=folder+"voyage."+wav;
+myaudiovoyage2.volume=0;
+loadsound64(myaudiovoyage2,deerhuntermp3);
+myaudiovoyage2.onload=function(){
+ //setTimeout("playsound(myaudiovoyage2);",500);
+ setTimeout("setvol(myaudiovoyage2,0.65);",500);
+ setTimeout("setspeed(myaudiovoyage2,1.0);",500);
+ }
+var tsoundvoyage=0,isoundvoyage=0;
 function soundvoyage(){
+if(isoundvoyage==1 && tframe>tsoundvoyage+295000-200){isoundvoyage=0;}//4'53
+if(isoundvoyage==2 && tframe>tsoundvoyage2+223000-200){isoundvoyage=0;}//3'41
+if(isoundvoyage==0){if(Math.random()<0.5){isoundvoyage=1;}else{isoundvoyage=2;}}
+if(isoundvoyage==1){soundvoyage1();}else{soundvoyage2();}
+}
+function soundvoyage1(){
  if(tframe>tsoundvoyage+295000){//4'53
    tsoundvoyage=tframe;
    setvol(myaudiovoyage,0.65);
    playsound(myaudiovoyage);
  }else{setvol(myaudiovoyage,0.65);}
+}
+var tsoundvoyage2=0,vol2=0.70; 
+function soundvoyage2(){
+ if(tframe>tsoundvoyage2+223000){//3'41
+   tsoundvoyage2=tframe;
+   setvol(myaudiovoyage2,vol2);
+   playsound(myaudiovoyage2);
+ }else{setvol(myaudiovoyage2,vol2);}
 } 
 function stopsoundvoyage(){
+if(isoundvoyage==1){
    if(tframe<tsoundvoyage+295000){setvol(myaudiovoyage,0.002);}
+}else{
+   if(tframe<tsoundvoyage2+223000){setvol(myaudiovoyage,0.002);}
+}   
 }
 function restartsoundvoyage(){
+if(isoundvoyage==1){
    if(tframe<tsoundvoyage+295000){setvol(myaudiovoyage,0.65);}
+}else{
+   if(tframe<tsoundvoyage+223000){setvol(myaudiovoyage,vol2);}
+}
 }
 //var myaudiomusic = audioctx.createBufferSource();
 //audiosrc=folder+"music."+wav;
