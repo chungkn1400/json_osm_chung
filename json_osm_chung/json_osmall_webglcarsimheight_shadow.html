@@ -89,6 +89,7 @@ openstreetmap roads to html5 array -->
 <script>
 try{if(localStorage){};}catch(e){localStorage=null;alert("localStorage is not supported");};
 var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
+apikey='&key=AIzaSyB6IVrhJJ9pNpagPZIKyEQYlDHDsoAGusE';
 //put here your google static map apikey (=> https://developers.google.com/maps/documentation/static-maps/get-api-key)
 //to get more than per ip apiusage quota (some thousands to 20 thousands per day) (its free)
 </script>
@@ -14942,7 +14943,9 @@ var tsoundvoyage=0,isoundvoyage=0;
 function soundvoyage(){
 if(isoundvoyage==1 && tframe>tsoundvoyage+295000-200){isoundvoyage=0;}//4'53
 if(isoundvoyage==2 && tframe>tsoundvoyage2+223000-200){isoundvoyage=0;}//3'41
-if(isoundvoyage==0){if(Math.random()<0.5){isoundvoyage=1;}else{isoundvoyage=2;}}
+if(isoundvoyage==0){
+   //tsoundvoyage=0;tsoundvoyage2=0;
+   if(Math.random()<0.5){isoundvoyage=1;}else{isoundvoyage=2;}}
 if(isoundvoyage==1){soundvoyage1();}else{soundvoyage2();}
 }
 function soundvoyage1(){
