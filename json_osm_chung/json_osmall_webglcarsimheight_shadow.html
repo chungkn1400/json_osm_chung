@@ -1002,14 +1002,14 @@ var windx0=600,windy0=400;
 var cssscale=1/1,cssscaley=1/1;
 var auxvar=null,auxvar2=null,auxvar3=null,auxtext="";
 var test=0;
-var http="http:";
+var http="https:";
 if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //http="http:";
 var overpass="//overpass.osm.rambler.ru/cgi/";
 //overpass="//overpass-api.de/api/";
-//overpass="//api.openstreetmap.fr/oapi/";
-if(http=="https:"){overpass="//overpass-api.de/api/";}
+overpass="//api.openstreetmap.fr/api/";
+//if(http=="https:"){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
 var overpass2="//overpass-api.de/api/";
 //overpass2=overpass1;;
@@ -1023,9 +1023,10 @@ suboverpass(0);
 }
 function suboverpass(tprompt){
 var crlf=String.fromCharCode(13)+String.fromCharCode(10);
-var overpass01="//overpass.osm.rambler.ru/cgi/";
+//var overpass01="//overpass.osm.rambler.ru/cgi/";
+var overpass01="//api.openstreetmap.fr/api/";
 var overpass02="//overpass-api.de/api/";
-var overpass03="//api.openstreetmap.fr/oapi/";
+var overpass03="//api.openstreetmap.fr/api/";
 var msg="0 => 1+2"+crlf;
 msg+="1 => "+overpass01+crlf;
 msg+="2 => "+overpass02+crlf;
