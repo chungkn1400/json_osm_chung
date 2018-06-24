@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- json_osmall_webglcarsimheight_noshadow a program by NGUYEN.Chung (2015-2018) 
+<!-- json_osmall_webglcarsimheight_noshadow a program by NGUYEN.Chung (2015) 
 openstreetmap roads to html5 array -->
 <head>
 <link id="ico" rel="shortcut icon" href="json_osm_chung.ico">
@@ -476,14 +476,13 @@ var windx0=600,windy0=400;
 var cssscale=1/1,cssscaley=1/1;
 var auxvar=null,auxvar2=null,auxvar3=null,auxtext="";
 var test=0;
-var http="https:";
+var http="http:";
 if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //var overpass="//overpass.osm.rambler.ru/cgi/";
 //var overpass="//overpass-api.de/api/";
-var overpass="//api.openstreetmap.fr/api/";
-//overpass.osm.rambler.ru/cgi/";
-//if(http=="https:"){overpass="//overpass-api.de/api/";}
+var overpass="//overpass.osm.rambler.ru/cgi/";
+if(http=="https:"){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
 var overpass2="//overpass-api.de/api/";
 var toverpass=0;
@@ -851,12 +850,12 @@ printmsg("loading...");
 context.fillStyle = '#009900';
 var j=180;
 j+=20;context.fillText("webglcarsimheight_noshadow",20,j);
-j+=20;context.fillText("a program by NGUYEN.Chung (freeware 2015-2018)",20,j);
+j+=20;context.fillText("a program by NGUYEN.Chung (freeware 2015)",20,j);
 context.fillStyle = '#000000';
 j+=20;context.fillText("powered by glMatrix",20,j);
 j+=20;context.fillText("powered by Openstreetmap",20,j);
-j+=20;context.fillText("powered by Bing static maps",20,j);
-//j+=20;context.fillText("powered by Google maps",20,j);
+j+=20;context.fillText("powered by Gooble static maps",20,j);
+j+=20;context.fillText("powered by Google maps",20,j);
 j+=20;context.fillText("powered by responsivevoice",20,j);
 j+=20;context.fillText("powered by nominatim.openstreetmap.org/reverse",20,j);
 j+=20;context.fillText("powered by overpass-api.de/api",20,j);
@@ -3136,38 +3135,12 @@ function updatesoltexture2(){
 var latsol=lat,lngsol=lng,dlatsol=1,dlngsol=1;
 var latsol0=lat,lngsol0=lng;
 function getmap(zoom,lat,lng,size,type0,scale){
-/*var type=type0;
-if(type=="jpg"){type="jpg-baseline";}
-var mapstyle="&style=feature:road%7Cvisibility:off&style=element:labels%7Cvisibility:off&style=element:geometry.stroke%7Cvisibility:off";
-return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zoom="+zoom+"&scale="+scale+"&size="+size+"x"+size+"&maptype=satellite&format="+type+mapstyle+apikey;
-*/
-////var mapstyle="&style=feature:road%7Cvisibility:on&style=element:labels%7Cvisibility:off&style=element:geometry.stroke%7Cvisibility:off";
-////return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zoom="+zoom+"&scale="+scale+"&size="+size+"x"+size+"&maptype=hybrid&format="+type+mapstyle;
-//http://dev.virtualearth.net/REST/v1/Imagery/Map/aerial/47.619048,-122.35384/15?mapSize=500,500&key=%20Aq0npnXsrnwL9eY3rCUQsJZJJedr8Za9hIH-XsWnppaizf92DYjKS1syE9K3HqVr	
-var sizex=Math.floor(scale*size);
-var zoom1=zoom+1;
-return "http://dev.virtualearth.net/REST/v1/Imagery/Map/aerial/"+lat+","+lng+"/"+zoom1+"?mapSize="+sizex+","+sizex+"&format=jpeg"+"&key=%20Aq0npnXsrnwL9eY3rCUQsJZJJedr8Za9hIH-XsWnppaizf92DYjKS1syE9K3HqVr"
-} 
-function getterrain(zoom,lat,lng,size,type0,scale){
-//var type=type0;
-//if(type=="jpg"){type="jpg-baseline";}
-////var mapstyle="&style=element:all%7Cvisibility:off";
-////mapstyle+="&style=element:geometry.fill%7Cvisibility:on";
-////mapstyle+="&style=feature:road%7Cvisibility:off";
-/*var mapstyle="&style=feature:road%7Cvisibility:off&style=element:labels%7Cvisibility:off&style=element:geometry.stroke%7Cvisibility:off";
-return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zoom="+zoom+"&scale="+scale+"&size="+size+"x"+size+"&maptype=terrain&format="+type+mapstyle+apikey;
-*/
-var sizex=Math.floor(scale*size);
-var zoom1=zoom+1;
-return "http://dev.virtualearth.net/REST/v1/Imagery/Map/road/"+lat+","+lng+"/"+zoom1+"?mapSize="+sizex+","+sizex+"&format=jpeg&st=me|lv:0"+"&key=%20Aq0npnXsrnwL9eY3rCUQsJZJJedr8Za9hIH-XsWnppaizf92DYjKS1syE9K3HqVr"
-} 
-function getmap_old(zoom,lat,lng,size,type0,scale){
 var type=type0;
 if(type=="jpg"){type="jpg-baseline";}
 var mapstyle="&style=feature:road%7Cvisibility:off&style=element:labels%7Cvisibility:off&style=element:geometry.stroke%7Cvisibility:off";
 return "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+"&zoom="+zoom+"&scale="+scale+"&size="+size+"x"+size+"&maptype=satellite&format="+type+mapstyle+apikey;
 }
-function getterrain_old(zoom,lat,lng,size,type0,scale){
+function getterrain(zoom,lat,lng,size,type0,scale){
 var type=type0;
 if(type=="jpg"){type="jpg-baseline";}
 //var mapstyle="&style=element:all%7Cvisibility:off";
