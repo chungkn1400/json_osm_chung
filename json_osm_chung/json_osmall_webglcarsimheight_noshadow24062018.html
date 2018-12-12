@@ -82,7 +82,6 @@ openstreetmap roads to html5 array -->
 try{if(localStorage){};}catch(e){localStorage=null;alert("localStorage is not supported");};
 var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
 //apikey='&key=AIzaSyB6IVrhJJ9pNpagPZIKyEQYlDHDsoAGusE';
-apikey='AIzaSyApcL5vUfN5urgDmXsHlRbZQ_e3y_4skcU';
 //put here your google static map apikey (=> https://developers.google.com/maps/documentation/static-maps/get-api-key)
 //to get more than per ip apiusage quota (some thousands to 20 thousands per day) (its free)
 </script>
@@ -481,8 +480,8 @@ var http="https:";
 if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //var overpass="//overpass.osm.rambler.ru/cgi/";
-var overpass="//overpass-api.de/api/";
-//var overpass="//api.openstreetmap.fr/api/";
+//var overpass="//overpass-api.de/api/";
+var overpass="//api.openstreetmap.fr/api/";
 //overpass.osm.rambler.ru/cgi/";
 //if(http=="https:"){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
@@ -704,12 +703,11 @@ var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 //keyway="[building~'tower|apartment|commercial']";
 keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+")";
 //keyway="(way[amenity~'fuel']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
-keyway="way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon;
+keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
-wayurl=http+overpass+"interpreter?data=[out:json];("+keyway+";)%3Bout%208999%3B";
-//alert("ok");
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%208999%3B";
 try{		
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
@@ -735,7 +733,7 @@ if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overp
 var nodeurl2=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
-	if(i<=inode2){nodeurl2+=";";}
+	if(i<inode2){nodeurl2+=";";}
 	}
 nodeurl2+="%29%3Bout%20skel%201999%3B";
 try{		
@@ -747,7 +745,7 @@ if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overp
 var nodeurl3=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode3;i++){
     nodeurl3+="node%28"+nodeid3[i]+"%29";
-	if(i<=inode3){nodeurl3+=";";}
+	if(i<inode3){nodeurl3+=";";}
 	}
 nodeurl3+="%29%3Bout%20skel%201999%3B";
 try{		
@@ -2278,7 +2276,7 @@ latx=lat;lngx=lng;tmap=0;tloadsol=0;tinittree2=1;tinitgmap=2;
 z=-1;tloadingreverse=tframe+1100;locx=999;
 x00=999999;trygetways=1;tinit=0;
 }
-var xmlhttp,httpstatus;
+var xmlhttp;
 function httpGet(url,callback) 
 {
   xmlhttp=null;
@@ -2302,10 +2300,6 @@ function httpGet(url,callback)
   }
 	xmlhttp.onreadystatechange=function()
     {
-		if(xmlhttp.readyState==4){httpstatus=xmlhttp.status;//alert(httpstatus);
-		    if(httpstatus>=400){alert("http "+httpstatus+"  "+url);
-			   if(loading==1){
-			      setTimeout("if(loading==1 && httpstatus>400){loading=0;};",8000);}}}
         if (xmlhttp.readyState==4 && xmlhttp.status==200)
         {callback(xmlhttp.responseText);
         }
