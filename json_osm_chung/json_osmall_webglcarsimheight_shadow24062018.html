@@ -1007,8 +1007,8 @@ if(document.location.href.indexOf("https")>=0){
    http="https:";}
 //http="http:";
 var overpass="//overpass.osm.rambler.ru/cgi/";
-overpass="//overpass-api.de/api/";
-//overpass="//api.openstreetmap.fr/api/";
+//overpass="//overpass-api.de/api/";
+overpass="//api.openstreetmap.fr/api/";
 //if(http=="https:"){overpass="//overpass-api.de/api/";}
 var overpass1=overpass;
 var overpass2="//overpass-api.de/api/";
@@ -1492,17 +1492,11 @@ keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|t
 keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon2+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 var keyway2="way['building:height']"+latlon2+";way['building']['height']"+latlon2+";way['building']['levels']"+latlon2+";way['building:levels']"+latlon2;
 keyway="%28"+keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
-keyway=keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3;
 //keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="(way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
-//keyway="way[amenity~'parking|hospital']"+latlon;
-wayurl=http+overpass+"interpreter?data=[out:json];("+keyway+";)%3Bout%208999%3B";
-//wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+";"+keyway+"%3Bout%2099%3B";
-//wayurl=http+overpass+"interpreter?data=[out:json]"+"%3Bout%2099%3B";
-//wayurl="http://overpass-api.de/api/interpreter?data=[out:json];";
-//alert(wayurl);
+wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%208999%3B";
 try{		
 httpGet(wayurl,waycallback);
 }catch (e){alert("error getways");loading=0;}
@@ -1573,7 +1567,7 @@ var latlon="%28"+lat11+"%2C"+lon11+"%2C"+lat21+"%2C"+lon21+"%29";
 var nodeurl2=http+overpass+"interpreter?data=[out:json];%28node[amenity~'fuel|hospital']"+latlon+";node[railway~'station']"+latlon+";node[shop~'mall|supermarket']"+latlon+";";
 for(var i=1;i<=inode2;i++){
     nodeurl2+="node%28"+nodeid2[i]+"%29";
-	if(i<=inode2){nodeurl2+=";";}
+	if(i<inode2){nodeurl2+=";";}
 	}
 //nodeurl2+="%29%3Bout%20skel%201999%3B";
 nodeurl2+="%29%3Bout%201999%3B";
@@ -1587,7 +1581,7 @@ if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overp
 var nodeurl3=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode3;i++){
     nodeurl3+="node%28"+nodeid3[i]+"%29";
-	if(i<=inode3){nodeurl3+=";";}
+	if(i<inode3){nodeurl3+=";";}
 	}
 nodeurl3+="%29%3Bout%20skel%201999%3B";
 try{		
@@ -3544,8 +3538,8 @@ function httpGet(url,callback)
   }
 	xmlhttp.onreadystatechange=function()
     {
-		if(xmlhttp.readyState==4){httpstatus=xmlhttp.status;//alert(httpstatus);
-		    if(httpstatus>=400){alert("http "+httpstatus+"  "+url);
+		if(xmlhttp.readyState==4){httpstatus=xmlhttp.status;
+		    if(httpstatus>400){
 			   if(loading==1){
 			      setTimeout("if(loading==1 && httpstatus>400){loading=0;};",8000);}}}
         if(xmlhttp.readyState==4 && xmlhttp.status==200){callback(xmlhttp.responseText);}
