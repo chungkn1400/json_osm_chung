@@ -129,7 +129,7 @@ var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 //keyway="(way['building:height']"+latlon+";way['building:levels']"+latlon+")";
 //keyway="(way['building:height']"+latlon+";way['height']"+latlon+";way['building:levels']"+latlon+")";
 //keyway="[building~'tower|apartment|commercial']";
-keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+")";
+keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+";)";
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
 wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3B";
 try{		
@@ -314,6 +314,8 @@ function httpGet(url,callback)
   }
     xmlhttp.onreadystatechange=function()
     {
+        if (xmlhttp.readyState==4 && xmlhttp.status>=400)
+		{alert("http "+xmlhttp.status+"  "+url);};
         if (xmlhttp.readyState==4 && xmlhttp.status==200)
         {callback(xmlhttp.responseText);
         }
