@@ -116,11 +116,11 @@ var lat2=lat+dlat/2,lon2=lng+dlon/2;
 var wayurl=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
 var nodeurl=http+overpass+"interpreter?data=[out:json];%28node%28371597318%29;node%28371597317%29%29%3Bout%20skel%209%3B";
 wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
-wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%2099%3B";
+wayurl=http+overpass+"interpreter?data=[out:json];way%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+";%29%3Bout%2099%3B";
 //wayurl=http+overpass+"interpreter?data=[out:json];way[highway~'motorway|trunk|primary']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
 //wayurl=http+overpass+"interpreter?data=[out:json];way[highway~'motorway|trunk']%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
 //wayurl=http+overpass+"interpreter?data=[out:json];way[highway=motorway]%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%20999%3B";
-nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
+nodeurl=http+overpass+"interpreter?data=[out:json];node%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+";%29%3Bout%20skel%209999%3B";
 var nodekey,nodekey2,nodekey3,nkeymax=450;
 //nodeurl=http+overpass+"interpreter?data=[out:json];%28"+nodekey+"%29%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20skel%209999%3B";
 function waycallback(r){//alert(r);
@@ -189,7 +189,7 @@ var latlon="%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29";
 //keyway="(way['building:height']"+latlon+";way['building:levels']"+latlon+")";
 //keyway="(way['building:height']"+latlon+";way['height']"+latlon+";way['building:levels']"+latlon+")";
 //keyway="[building~'tower|apartment|commercial']";
-keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+")";
+keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon+";)";
 //keyway="way[highway~'motorway|trunk|primary|secondary|tertiary|unclassified|residential']"+latlon;
 //wayurl=http+overpass+"interpreter?data=[out:json];way"+keyway+"%28"+lat1+"%2C"+lon1+"%2C"+lat2+"%2C"+lon2+"%29%3Bout%20399%3B";
 wayurl=http+overpass+"interpreter?data=[out:json];"+keyway+"%3Bout%204999%3B";
@@ -485,6 +485,8 @@ function httpGet(url,callback)
   }
     xmlhttp.onreadystatechange=function()
     {
+        if (xmlhttp.readyState==4 && xmlhttp.status>=400)
+		{alert("http "+xmlhttp.status+"  "+url);};
         if (xmlhttp.readyState==4 && xmlhttp.status==200)
         {callback(xmlhttp.responseText);
         }
