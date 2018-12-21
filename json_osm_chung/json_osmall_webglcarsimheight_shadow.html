@@ -1602,7 +1602,7 @@ if(toverpass==0){toverpass=1;overpass=overpass1;}else{toverpass=0;overpass=overp
 var nodeurl31=http+overpass+"interpreter?data=[out:json];%28";
 for(var i=1;i<=inode31;i++){
     nodeurl31+="node%28"+nodeid31[i]+"%29";
-	if(i<inode31){nodeurl31+=";";}
+	if(i<=inode31){nodeurl31+=";";}
 	}
 nodeurl31+="%29%3Bout%20skel%201999%3B";
 try{		
