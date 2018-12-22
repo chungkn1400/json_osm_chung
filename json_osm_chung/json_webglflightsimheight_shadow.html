@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- json_osmall_webglcarsimheight_shadow a program by NGUYEN.Chung (2015-2018) 
+<!-- json_webglflightsimheight_shadow a program by NGUYEN.Chung (2015-2018) 
 openstreetmap roads to html5 array -->
 <head>
 <link id="ico" rel="shortcut icon" href="json_osm_chung.ico">
@@ -1798,7 +1798,7 @@ function printloading(){
 context.font = "12pt Arial";
 context.fillStyle = '#00AA00';
 var j=180;
-j+=20;context.fillText("webglcarsimheight_shadow",20,j);
+j+=20;context.fillText("webglflightsimheight_shadow",20,j);
 j+=20;context.fillText("a program by NGUYEN.Chung (freeware 2015-2018)",20,j);
 context.fillStyle = '#000000';
 j+=20;context.fillText("powered by glMatrix",20,j);
@@ -13449,15 +13449,15 @@ for(var i=0;i<ncitypanel;i++){
    citypanelsave+=citypanelname[i]+"/";
    citypanelsave+="$";
  }
-if(localStorage){localStorage.setItem("webglcarsimheight_shadow_citypanelsave",citypanelsave);}
+if(localStorage){localStorage.setItem("webglflightsimheight_shadow_citypanelsave",citypanelsave);}
 }
 function clearcitypanelsave(){
 citypanelsave="";
-if(localStorage){localStorage.setItem("webglcarsimheight_shadow_citypanelsave",citypanelsave);}
+if(localStorage){localStorage.setItem("webglflightsimheight_shadow_citypanelsave",citypanelsave);}
 }
 function loadcitypanel(){
 if(localStorage){
-   citypanelsave=localStorage.getItem("webglcarsimheight_shadow_citypanelsave");
+   citypanelsave=localStorage.getItem("webglflightsimheight_shadow_citypanelsave");
    if(citypanelsave==null){return;};}
 else{return;}   
 var words=citypanelsave.split("$");
@@ -15238,10 +15238,10 @@ if(Math.abs(combolat-latx)>0.1 || Math.abs(combolng-lngx)>0.1){
 function readcookie(){
 var mycookie=document.cookie+";";
 //alert("mycookie="+mycookie);
-var pref="jsonosmwebglchung2=";
-if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
-else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
-else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
+var pref="jsonwebglchung3=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonwebglchung3woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonwebglchung32=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonwebglchung33=";}
 var i=mycookie.indexOf(pref,0);
 if(i<0){return;}
 i+=pref.length;
@@ -15258,19 +15258,19 @@ setsearchtxt();
 savecitypanel();
 mycookie+=searchtxt;
 //alert(mycookie);  
-var pref="jsonosmwebglchung2=";
-if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
-else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
-else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
+var pref="jsonwebglchung3=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonwebglchung3woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonwebglchung32=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonwebglchung33=";}
 mycookie =pref+mycookie+"; expires=Fri, 3 Aug 2100 20:47:11 UTC; path=/";
 if(mycookie.length>(3900-cookie0.length)){alert("could not save, cookie too long");return;}
 document.cookie=mycookie;
 }
 function deletecookie(){
-var pref="jsonosmwebglchung2=";
-if(document.location.href.indexOf("woman",0)>0){pref="jsonosmwebglchung2woman=";}
-else if(document.location.href.indexOf("2/",0)>0){pref="jsonosmwebglchung22=";}
-else if(document.location.href.indexOf("3/",0)>0){pref="jsonosmwebglchung23=";}
+var pref="jsonwebglchung3=";
+if(document.location.href.indexOf("woman",0)>0){pref="jsonwebglchung3woman=";}
+else if(document.location.href.indexOf("2/",0)>0){pref="jsonwebglchung32=";}
+else if(document.location.href.indexOf("3/",0)>0){pref="jsonwebglchung33=";}
 document.cookie =pref+";expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/";
 }
 function subcookie(){
@@ -15281,7 +15281,7 @@ function subcookie(){
 function subloadsave(){
 tgamesave=1;
 gamereturndata=null;
-gameprefix="webglcarsimheight_shadow";
+gameprefix="webglflightsimheight_shadow";
 var name=formatname(locationname);
 if(name==""){name="unknown"}
 setsearchtxt();
