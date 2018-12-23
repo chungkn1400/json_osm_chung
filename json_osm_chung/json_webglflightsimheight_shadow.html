@@ -1106,6 +1106,7 @@ iways[0]=[];iways[1]=[];iways[2]=[];iways[3]=[];iways[4]=[];iways[5]=[];iways[6]
 var iwaylat=[],iwaylng=[];for(var i=0;i<=6;i++){iwaylat[i]=91;iwaylng[i]=0;};
 var iwaydlat=[],iwaydlng=[];for(var i=0;i<=6;i++){iwaydlat[i]=0;iwaydlng[i]=0;};
 var t100=80;
+var ntower0=0;
 function waycallback(r){//alert(r);
   //msgload("");
   wayjson=JSON.parse(r);
@@ -1140,7 +1141,7 @@ function waycallback(r){//alert(r);
   msg+="len="+ways.length;
   if(ways.length>0){
   for(var i=0;i<ways.length;i++){
-   //var way=(ways[i]);
+   var way=(ways[i]);
    /*msg+="/ "+way.type+" id="+way.id+" "
    waytype="none";
    if(way.tags){if(way.tags.highway){
@@ -1150,10 +1151,11 @@ function waycallback(r){//alert(r);
       //if(i<2){msg+="/"+way.nodes[j];};
 	  nnode+=1;
 	  }*/
-   //if(way.tags){if(way.tags.building){ntower+=1;}}
+   if(way.tags){if(way.tags.building){ntower+=1;}}
    if(ways[i].nodes){nnode+=ways[i].nodes.length;}
    }}
   //alert("nnode="+nnode+" "+msg);
+  ntower0=ntower;
   dtweb=timer()-dtweb;
   setTimeout("getnodes();",t300+t100);
   //if(nnode<7000){setTimeout("getways2();",20);}
@@ -1387,6 +1389,7 @@ else if(ianchorship>=0 && text!="" && tinit>2){context.fillText("wind="+parseInt
 var loading=0,tupdatebuffer=0,klon=1,dtloading=0,dxmax2=1,kdxmax=1,dtgetways=0;
 var trygetways=0,dtweb=0;
 var ilat=0,ilng=0,tilat=0,tautopilot0=0,icos1=1,isin1=0,mylatlon2="";
+var h30=30,h10=10;
 var k4=1.5; 
 function getways(){
 trygetways=1;
@@ -1416,7 +1419,7 @@ if(tinit<4){k=1;kdxmax=0.75+testwater;dxmax2=13;avgfps=1;
 if(k<1 || dtweb>5900){kdxmax-=0.25;}
 else if(k>1.1){kdxmax+=0.25;}
 if(k<0.5){kdxmax-=0.25;}
-kdxmax=Math.max(0.75,Math.min(4,kdxmax));auxvar2=kdxmax;
+kdxmax=Math.max(0.75,Math.min(4,kdxmax));
 //auxvar=kdxmax;auxvar2=nodes.length;
 dxmax=Math.max(19,dxmax2*kdxmax*k4);
 lat=latx+sin1*dxmax/scale;
@@ -1502,10 +1505,12 @@ keyway="(way[building]"+latlon+";way[highway~'motorway|trunk|primary|secondary|t
 //keyway="(way[amenity~'fuel']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 keyway="(way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon2+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon+")";
 var keyway2="way['building:height']"+latlon2+";way['building']['height']"+latlon2+";way['building']['levels']"+latlon2+";way['building:levels']"+latlon2;
-var h30=30,h10=10;
+if(ntower0>40 && h30<50){h30+=6;h10=h30*0.33;}
+if(ntower0<10 && h30>10){h30-=6;h10=h30*0.33;}
 var testheight="(if:(number(t['building:height'])>"+h30+")||(number(t['height'])>"+h30+
                  ")||(number(t['building:levels'])>"+h10+")||(number(t['levels'])>"+h10+"))";
 keyway2="way['building']"+testheight+latlon;//+";node(w)";
+keyway2=keyway2+";way[amenity]"+latlon;
 //keyway2+=";way['building:part'~'yes']"+testheight+latlon;
 keyway="%28"+keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3+"%29";
 keyway=keyway2+";way[amenity~'parking|hospital']"+latlon+";way[natural~'wood|forest']"+latlon+";way[landuse~'forest']"+latlon+";way[building]"+latlon+";way[highway]"+latlon+";way[aeroway~'aerodrome|runway|taxiway']"+latlon3;
@@ -2435,7 +2440,7 @@ var tscroll=0,tscale=0,tscale0=0,tgaz=0,vcruise=0.8;
 var o2sol=0,o3sol=0,vcar0=0,vmx=0,vmy=0,vmz=0;
 var vmx2=0,vmy2=0,vmz2=0,vmxyz0=0,tprop0=0;
 var tcollide=0,zsol=0,troad=0,dtroad=0;
-var o3volant=0,tjoyx=0,tfly=0,iview=0,vrunauto=0,vrunauto0=0,landing=1;
+var o3volant=0,tjoyx=0,tfly=1,iview=1,vrunauto=0,vrunauto0=0,landing=1;
 var winwidth=window.innerWidth-1;
 var winheight=window.innerHeight;
 var timer0=0,timer1=0,dttroad=0,lastz=0,dtinitmap=0;
@@ -5811,7 +5816,6 @@ function drawroofs(){
     //mat4.identity(mvMatrix);
 	mat4.translate(mvMatrix, [0,0,0]);
     var sc=0.5;
-	auxvar3+=1;
     mat4.scale(mvMatrix,[sc,sc,1]);
 	gl.activeTexture(gl.TEXTURE3);
     gl.bindTexture(gl.TEXTURE_2D,  roofTexture);
@@ -6505,9 +6509,9 @@ function drawsky(){
     gl.bindTexture(gl.TEXTURE_2D,  skydomeTexture);
     gl.uniform1i(shader0Program.samplerUniform, 4);
     
-	var aux=1-0.945*Math.abs(12-hour2)/12;
-    var aux2=1-0.93*Math.abs(12-hour2)/12;
-    var aux3=1-0.62*Math.abs(12-hour2)/12;
+	var aux=1-0.945*Math.abs(12-hour2)/20;
+    var aux2=1-0.93*Math.abs(12-hour2)/20;
+    var aux3=1-0.62*Math.abs(12-hour2)/20;
     colorr=1.0*aux3;colorg=1.0*aux;colorb=1.0*aux2;colora=1.0;
     drawcarre2sh0();
 	colorr=1;colorg=1;colorb=1;colora=1;
