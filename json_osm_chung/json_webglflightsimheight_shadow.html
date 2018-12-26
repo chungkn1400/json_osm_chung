@@ -89,13 +89,15 @@ openstreetmap roads to html5 array -->
 <script>
 try{if(localStorage){};}catch(e){localStorage=null;alert("localStorage is not supported");};
 var apikey='&key=AIzaSyAH372ZH8QSQgRHsqdtqNxkLVpcp_XUUkE';
-apikey='AIzaSyApcL5vUfN5urgDmXsHlRbZQ_e3y_4skcU';
+apikey='&key=AIzaSyApcL5vUfN5urgDmXsHlRbZQ_e3y_4skcU';
+var myapikey='AIzaSyApcL5vUfN5urgDmXsHlRbZQ_e3y_4skcU';
 //apikey='&key=AIzaSyB6IVrhJJ9pNpagPZIKyEQYlDHDsoAGusE';
 //put here your google static map apikey (=> https://developers.google.com/maps/documentation/static-maps/get-api-key)
 //to get more than per ip apiusage quota (some thousands to 20 thousands per day) (its free)
 </script>
 <script type="text/javascript" src="gamesave.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3" type="text/javascript" ></script>
+<!--script async defer
+        src="https://maps.googleapis.com/maps/api/js"+apikey+"&callback=initgooglemap" type="text/javascript" ></script-->
 <script type="text/javascript" src='https://code.responsivevoice.org/responsivevoice.js'></script>
 <script src="glMatrix-0.9.5.min.js"></script>
 <script src="webgl-utils.js"></script>
@@ -14755,34 +14757,6 @@ var k=prompt("wind : enter a number 0.0 - 200.0 last="+k0+" km/h")
 if(k){k=Math.max(0,Math.min(200.0,evaln(k)));wind2=k;wind=k;msgload("");}
 if(wind2<=0.01){trygetways=1;trygetweather=1;}
 }
-var geolocation="";
-function geolocate(){
-geolocation = "paris france";
-geolocation=window.prompt("flyto : enter address or location");
-//alert("geolocation="+geolocation);
-if (geolocation.length>0){
-  var geocoder = new google.maps.Geocoder();
-  geocoder.geocode( { 'address': geolocation}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-      var latlng=results[0].geometry.location;
-	  lat=latlng.lat();
-	  lng=latlng.lng();
-	  flytolat=lat;flytolng=lng;flytoname=geolocation;
-	  combolat=lat;combolng=lng;locationname=flytoname;cityname="";
-	  icombo=1;
-	  document.getElementById('combo')[icombo].text=flytoname;
-	  document.getElementById('combo').selectedIndex=icombo;
-      latx0=lat;lngx0=lng;lngsol0=999;
-      latx=lat;lngx=lng;tmap=0;z=-1;
-	  tloadingreverse=timer()+1100;locx=99999;
-      x00=999999;trygetways=1;tinit=0;//getways();
-    } else {
-      alert('Geolocation not found ! ' + status);
-    }
-  });
-}
-document.getElementById('msg').focus();
-}
 try{
 var audioctx = new (window.AudioContext || window.webkitAudioContext)();
 var twebaudio=1;
@@ -15656,6 +15630,38 @@ if(dx<=(1.0-dy)){
 	}
 }
 var map,marker,maplatlng;
+var geolocation="",geocoder;
+function geolocate(){
+geolocation = "paris france";
+geolocation=window.prompt("flyto : enter address or location");
+//alert("geolocation="+geolocation);
+if (geolocation.length>0){
+  //initgooglemap();
+  //showmap();
+  //alert(geocoder);
+  //var geocoder = new google.maps.Geocoder();
+  geocoder.geocode( { 'address': geolocation}, function(results, status) {
+    //alert(status);
+	if (status == google.maps.GeocoderStatus.OK) {
+      var latlng=results[0].geometry.location;
+	  lat=latlng.lat();
+	  lng=latlng.lng();
+	  flytolat=lat;flytolng=lng;flytoname=geolocation;
+	  combolat=lat;combolng=lng;locationname=flytoname;cityname="";
+	  icombo=1;
+	  document.getElementById('combo')[icombo].text=flytoname;
+	  document.getElementById('combo').selectedIndex=icombo;
+      latx0=lat;lngx0=lng;lngsol0=999;
+      latx=lat;lngx=lng;tmap=0;z=-1;
+	  tloadingreverse=timer()+1100;locx=99999;
+      x00=999999;trygetways=1;tinit=0;//getways();
+    } else {
+      alert('Geolocation not found ! ' + status);
+    }
+  });
+}
+document.getElementById('msg').focus();
+}
 function initgooglemap(){
     map=new google.maps.Map(document.getElementById('mapdiv'), {
     center: new google.maps.LatLng(latx,lngx),
@@ -15672,6 +15678,8 @@ function initgooglemap(){
 	lngx=maplatlng.lng();
 	tmap=0;tmousedown=0;tinit=0;trygetways=1;x00=999999;
   });
+  geocoder = new google.maps.Geocoder();
+  //alert(geocoder);
 }
 function updatemarker(){
   marker.setMap(null);
@@ -15954,9 +15962,17 @@ while(hour<0){hour+=24;};
 try{initparms();}catch(e){alert("error initparms()");}
 //getways();
 getweather();timeinit=timer();
-initgooglemap();setTimeout("hidemap();",2000);
+//initgooglemap();
+setTimeout("hidemap();",2000);
 setTimeout("getways();initwebgl();",3000);
 setTimeout('radiomsg("hello,how are you");',4000);
+function initmap(){//alert("ok");
+  initgooglemap();
+  //geolocate();
+}
+</script>
+<script  
+ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyApcL5vUfN5urgDmXsHlRbZQ_e3y_4skcU&callback=initmap">
 </script>
 <script type="text/javascript" src="stats.js">
 </script>
